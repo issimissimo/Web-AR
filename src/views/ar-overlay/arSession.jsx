@@ -13,7 +13,7 @@ import { Container, Centered } from '@components/smallElements'
 
 
 
-import Calibration from './Calibration';
+import Localization from './Localization';
 
 import GAMES_LIST from '@plugin';
 
@@ -51,12 +51,13 @@ export default function ArSession(props) {
     let _gamesInitialized = 0;
 
 
-
-
-
-
     //#region [lifeCycle]
     onMount(() => {
+
+        if (config.debugOnDesktop) {
+            document.getElementsByTagName("body")[0].style.backgroundColor = "black"
+        }
+
 
         // Let's avoid annoying issue that each time I modify something
         // in this code the controller is "undefined", so I have to 
@@ -81,7 +82,9 @@ export default function ArSession(props) {
         });
         // }
 
-        if (props.marker.games.length > 0) loadAllModules();
+        if (props.marker.games.length > 0) {
+            loadAllModules();
+        }
         else setLoading(() => false);
     });
 
@@ -89,7 +92,7 @@ export default function ArSession(props) {
     createEffect(() => {
         console.log("---- Games running:", props.gamesRunning)
         // console.log("---- Games imported:", gamesImported());
-        // console.log("---- Game id selected:", selectedGameId());
+        console.log("---- Game id selected:", selectedGameId());
         // console.log("---- Games initializing:", gamesInitializing());
     })
 
@@ -100,12 +103,11 @@ export default function ArSession(props) {
     */
     async function loadAllModules() {
         if (props.marker.games, length > 0) {
-            
-            setGamesInitializing(() => true);
 
             for (const el of props.marker.games) {
                 if (el.enabled) {
                     // load dynamically the module
+                    setGamesInitializing(() => true);
                     await loadModule(el.id, el.name, true);
                 }
             }
@@ -171,6 +173,7 @@ export default function ArSession(props) {
         if (_gamesInitialized === modules().length) {
             console.log("all games initialized!")
             setGamesInitializing(() => false);
+
 
             // If just one of the game need localization,
             // we need to show the Localization component
@@ -245,6 +248,7 @@ export default function ArSession(props) {
         setSelectedGameId(null);
 
         console.log("GAME TO SAVE:", gameToSave);
+        console.log("GAME DATA TO SAVE:", gameToSave.gameData());
 
         const newGameId = await firebase.firestore.addGame(props.userId, props.marker.id, gameToSave.name);
         console.log('Creato in Firestore il game con ID:', newGameId)
@@ -274,9 +278,6 @@ export default function ArSession(props) {
     * with the function "handleModuleLoaded")
     */
     async function loadModule(moduleId, moduleName, storedOnDatabase, selectOnEnd = false) {
-
-        
-
         const raw = await import(`../../plugin/${moduleName}.jsx`);
         const newModule = {
             id: moduleId,
@@ -285,7 +286,6 @@ export default function ArSession(props) {
             component: raw.default,
         }
         setModules((prev) => [...prev, newModule]);
-
 
         // Select the new game created
         if (selectOnEnd) {
@@ -330,14 +330,16 @@ export default function ArSession(props) {
                                     return <Component
                                         id={item.id}
                                         stored={item.stored}
-                                        selected={item.id === selectedGameId() ? true : false}
+                                        selected={item.id === selectedGameId() &&
+                                            localizationState() !== LOCALIZATION_STATE.REQUIRED ?
+                                            true : false}
                                     />;
                                 }}
                             </For>
 
                             {!gamesInitializing() && (
                                 localizationState() === LOCALIZATION_STATE.REQUIRED ?
-                                    <Calibration
+                                    <Localization
                                         planeFound={props.planeFound}
                                         setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
                                     />

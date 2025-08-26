@@ -1,5 +1,11 @@
-export function getOffsetMatrix(matrixA, matrixB) {
-    const m = matrixA.clone().invert().multiply(matrixB);
+// export function getOffsetMatrix(matrixA, matrixB) {
+//     const m = matrixA.clone().invert().multiply(matrixB);
+//     return m;
+// }
+export function getObjOffsetMatrix(refMatrix, obj) {
+    obj.updateWorldMatrix(true, false);
+    const matrixB = obj.matrix;
+    const m = refMatrix.clone().invert().multiply(matrixB);
     return m;
 }
 export function getGlobalMatrixFromOffsetMatrix(matrixA, matrixB) {

@@ -22,7 +22,7 @@ export default function UI(props) {
             });
             return totalAllowed - nGames;
         }
-        return 0;
+        return totalAllowed;
     }
 
 
@@ -44,37 +44,51 @@ export default function UI(props) {
 
 
 
+
+    const Inventory = () => {
+        return (
+            <>
+                <p>INVENTORY</p>
+
+                {
+                    GAMES_LIST.map(gameSpecs => (
+                        <Button
+                            onClick={() => props.addNewModule("temporaryModuleID", gameSpecs.fileName)}
+                            enabled={getGamesAvailableByName(gameSpecs.fileName) > 0 ? true : false}
+                        >{gameSpecs.title}</Button>
+                    ))
+                }
+
+                <Button
+                    onClick={props.saveGame}
+                    enabled={props.saveEnabled}
+                >SAVE GAME</Button>
+
+            </>
+        )
+    }
+
+
+
+    const renderView = () => {
+
+        switch (context.appMode) {
+
+            case AppMode.SAVE:
+                return <Inventory/>;
+
+            case AppMode.LOAD:
+                return <div></div>
+
+
+        }
+    };
+
+
+
     return (
         <Container>
-
-            {context.appMode === AppMode.SAVE ?
-
-                <>
-
-                    <p>INVENTORY</p>
-
-                    {
-                        GAMES_LIST.map(gameSpecs => (
-                            <Button
-                                onClick={() => props.addNewModule("temporaryModuleID", gameSpecs.fileName)}
-                                enabled={getGamesAvailableByName(gameSpecs.fileName) > 0 ? true : false}
-                            >{gameSpecs.title}</Button>
-                        ))
-                    }
-
-                    <Button
-                        onClick={props.saveGame}
-                        enabled={props.saveEnabled}
-                    >SAVE GAME</Button>
-
-                </>
-
-                :
-
-                <div></div>
-
-            }
-
+           {renderView()}
         </Container>
     )
 }

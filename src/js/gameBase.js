@@ -1,22 +1,22 @@
-import { onMount, createSignal, useContext } from 'solid-js';
+import { onMount, createSignal, useContext, createEffect } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
 import GAMES_LIST from '@plugin';
 import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
 import modelLoader from '@tools/three/modelLoader';
+import { getObjOffsetMatrix, getGlobalMatrixFromOffsetMatrix } from '@tools/three/maths';
 
 
 
 // ===== HOOK BASE =====
 export function useGame(gameName, gameId, config = {}) {
 
-    const context = useContext(Context);
     const firebase = useFirebase();
-
+    const context = useContext(Context);
     const gameDetails = GAMES_LIST.find(g => g.fileName === gameName);
     const gameAssets = [];
+    const [initialized, setInitialized] = createSignal(false);
     const [gameData, setGameData] = createSignal(null);
-
     const loader = new modelLoader();
 
 
@@ -24,10 +24,16 @@ export function useGame(gameName, gameId, config = {}) {
         context.onLoaded(game);
     });
 
+    createEffect(() => {
+        console.log(gameData());
+        if (initialized()){
+            context.onInitialized();
+        }
+    })
 
-    const initialized = () => {
-        context.onInitialized();
-    }
+    // const initialized = () => {
+    //     context.onInitialized();
+    // }
 
     const localizationCompleted = () => {
         return context.localizationCompleted();
@@ -36,12 +42,11 @@ export function useGame(gameName, gameId, config = {}) {
 
 
     // Load game data from Realtime Database
-    const loadGameData = async (gameId, callback = null) => {
+    const loadGameData = async () => {
         try {
             const path = `${context.userId}/markers/${context.markerId}/games/${gameId}`;
             const data = await firebase.realtimeDb.loadData(path);
             setGameData(data);
-            if (callback) callback(data);
         } catch (error) {
             console.error("Errore nel caricamento JSON:", error);
         }
@@ -59,6 +64,7 @@ export function useGame(gameName, gameId, config = {}) {
 
         // add to scene
         SceneManager.scene.add(asset);
+
     }
 
 
@@ -89,7 +95,11 @@ export function useGame(gameName, gameId, config = {}) {
         id: gameId,
         appMode: context.appMode,
         initialized,
+        setInitialized,
         localizationCompleted,
+        referenceMatrix: context.referenceMatrix,
+        getObjOffsetMatrix,
+        getGlobalMatrixFromOffsetMatrix,
         onTap,
         super: { onTap: _onTapBase },
         renderLoop,

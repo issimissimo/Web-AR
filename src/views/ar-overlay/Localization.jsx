@@ -5,7 +5,7 @@ import Reticle from '@js/reticle';
 import { Matrix4 } from 'three';
 
 
-export default function Calibration(props) {
+export default function Localization(props) {
 
     const [difficult, setDifficult] = createSignal(false)
 

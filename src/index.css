@@ -27,8 +27,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  background-color: var(--color-background);
 }
 
 body {
@@ -55,12 +53,6 @@ body {
   padding: 1.5em;
 }
 
-/* #main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-} */
 
 .glass {
   backdrop-filter: blur(4px);
@@ -100,7 +92,7 @@ canvas {
 #backgroundContainer {
   position: relative;
   min-height: 100dvh;
-  /* background-color: var(--color-background); */
+  background-color: var(--color-background);
   overflow: hidden;
   width: 100%;
   display: flex;

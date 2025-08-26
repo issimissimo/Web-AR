@@ -22,7 +22,7 @@ let _hitTestSource = null;
 let _hitTestSourceRequested = false;
 let _isHitting = false;
 let _surfType = null;
-let _hidden = false;
+let _visible = false;
 let _reticleMode = null;
 
 
@@ -184,7 +184,7 @@ const Reticle = {
      * @returns {void}
      */
     update(frame, callback) {
-        if (_hidden) {
+        if (!_visible) {
             _planeMesh.visible = false;
             _circleMesh.visible = false;
             return;
@@ -286,12 +286,12 @@ const Reticle = {
         return _circleMesh.matrixWorld;
     },
 
-    setHidden(value) {
-        _hidden = value;
+    setVisible(value) {
+        _visible = value;
     },
 
-    hidden() {
-        return _hidden;
+    visible() {
+        return _visible;
     },
 
     surfType() {
@@ -301,10 +301,6 @@ const Reticle = {
     setUsePlaneDetection(value) {
         _reticleMode = value ? MODE.PLANE : MODE.FREE;
     },
-
-    usePlaneDetection() {
-        return _reticleMode === MODE.PLANE ? true : false;
-    }
 }
 
 export default Reticle;   

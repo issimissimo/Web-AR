@@ -9,29 +9,47 @@ class modelLoader {
         draco.setDecoderConfig({ type: "js" })
         draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/")
         this.loader.setDRACOLoader(draco)
-        this.mixer = null;
+        this.mixers = [];
         this.clock = null;
         this.gltf = null;
+        this.model = null;
         this._loaded = false;
+    }
+
+    _setupAnimations(model) {
+        if (this.gltf.animations.length > 0) {
+            if (!this.clock) this.clock = new Clock();
+            const mixer = new AnimationMixer(model);
+            this.gltf.animations.forEach((clip) => {
+                const action = mixer.clipAction(clip);
+                action.play();
+
+                // Shift casuale dell’animazione
+                action.time = Math.random() * clip.duration;
+            });
+            this.mixers.push(mixer);
+        }
     }
 
     async load(fileUrl) {
         this.gltf = await this.loader.loadAsync(fileUrl);
-
-        if (this.gltf.animations.length > 0) {
-            this.clock = new Clock();
-            this.mixer = new AnimationMixer(this.gltf.scene);
-            this.gltf.animations.forEach(clip => this.mixer.clipAction(clip).play());
-        }
-
+        this.model = this.gltf.scene;
+        this._setupAnimations(this.model);
         this._loaded = true;
-        return this.gltf;
+        return this.model;
+    }
+
+
+    clone() {
+        const newModel = this.model.clone(true);
+        this._setupAnimations(newModel);
+        return newModel;
     }
 
     animate() {
-        if (this.mixer) {
+        if (this.mixers.length > 0) {
             const dt = this.clock.getDelta();
-            this.mixer.update(dt);
+            this.mixers.forEach(mixer => mixer.update(dt));
         }
         else {
             console.warn("You want to animate an object with NO animations!")

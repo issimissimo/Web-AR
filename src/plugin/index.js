@@ -42,7 +42,7 @@ export const GAMES_LIST = [
         title: 'Fiori che crescono',
         description: 'Posiziona sulle superfici dei fiori che crescono',
         image: '/images/games/backgrounds/vetro.jpg',
-        category: 'placeOnSurface',
+        category: 'game',
         allowed: 1,
         localized: false,
         tags: [],
