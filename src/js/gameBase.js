@@ -25,7 +25,6 @@ export function useGame(gameName, gameId, config = {}) {
     });
 
     createEffect(() => {
-        console.log(gameData());
         if (initialized()){
             context.onInitialized();
         }

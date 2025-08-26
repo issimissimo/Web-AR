@@ -4,6 +4,9 @@ import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4 } from 'three';
 
 
+const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080];
+
+
 export default function Baloons(props) {
 
     /*
@@ -36,7 +39,10 @@ export default function Baloons(props) {
 
         if (props.stored) {
             // Load the game data from RealtimeDB
-            game.loadGameData()
+            await game.loadGameData();
+
+            // loadAllModels();
+
         }
         else {
             game.setGameData(defaultGameData);
@@ -57,7 +63,11 @@ export default function Baloons(props) {
     * On localizationCompleted
     */
     createEffect(() => {
-        // if (game.localizationCompleted()) {
+        if (game.localizationCompleted()) {
+            if (props.stored) {
+                loadAllModels();
+            }
+        }
 
         //     async function waitForGltf() {
         //         while (!game.loader.loaded()) {
@@ -131,11 +141,11 @@ export default function Baloons(props) {
     return (
         <>
             {
-                props.selected && (
+                props.selected && game.initialized() && (
                     <Container>
                         <Title>{game.gameDetails.title}</Title>
                         <Description>{game.gameDetails.description}</Description>
-                        <button onClick={() => spawnModel()}>SPAWN!</button>
+                        <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
                     </Container>
                 )
             }
@@ -148,11 +158,38 @@ export default function Baloons(props) {
     */
 
 
-    function spawnModel() {
+    function loadAllModels() {
+        game.gameData().forEach(assetData => {
+
+            const newModel = game.loader.clone();
+            newModel.matrixAutoUpdate = false;
+
+            // position
+            const offsetMatrix = new Matrix4();
+            offsetMatrix.fromArray(assetData.diffMatrix.elements);
+            const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
+                (game.referenceMatrix, offsetMatrix);
+            newModel.matrix.copy(globalMatrix);
+
+            // color
+            const colorIndex = assetData.color;
+            newModel.traverse((child) => {
+                if (child.isMesh && child.material && child.material.name === "baloon") {
+                    const newModelColor = balloonColors[colorIndex];
+                    child.material = child.material.clone(); // clone per non cambiare il materiale originale
+                    child.material.color = new Color(newModelColor);
+                }
+            });
+
+            game.addToScene(newModel);
+        });
+    }
+
+
+    function spawnModelOnTap() {
 
         if (!game.localizationCompleted() || !game.loader.loaded()) return;
 
-        const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080];
         const newModel = game.loader.clone();
 
         newModel.position.set(
@@ -174,9 +211,6 @@ export default function Baloons(props) {
 
         // Aggiunge il modello alla scena
         game.addToScene(newModel);
-
-        // /// IMPORTANTE!!!!
-        // newModel.updateMatrix(); // TODO spostarlo che venga fatto in automatico!
 
         const newModelMatrix = newModel.matrix;
         console.log("NEW MATRIX:", newModelMatrix)
