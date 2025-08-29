@@ -18,7 +18,7 @@ export default function EnvLight(props) {
         },
 
         renderLoop: () => {
-            
+
         }
     });
 
@@ -41,10 +41,9 @@ export default function EnvLight(props) {
         // console.log("stored:", props.stored);
         // console.log("DETAILS:", game.gameDetails)
 
-
         if (props.stored) {
             // Load the game data from RealtimeDB
-            game.loadGameData(props.id)
+            game.loadGameData()
         }
         else {
             // Set default gameData
@@ -76,9 +75,9 @@ export default function EnvLight(props) {
             SceneManager.scene.remove(SceneManager.light);
 
             /*
-            * Don't forget to call "game.initialized()" at finish 
+            * Don't forget to call "game.setInitialized(true)" at finish 
             */
-            game.initialized();
+            game.setInitialized(true)
         });
     }
 
@@ -106,27 +105,30 @@ export default function EnvLight(props) {
         text-align: center;
     `
 
-  
+
 
     /*
     * RENDER
     */
     return (
-        props.selected ?
-        
-        <Container>
-            <Title>{game.gameDetails.title}</Title>
-            <Description>{game.gameDetails.description}</Description>
-            {/* <Button
+        <>
+            {
+                props.selected && game.initialized() && (
+
+                    <Container>
+                        <Title>{game.gameDetails.title}</Title>
+                        <Description>{game.gameDetails.description}</Description>
+                        {/* <Button
                 onClick={() => game.saveGame(gameData)}
             >Test salva game e dati</Button> */}
-            {/* <Button
+                        {/* <Button
                 onClick={() => game.loadData(props.id, (data) => setGameData(() => data))}
             >Test carica dati</Button> */}
-        </Container>
+                    </Container>
 
-        :
-        <div/>
+                )
+            }
+        </>
     );
 
 }

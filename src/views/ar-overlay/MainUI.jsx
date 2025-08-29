@@ -8,7 +8,7 @@ import { AppMode } from '@/main';
 import GAMES_LIST from '@plugin';
 
 
-export default function UI(props) {
+export default function MainUI(props) {
 
     const context = useContext(Context);
 
@@ -68,6 +68,8 @@ export default function UI(props) {
         )
     }
 
+
+    
 
 
     const renderView = () => {

@@ -265,6 +265,76 @@ const Reticle = {
         }
     },
 
+    destroy() {
+        // Cleanup della planeMesh e dei suoi children
+        if (_planeMesh) {
+            // Rimuovi dalla scena
+            if (_scene) {
+                _scene.remove(_planeMesh);
+            }
+
+            // Cleanup del _reticleLookAt se presente
+            if (_reticleLookAt) {
+                _planeMesh.remove(_reticleLookAt);
+                if (_reticleLookAt.geometry) _reticleLookAt.geometry.dispose();
+                if (_reticleLookAt.material) _reticleLookAt.material.dispose();
+                _reticleLookAt = null;
+            }
+
+            // Dispose della geometria e materiale della planeMesh
+            if (_planeMesh.geometry) _planeMesh.geometry.dispose();
+            if (_planeMesh.material) {
+                if (Array.isArray(_planeMesh.material)) {
+                    _planeMesh.material.forEach(material => material.dispose());
+                } else {
+                    _planeMesh.material.dispose();
+                }
+            }
+            _planeMesh = null;
+        }
+
+        // Cleanup della circleMesh
+        if (_circleMesh) {
+            // Rimuovi dalla camera
+            if (_camera) {
+                _camera.remove(_circleMesh);
+            }
+
+            // Dispose della geometria e materiale
+            if (_circleMesh.geometry) _circleMesh.geometry.dispose();
+            if (_circleMesh.material) _circleMesh.material.dispose();
+            _circleMesh = null;
+        }
+
+        // Cleanup della geometria _geomLookAt
+        if (_geomLookAt) {
+            _geomLookAt.dispose();
+            _geomLookAt = null;
+        }
+
+        // Cleanup dell'hit test source
+        if (_hitTestSource) {
+            // Non c'è un metodo dispose esplicito per hitTestSource,
+            // ma resettiamo la variabile
+            _hitTestSource = null;
+        }
+
+        // Reset di tutte le variabili di stato
+        _hitTestSourceRequested = false;
+        _isHitting = false;
+        _surfType = null;
+        _visible = false;
+        _reticleMode = null;
+        _initialized = false;
+
+        // Reset dei riferimenti
+        _renderer = null;
+        _scene = null;
+        _camera = null;
+
+        console.log("Reticle destroyed successfully");
+    },
+
     initialized() {
         return _initialized;
     },

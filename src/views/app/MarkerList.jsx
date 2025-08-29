@@ -228,7 +228,7 @@ const MarkersList = (props) => {
           <Button
             active={true}
             icon={faPlus}
-            border={markers().length === 0 ? true : false}
+            // border={markers().length === 0 ? true : false}
             onClick={() => props.onCreateNewMarker()}
           >Crea nuovo
           </Button>

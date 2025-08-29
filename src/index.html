@@ -8,8 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- loader -->
-  <script src="/utils/loader/loader.js"></script>
-  <link href="/utils/loader/loader.css" rel="stylesheet">
+  <!-- <script src="/utils/loader/loader.js"></script> -->
+  <!-- <link href="/utils/loader/loader.css" rel="stylesheet"> -->
+  <link rel="preload" href="/utils/loader/loader.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
   <!-- <script src="https://launchar.app/sdk/v1?key=VGzctezQqpavQxnTXtegZVxXGkjMRfRt&redirect=true"></script> -->
 
@@ -40,6 +41,8 @@
   <div id="app"></div>
   <div id="ar-overlay"></div>
 
+  <!-- spinner -->
+  <script src="/utils/loader/loader.js"></script>
 
   <!-- launch -->
   <script>

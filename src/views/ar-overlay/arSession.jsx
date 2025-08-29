@@ -5,7 +5,7 @@ import { Matrix4 } from 'three';
 import { styled } from 'solid-styled-components';
 
 // Main components
-import UI from './UI';
+import MainUI from './MainUI';
 
 import Header from '@components/Header';
 import Loader from '@components/Loader';
@@ -17,10 +17,12 @@ import Localization from './Localization';
 
 import GAMES_LIST from '@plugin';
 
+import { AppMode } from '@/main';
+
 
 // XR
 import SceneManager from '@js/sceneManager';
-
+import Reticle from '@js/reticle';
 
 
 
@@ -59,13 +61,6 @@ export default function ArSession(props) {
         }
 
 
-        // Let's avoid annoying issue that each time I modify something
-        // in this code the controller is "undefined", so I have to 
-        // reload everything!
-        // if (typeof SceneManager.controller === "undefined") {
-        //     console.warn("The SceneManager.controller is UNDEFINED! Probably you have just updated something in arSession.jsx!")
-        // }
-        // else {
 
         // On TAP on screen
         // event listener
@@ -80,8 +75,8 @@ export default function ArSession(props) {
             // Call onTap function of all the gamesRunning
             props.gamesRunning.forEach((el) => el.onTap());
         });
-        // }
-
+       
+        // Load games of this marker
         if (props.marker.games.length > 0) {
             loadAllModules();
         }
@@ -344,7 +339,7 @@ export default function ArSession(props) {
                                         setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
                                     />
                                     :
-                                    <UI
+                                    <MainUI
                                         marker={props.marker}
                                         addNewModule={(id, name) => loadModule(id, name, false, true)}
                                         saveEnabled={selectedGameId() !== null ? true : false}

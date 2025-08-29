@@ -138,25 +138,53 @@ export default function Baloons(props) {
     /*
     * RENDER
     */
+    //#region [render]
+
+
+    const AuthorUI = () => {
+        return (
+            <Container>
+                <Title>{game.gameDetails.title}</Title>
+                <Description>{game.gameDetails.description}</Description>
+                <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+            </Container>
+        )
+    }
+
+
+    const UserUI = () => {
+        return (
+            <div></div>
+        )
+    }
+
+
+
+
+
     return (
         <>
             {
                 props.selected && game.initialized() && (
-                    <Container>
-                        <Title>{game.gameDetails.title}</Title>
-                        <Description>{game.gameDetails.description}</Description>
-                        <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
-                    </Container>
+                    (() => {
+                        switch (game.appMode) {
+                            case game.AppMode.SAVE:
+                                return <AuthorUI />;
+                            case game.AppMode.LOAD:
+                                return <UserUI />;
+                        }
+                    })()
                 )
             }
         </>
     );
 
 
+
     /*
     * FUNCTIONS
     */
-
+    //#region [functions]
 
     function loadAllModels() {
         game.gameData().forEach(assetData => {

@@ -5,6 +5,12 @@ import Reticle from '@js/reticle';
 import { Matrix4 } from 'three';
 
 
+const VIEWS = {
+    SEARCHING: 'searching',
+    TARGETING: 'targeting'
+}
+
+
 export default function Localization(props) {
 
     const [difficult, setDifficult] = createSignal(false)

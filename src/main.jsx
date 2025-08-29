@@ -299,8 +299,9 @@ export default function Main() {
      * go back to 1st screen
      */
     const handleReset = () => {
-        setupMarker();
+        if (Reticle.initialized()) Reticle.destroy();
         SceneManager.destroy();
+        setupMarker();
         setGamesRunning(() => []);
         setBackgroundVisible(true);
         if (currentAppMode() === AppMode.SAVE) goToMarkerList();

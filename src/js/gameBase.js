@@ -1,6 +1,7 @@
 import { onMount, createSignal, useContext, createEffect } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
 import GAMES_LIST from '@plugin';
+import { AppMode } from '@/main';
 import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
 import modelLoader from '@tools/three/modelLoader';
@@ -29,10 +30,6 @@ export function useGame(gameName, gameId, config = {}) {
             context.onInitialized();
         }
     })
-
-    // const initialized = () => {
-    //     context.onInitialized();
-    // }
 
     const localizationCompleted = () => {
         return context.localizationCompleted();
