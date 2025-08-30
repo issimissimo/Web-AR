@@ -1,6 +1,6 @@
 import { onMount, createSignal, useContext, createEffect } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
-import PLUGINS_LIST from '@plugins';
+import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 import { AppMode } from '@/main';
 import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
@@ -26,7 +26,7 @@ export function useGame(gameName, gameId, config = {}) {
     });
 
     createEffect(() => {
-        if (initialized()){
+        if (initialized()) {
             context.onInitialized();
         }
     })

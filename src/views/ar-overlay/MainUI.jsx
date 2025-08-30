@@ -5,7 +5,7 @@ import { styled } from 'solid-styled-components';
 import { Context } from '@views/ar-overlay/arSession';
 import { AppMode } from '@/main';
 
-import PLUGINS_LIST from '@plugins';
+import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 
 
 export default function MainUI(props) {

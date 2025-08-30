@@ -77,4 +77,3 @@ export const PLUGINS_LIST = [
     },
 ];
 
-export default PLUGINS_LIST

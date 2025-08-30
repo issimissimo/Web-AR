@@ -6,6 +6,8 @@ import { styled } from 'solid-styled-components';
 
 // Main components
 import MainUI from './MainUI';
+import Localization from './Localization';
+import Inventory from './Inventory';
 
 import Header from '@components/Header';
 import Loader from '@components/Loader';
@@ -13,9 +15,9 @@ import { Container, Centered } from '@components/smallElements'
 
 
 
-import Localization from './Localization';
 
-import PLUGINS_LIST from '@plugins';
+
+import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 
 import { AppMode } from '@/main';
 
@@ -75,7 +77,7 @@ export default function ArSession(props) {
             // Call onTap function of all the gamesRunning
             props.gamesRunning.forEach((el) => el.onTap());
         });
-       
+
         // Load games of this marker
         if (props.marker.games.length > 0) {
             loadAllModules();
@@ -339,6 +341,7 @@ export default function ArSession(props) {
                                         setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
                                     />
                                     :
+                                    props.appMode === AppMode.SAVE &&
                                     <MainUI
                                         marker={props.marker}
                                         addNewModule={(id, name) => loadModule(id, name, false, true)}

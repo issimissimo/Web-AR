@@ -12,7 +12,7 @@ import ButtonSecondary from '@components/ButtonSecondary';
 import Toggle from '@components/toggle';
 import Message from '@components/Message';
 
-import PLUGINS_LIST from '@plugins';
+import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 
 import Fa from 'solid-fa';
 import { faSave, faQrcode, faPuzzlePiece, faTrash, faDownload } from "@fortawesome/free-solid-svg-icons";
