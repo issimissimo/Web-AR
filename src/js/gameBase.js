@@ -1,6 +1,6 @@
 import { onMount, createSignal, useContext, createEffect } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
-import GAMES_LIST from '@plugin';
+import PLUGINS_LIST from '@plugins';
 import { AppMode } from '@/main';
 import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
@@ -14,7 +14,7 @@ export function useGame(gameName, gameId, config = {}) {
 
     const firebase = useFirebase();
     const context = useContext(Context);
-    const gameDetails = GAMES_LIST.find(g => g.fileName === gameName);
+    const gameDetails = PLUGINS_LIST.find(g => g.fileName === gameName);
     const gameAssets = [];
     const [initialized, setInitialized] = createSignal(false);
     const [gameData, setGameData] = createSignal(null);

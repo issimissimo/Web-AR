@@ -5,7 +5,7 @@ import { styled } from 'solid-styled-components';
 import { Context } from '@views/ar-overlay/arSession';
 import { AppMode } from '@/main';
 
-import GAMES_LIST from '@plugin';
+import PLUGINS_LIST from '@plugins';
 
 
 export default function MainUI(props) {
@@ -13,7 +13,7 @@ export default function MainUI(props) {
     const context = useContext(Context);
 
     const getGamesAvailableByName = (gameName) => {
-        const gameSpecs = GAMES_LIST.find(g => g.fileName === gameName);
+        const gameSpecs = PLUGINS_LIST.find(g => g.fileName === gameName);
         const totalAllowed = gameSpecs.allowed;
         let nGames = 0;
         if (props.marker.games) {
@@ -51,7 +51,7 @@ export default function MainUI(props) {
                 <p>INVENTORY</p>
 
                 {
-                    GAMES_LIST.map(gameSpecs => (
+                    PLUGINS_LIST.map(gameSpecs => (
                         <Button
                             onClick={() => props.addNewModule("temporaryModuleID", gameSpecs.fileName)}
                             enabled={getGamesAvailableByName(gameSpecs.fileName) > 0 ? true : false}

@@ -10,7 +10,7 @@ import UI from './UI';
 import { Context } from '@plugin/common';
 import Calibration from '@plugin/calibration';
 
-import GAMES_LIST from '@plugin';
+import PLUGINS_LIST from '@plugin';
 
 
 // XR
@@ -220,7 +220,7 @@ export default function ArSession(props) {
         setComponentsLoaded((prev) => [...prev, loadedComponent]);
 
 
-        const gameSpecs = GAMES_LIST.find(g => g.fileName === componentName);
+        const gameSpecs = PLUGINS_LIST.find(g => g.fileName === componentName);
         console.log(gameSpecs)
     }
 

@@ -29,7 +29,7 @@ export default defineConfig({
       '@js': resolve(__dirname, './src/js'),
       '@tools': resolve(__dirname, './src/tools'),
       '@hooks': resolve(__dirname, './src/hooks'),
-      '@plugin': resolve(__dirname, './src/plugin'),
+      '@plugins': resolve(__dirname, './src/plugins'),
     }
   }
 });

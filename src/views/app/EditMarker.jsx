@@ -12,7 +12,7 @@ import ButtonSecondary from '@components/ButtonSecondary';
 import Toggle from '@components/toggle';
 import Message from '@components/Message';
 
-import GAMES_LIST from '@plugin';
+import PLUGINS_LIST from '@plugins';
 
 import Fa from 'solid-fa';
 import { faSave, faQrcode, faPuzzlePiece, faTrash, faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -274,7 +274,7 @@ const EditMarker = (props) => {
     };
 
     const getGameTitle = (gameName) => {
-      const gameSpecs = GAMES_LIST.find(g => g.fileName === gameName);
+      const gameSpecs = PLUGINS_LIST.find(g => g.fileName === gameName);
       return gameSpecs.title;
     }
 

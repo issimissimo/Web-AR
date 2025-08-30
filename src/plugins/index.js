@@ -1,10 +1,10 @@
 /*
-* ===== PLUGIN CATEGORIES =====
+* ===== PLUGINS CATEGORIES =====
 * This list should be NEVER modified!
 * Only if you need a new category
 */
 
-export const PLUGIN_CATEGORIES = [
+export const PLUGINS_CATEGORIES = [
     {
         name: "Luci",
         icon: "/icons/Category_luci.svg"
@@ -26,11 +26,11 @@ export const PLUGIN_CATEGORIES = [
 
 
 /*
-* ===== PLUGIN LIST =====
+* ===== PLUGINS LIST =====
 * This list MUST be modified when you add (or delete) plugins
 */
 
-export const GAMES_LIST = [
+export const PLUGINS_LIST = [
     {
         fileName: "envLight",
         title: "Luce HDRI",
@@ -77,4 +77,4 @@ export const GAMES_LIST = [
     },
 ];
 
-export default GAMES_LIST
+export default PLUGINS_LIST

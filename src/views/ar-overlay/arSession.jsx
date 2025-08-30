@@ -15,7 +15,7 @@ import { Container, Centered } from '@components/smallElements'
 
 import Localization from './Localization';
 
-import GAMES_LIST from '@plugin';
+import PLUGINS_LIST from '@plugins';
 
 import { AppMode } from '@/main';
 
@@ -177,7 +177,7 @@ export default function ArSession(props) {
             for (let i = 0; i < props.gamesRunning.length; i++) {
                 const _game = props.gamesRunning[i];
 
-                const gameSpecs = GAMES_LIST.find(g => g.fileName === _game.name);
+                const gameSpecs = PLUGINS_LIST.find(g => g.fileName === _game.name);
                 if (gameSpecs.localized && localizationState() !== LOCALIZATION_STATE.COMPLETED) {
 
                     // Hide all the meshes of all the games
@@ -273,7 +273,7 @@ export default function ArSession(props) {
     * with the function "handleModuleLoaded")
     */
     async function loadModule(moduleId, moduleName, storedOnDatabase, selectOnEnd = false) {
-        const raw = await import(`../../plugin/${moduleName}.jsx`);
+        const raw = await import(`../../plugins/${moduleName}.jsx`);
         const newModule = {
             id: moduleId,
             name: moduleName,

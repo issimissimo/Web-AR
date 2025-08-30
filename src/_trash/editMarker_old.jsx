@@ -8,7 +8,7 @@ import { Button, BUTTON_MODE, ArButtonContainer, BackButton } from '@/ui';
 import { faTrashAlt, faSave } from '@fortawesome/free-solid-svg-icons';
 
 // Games
-import { GAMES_LISTING } from '@games/common';
+import { PLUGINS_LISTING } from '@games/common';
 
 
 export default function EditMarker(props) {
@@ -46,7 +46,7 @@ export default function EditMarker(props) {
 
           const fileName = el.name;
 
-          const game = GAMES_LISTING.find(g => g.fileName === fileName);
+          const game = PLUGINS_LISTING.find(g => g.fileName === fileName);
           const title = game?.title || '';
           const description = game?.description || '';
           const allowed = game?.allowed;
