@@ -4,8 +4,13 @@ import { styled } from "solid-styled-components"
 const BlurredCover = (props) => {
 
     const BlurredContainer = styled(Motion)`
-    position: absolute;
-    pointer-events: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: -1;
   `;
 
     // valori animazione "in" (entrata)
@@ -26,11 +31,6 @@ const BlurredCover = (props) => {
 
     return (
         <BlurredContainer
-            style={{
-                position: "absolute",
-                width: "100%",
-                height: "100dvh",
-            }}
             animate={props.direction === "in" ? animIn : animOut}
             transition={{ duration: 1, easing: "ease-in-out", delay: 0 }}
             initial={false}

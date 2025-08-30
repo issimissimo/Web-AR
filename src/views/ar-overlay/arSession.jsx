@@ -11,6 +11,7 @@ import Inventory from './Inventory';
 
 import Header from '@components/Header';
 import Loader from '@components/Loader';
+import BlurredCover from '@components/BlurredCover';
 import { Container, Centered } from '@components/smallElements'
 
 
@@ -50,6 +51,7 @@ export default function ArSession(props) {
     const [modules, setModules] = createSignal([]);
     const [gamesInitializing, setGamesInitializing] = createSignal(false);
     const [selectedGameId, setSelectedGameId] = createSignal(null);
+    const [blurVisible, setBlurVisible] = createSignal(false);
 
     let _tapEnabled = true;
     let _gamesInitialized = 0;
@@ -291,6 +293,12 @@ export default function ArSession(props) {
     }
 
 
+    const handleSetBlurVisible = (inventoryVisible) => {
+        // TODO - gestire anche Localization!
+        setBlurVisible(()=> inventoryVisible);
+    }
+
+
     const Main = styled('div')`
           position: absolute;
           top: 0;
@@ -318,6 +326,8 @@ export default function ArSession(props) {
             localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED
         }}>
             <Main id="arSession">
+
+                <BlurredCover direction={blurVisible() ? "in" : "out"} />
 
                 {/* HEADER */}
                 <Header
@@ -357,6 +367,7 @@ export default function ArSession(props) {
                                         addNewModule={(id, name) => loadModule(id, name, false, true)}
                                         saveEnabled={selectedGameId() !== null ? true : false}
                                         saveGame={handleSaveSelectedGame}
+                                        onToggleUi={(showed) => handleSetBlurVisible(showed)}
                                     />
                             )}
                         </>

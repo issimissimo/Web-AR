@@ -235,6 +235,11 @@ const Inventory = (props) => {
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null);
     const [visible, setVisible] = createSignal(false);
 
+    const handleSetVisible = () => {
+        setVisible(() => !visible());
+        props.onToggleUi(visible());
+    }
+
     const InventoryContainer = styled('div')`
       flex: 1;
       display: flex;
@@ -271,11 +276,7 @@ const Inventory = (props) => {
 
 
     return (
-
-
-
         <InventoryContainer id="InventoryContainer">
-
 
             <CategoriesPicker
                 visible={visible()}
@@ -283,7 +284,6 @@ const Inventory = (props) => {
                 onCategoryPicked={(name) => handleCategorySelected(name)}
             >
             </CategoriesPicker>
-
 
             <InventoryItemsContainer>
                 {
@@ -302,20 +302,17 @@ const Inventory = (props) => {
                 }
             </InventoryItemsContainer>
 
-
             <Button
                 active={true}
                 icon={!visible() ? faPlus : faXmark}
                 border={!visible()}
                 background={visible() && 'transparent'}
-                onClick={() => setVisible(() => !visible())}
+                onClick={handleSetVisible}
             >
                 {!visible() ? "Aggiungi" : "Chiudi"}
             </Button>
 
         </InventoryContainer>
-
-
     )
 }
 
