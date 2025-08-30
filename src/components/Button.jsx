@@ -7,14 +7,14 @@ const StyledButton = styled(Motion.button)`
   display: ${props => props.visible ? 'block' : 'none'};
   width: 100%;
   flex-shrink: 0;
-  padding: ${props => props.small ? "0" : "0.7rem"};
+  padding: ${props => props.small ? "0.4rem" : "0.7rem"};
   font-size: ${props => props.small ? "small" : "1rem"};
   font-weight: 500;
   font-family: inherit;
   border-radius: 90px;
-  background: var(--color-background);
-  border: ${props => props.border ? (props.small ? "1px solid" : "2px solid") : "none"};
-  border-color: ${props => props.grey ? 'var(--color-grey)' : 'var(--color-primary)'};
+  background: ${props => props.background ? props.background : 'var(--color-background)'};
+  border: ${props => props.border ? (props.small ? "1px solid" : "2px solid") : "2px solid"};
+  border-color: ${props => props.border ? (props.grey ? 'var(--color-grey)' : 'var(--color-primary)') : 'transparent'};
   pointer-events: ${props => props.active ? 'auto' : 'none'};
   color: ${props => props.grey ? 'var(--color-grey)' : 'var(--color-primary)'};
   box-shadow: none;
@@ -24,8 +24,6 @@ const StyledButton = styled(Motion.button)`
   transition: background 0.05s, color 0.05s;
   &:focus {
     outline: none;
-    border-color: ${props => props.grey ? 'var(--color-grey)' : 'var(--color-primary)'};
-    background: var(--color-background);
   }
   &:active {
     background: ${props => props.grey ? 'var(--color-grey-dark)' : 'var(--color-primary-dark)'};

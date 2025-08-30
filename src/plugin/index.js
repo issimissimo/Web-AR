@@ -1,6 +1,33 @@
 /*
-* ===== GAMES LIST =====
-* This list must be modified to add (or delete) games
+* ===== PLUGIN CATEGORIES =====
+* This list should be NEVER modified!
+* Only if you need a new category
+*/
+
+export const PLUGIN_CATEGORIES = [
+    {
+        name: "Luci",
+        icon: "/icons/Category_luci.svg"
+    },
+    {
+        name: "3D",
+        icon: "/icons/Category_3D.svg"
+    },
+    {
+        name: "Giochi",
+        icon: "/icons/Category_giochi.svg"
+    },
+    {
+        name: "Custom",
+        icon: "/icons/Category_custom.svg"
+    },
+]
+
+
+
+/*
+* ===== PLUGIN LIST =====
+* This list MUST be modified when you add (or delete) plugins
 */
 
 export const GAMES_LIST = [
