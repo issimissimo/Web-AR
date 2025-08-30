@@ -398,7 +398,7 @@ export default function Main() {
 
 
     return (
-        <Container>
+        <Container id="mainContainer">
             {renderView()}
         </Container>
     );

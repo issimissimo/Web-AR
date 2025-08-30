@@ -2,7 +2,7 @@ import { onMount, createSignal } from 'solid-js';
 import { styled } from "solid-styled-components";
 import { Motion } from 'solid-motionone';
 
-import { Container, FitHeightScrollable } from '@components/smallElements'
+import { Container, FitHeight, FitHeightScrollable } from '@components/smallElements'
 import Button from '@components/button';
 import ButtonSecondary from '@components/ButtonSecondary';
 import SvgIcon from '@components/SvgIcon';
@@ -111,9 +111,13 @@ const CategoriesPicker = (props) => {
 
 const InventoryItem = (props) => {
 
+    onMount(() => {
+        console.log("MMMMMMMMMMMMM")
+    })
+
     const ItemContainer = styled(Motion.div)`
       margin-top: 2rem;
-      margin-bottom: 2rem;
+      /* margin-bottom: 2rem; */
     `;
 
 
@@ -244,8 +248,10 @@ const Inventory = (props) => {
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null);
     const [visible, setVisible] = createSignal(false);
 
-    const InventoryContainer = styled(Container)`
-      position: absolute;
+    const InventoryContainer = styled('div')`
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     `;
 
     const InventoryItemsContainer = styled(FitHeightScrollable)`
@@ -254,77 +260,74 @@ const Inventory = (props) => {
 
     onMount(() => {
         setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
+        console.log(PLUGINS_LIST)
     })
 
     const handleCategorySelected = (categoryName) => {
         setCurrentCategoryName(() => categoryName);
     }
 
-    const handleSetVisible = () => {
-        setVisible(true);
+    const getPluginsAvailableByName = (pluginName) => {
+        const pluginSpecs = PLUGINS_LIST.find(g => g.fileName === pluginName);
+        const totalAllowed = pluginSpecs.allowed;
+        let nGames = 0;
+        if (props.marker.games) {
+            props.marker.games.map(game => {
+                if (game.name === gameName) nGames++;
+            });
+            return totalAllowed - nGames;
+        }
+        return totalAllowed;
     }
+
+
 
     return (
 
-        <>
-
-            {/* Sfondo */}
-            <div
-                style={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                        "url('foto.jpg') center/cover no-repeat",
-                }}
-            />
-
-            <BlurredCover direction={visible() ? "in" : "out"} />
 
 
+        <InventoryContainer id="InventoryContainer">
 
 
-            <InventoryContainer id="InventoryContainer">
+            <CategoriesPicker
+                visible={visible()}
+                currentCategoryName={currentCategoryName()}
+                onCategoryPicked={(name) => handleCategorySelected(name)}
+            >
+            </CategoriesPicker>
 
 
-                <CategoriesPicker
-                    visible={visible()}
-                    currentCategoryName={currentCategoryName()}
-                    onCategoryPicked={(name) => handleCategorySelected(name)}
-                >
-                </CategoriesPicker>
+            <InventoryItemsContainer>
+                {
+                    visible() &&
+                    PLUGINS_LIST.map(plugin => (
+                        plugin.category === currentCategoryName() &&
+                        <InventoryItem
+                            enabled={plugin.allowed > 0 ? true : false}
+                            used={false}
+                            title={plugin.title}
+                            description={plugin.description}
+                            icon={plugin.icon}
+                            localizationRequired={plugin.localized}
+                        />
+                    ))
+                }
+            </InventoryItemsContainer>
 
 
-                <InventoryItemsContainer>
-                    {
-                        visible() &&
-                        PLUGINS_LIST.map(game => (
-                            game.category === currentCategoryName() &&
-                            <InventoryItem
-                                enabled={true}
-                                used={true}
-                                title={game.title}
-                                description={game.description}
-                                icon={"/icons/SVG/360.svg"}
-                                localizationRequired={true}
-                            />
-                        ))
-                    }
-                </InventoryItemsContainer>
+            <Button
+                active={true}
+                icon={!visible() ? faPlus : faXmark}
+                border={!visible()}
+                background={visible() && 'transparent'}
+                onClick={() => setVisible(() => !visible())}
+            >
+                {!visible() ? "Aggiungi" : "Chiudi"}
+            </Button>
+
+        </InventoryContainer>
 
 
-                <Button
-                    active={true}
-                    icon={!visible() ? faPlus : faXmark}
-                    border={!visible()}
-                    background={visible() && 'transparent'}
-                    onClick={() => setVisible(() => !visible())}
-                >
-                    {!visible() ? "Aggiungi" : "Chiudi"}
-                </Button>
-
-            </InventoryContainer>
-
-        </>
     )
 }
 

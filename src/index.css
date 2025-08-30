@@ -71,6 +71,8 @@ canvas {
 }
 
 #ar-overlay {
+  /* padding: 1.5em;
+  box-sizing: border-box; */
   /* display: flex; */
   /* flex-direction: column; */
   /* width: 100%; */

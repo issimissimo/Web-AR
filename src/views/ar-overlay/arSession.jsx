@@ -291,7 +291,17 @@ export default function ArSession(props) {
     }
 
 
-
+    const Main = styled('div')`
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          flex-direction: column;
+          padding: 1.5em;
+          box-sizing: border-box;
+        `;
 
 
 
@@ -307,7 +317,7 @@ export default function ArSession(props) {
             referenceMatrix: referenceMatrix(),
             localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED
         }}>
-            <Container id="arSession">
+            <Main id="arSession">
 
                 {/* HEADER */}
                 <Header
@@ -342,7 +352,7 @@ export default function ArSession(props) {
                                     />
                                     :
                                     props.appMode === AppMode.SAVE &&
-                                    <MainUI
+                                    <Inventory
                                         marker={props.marker}
                                         addNewModule={(id, name) => loadModule(id, name, false, true)}
                                         saveEnabled={selectedGameId() !== null ? true : false}
@@ -351,7 +361,7 @@ export default function ArSession(props) {
                             )}
                         </>
                 }
-            </Container>
+            </Main>
         </Context.Provider>
     );
 }
