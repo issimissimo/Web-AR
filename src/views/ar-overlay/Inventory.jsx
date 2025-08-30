@@ -45,7 +45,7 @@ const CategoryItem = (props) => {
     `;
 
     const CategoryName = styled('p')`
-        font-size: x-small;
+        font-size: 0.7rem;
     `;
 
     const BorderBottomBar = styled(Motion.div)`
@@ -111,11 +111,8 @@ const CategoriesPicker = (props) => {
 
 const InventoryItem = (props) => {
 
-    onMount(() => {
-        console.log("MMMMMMMMMMMMM")
-    })
 
-    const ItemContainer = styled(Motion.div)`
+const ItemContainer = styled(Motion.div)`
       margin-top: 2rem;
       /* margin-bottom: 2rem; */
     `;
@@ -174,13 +171,7 @@ const InventoryItem = (props) => {
 
                 <ItemIconContainer>
 
-
-
-                    {/* <ItemIcon src="/icons/SVG/360.svg"/> */}
-
                     <SvgIcon src={props.icon} size={40} color={'var(--color-secondary)'} />
-
-
 
                 </ItemIconContainer>
 
@@ -191,19 +182,21 @@ const InventoryItem = (props) => {
             </ItemHeader>
 
 
-
+            
             <ItemContent>
                 <ItemDescription>
                     {props.description}
                 </ItemDescription>
 
-                {props.localizationRequired && props.enabled && !props.used &&
+
+
+                {props.enabled && props.available && props.localizationRequired &&
                     <SpecsContainer>
                         <Fa icon={faLocationCrosshairs} size="1x" translateX={0} class="icon" />
                         Richiede localizzazione
                     </SpecsContainer>
                 }
-                {props.used &&
+                {!props.available &&
                     <SpecsContainer>
                         <Fa icon={faCheck} size="1x" translateX={0} class="icon" />
                         Aggiunto
@@ -215,7 +208,10 @@ const InventoryItem = (props) => {
                         Non disponibile
                     </SpecsContainer>
                 }
-                {props.enabled && !props.used &&
+
+
+
+                {props.enabled && props.available &&
                     <Button
                         style={{ "margin-top": "1rem" }}
                         active={true}
@@ -225,16 +221,7 @@ const InventoryItem = (props) => {
                         <Fa icon={faPlus} size="1x" translateX={1} class="icon" />
                     </Button>
                 }
-                {props.enabled && props.used &&
-                    <ButtonSecondary
-                        style={{ "margin-top": "1rem" }}
-                        active={true}
-                        small={true}
-                    // onClick={handleModifyMarker}
-                    >Rimuovi
-                        <Fa icon={faTrash} size="1x" translateX={1} class="icon" />
-                    </ButtonSecondary>
-                }
+               
             </ItemContent>
 
         </ItemContainer>
@@ -270,10 +257,11 @@ const Inventory = (props) => {
     const getPluginsAvailableByName = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find(g => g.fileName === pluginName);
         const totalAllowed = pluginSpecs.allowed;
+        console.log("totalAllowed:", totalAllowed)
         let nGames = 0;
         if (props.marker.games) {
             props.marker.games.map(game => {
-                if (game.name === gameName) nGames++;
+                if (game.name === pluginName) nGames++;
             });
             return totalAllowed - nGames;
         }
@@ -304,7 +292,7 @@ const Inventory = (props) => {
                         plugin.category === currentCategoryName() &&
                         <InventoryItem
                             enabled={plugin.allowed > 0 ? true : false}
-                            used={false}
+                            available={getPluginsAvailableByName(plugin.fileName) > 0 ? true : false}
                             title={plugin.title}
                             description={plugin.description}
                             icon={plugin.icon}
