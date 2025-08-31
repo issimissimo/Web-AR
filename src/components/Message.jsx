@@ -3,6 +3,7 @@ import { Motion } from 'solid-motionone';
 import Fa from 'solid-fa';
 import { faExclamation, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import ButtonSecondary from './ButtonSecondary';
+import SvgIcon from './SvgIcon';
 
 
 
@@ -46,6 +47,7 @@ const Message = (props) => {
       transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.25 }}
     >
       {props.icon && <Icon />}
+      {props.svgIcon && <SvgIcon src={props.svgIcon} size={80} color={'var(--color-secondary)'} />}
 
       <MessageBLock>
         <Fa icon={faExclamation} color={"var(--color-secondary)"} size="2.5x" translateY={0.2} class="icon" />

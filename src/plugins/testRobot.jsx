@@ -3,6 +3,7 @@ import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { Matrix4 } from 'three';
 import Reticle from '@js/reticle';
+import Message from '@components/Message';
 
 
 
@@ -117,7 +118,7 @@ export default function testRobot(props) {
     */
     return (
         <>
-            {
+            {/* {
                 !spawnedModel() &&
                 <Container>
                     <Title>{game.gameDetails.title}</Title>
@@ -127,7 +128,20 @@ export default function testRobot(props) {
                         spawnModel(fakeHitMatrix)
                     }}>SPAWN!</button>
                 </Container>
+            } */}
+
+            {
+                !spawnedModel() &&
+                <Container>
+                    <Message
+                        svgIcon={'/icons/tap.svg'}
+                        showReadMore={false}
+                    >
+                        Fai TAP sullo schermo per posizionare un robot su una superficie piana intorno a te
+                    </Message>
+                </Container>
             }
+
         </>
 
     );
