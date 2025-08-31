@@ -11,7 +11,7 @@ let appConfig = {
 
 export async function loadConfig() {
   try {
-    const response = await fetch('/appConfig.json');
+    const response = await fetch('./appConfig.json');
     const externalConfig = await response.json();
     appConfig = { ...appConfig, ...externalConfig };
   } catch (error) {

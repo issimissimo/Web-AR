@@ -25,7 +25,7 @@ export default function testRobot(props) {
         game.blurBackground(false);
 
         Reticle.set({
-            fileName: 'models/gizmo.glb'
+            fileName: 'models/reticle_v1.glb'
         });
     }
 

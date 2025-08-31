@@ -1,4 +1,5 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
 import {
     Vector3,
     Quaternion,
@@ -7,6 +8,7 @@ import {
     Mesh,
     MeshBasicMaterial,
     RingGeometry,
+    TextureLoader
 } from 'three';
 import SceneManager from "./sceneManager";
 
@@ -135,6 +137,12 @@ const Reticle = {
         if (options.fileName) {
             console.log("loading GLTF")
             const loader = new GLTFLoader();
+
+            const draco = new DRACOLoader()
+            draco.setDecoderConfig({ type: "js" })
+            draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/")
+            loader.setDRACOLoader(draco)
+
             loader.load(
                 options.fileName,
                 (gltf) => {
@@ -161,7 +169,7 @@ const Reticle = {
             _setReticleProperties();
         }
 
-        // Add the circle in front of the camera
+        // Add the circle target in front of the camera
         // to use in place of plane detection
         const circleGeometry = new RingGeometry(0, 0.02, 24);
         const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
