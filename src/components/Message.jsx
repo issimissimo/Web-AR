@@ -42,7 +42,9 @@ const Message = (props) => {
   );
 
   return (
-    <MessageContainer id="message"
+    <MessageContainer
+      class={props.class}
+      style={props.style}
       animate={{ opacity: [0, 1] }}
       transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.25 }}
     >

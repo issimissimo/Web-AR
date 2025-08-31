@@ -10,6 +10,7 @@ class Loader {
   }
 
   init() {
+    console.log("******* Loader --- INIT")
     // Se il document è già pronto, crea subito il loader
     if (document.readyState !== 'loading') {
       this.createLoader();
