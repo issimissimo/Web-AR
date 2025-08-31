@@ -196,7 +196,7 @@ const ItemContainer = styled(Motion.div)`
                         Richiede localizzazione
                     </SpecsContainer>
                 }
-                {!props.available &&
+                {!props.available && props.enabled &&
                     <SpecsContainer>
                         <Fa icon={faCheck} size="1x" translateX={0} class="icon" />
                         Aggiunto

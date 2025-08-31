@@ -18,7 +18,7 @@ const BlurredCover = (props) => {
         opacity: [0, 1],
         backdropFilter: ["blur(0px)", "blur(8px)"],
         WebkitBackdropFilter: ["blur(0px)", "blur(8px)"],
-        backgroundColor: ["rgba(0,0,0,0)", "rgba(0, 0, 0, 0.5)"],
+        backgroundColor: ["rgba(0,0,0,0)", "rgba(0, 0, 0, 0.7)"],
     }
 
     // valori animazione "out" (uscita → l’opposto)
@@ -26,7 +26,7 @@ const BlurredCover = (props) => {
         opacity: [1, 0],
         backdropFilter: ["blur(8px)", "blur(0px)"],
         WebkitBackdropFilter: ["blur(8px)", "blur(0px)"],
-        backgroundColor: ["rgba(0, 0, 0, 0.5)", "rgba(0,0,0,0)"],
+        backgroundColor: ["rgba(0, 0, 0, 0.7)", "rgba(0,0,0,0)"],
     }
 
     return (

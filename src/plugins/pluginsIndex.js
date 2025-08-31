@@ -75,5 +75,16 @@ export const PLUGINS_LIST = [
         tags: [],
         requirements: {}
     },
+     {
+        fileName: "testRobot",
+        title: 'Test per robot Comau',
+        description: 'Posiziona su una superficie il robot',
+        icon: '/icons/360.svg',
+        category: '3D',
+        allowed: 1,
+        localized: true,
+        tags: [],
+        requirements: {}
+    },
 ];
 

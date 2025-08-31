@@ -295,7 +295,7 @@ export default function ArSession(props) {
 
     const handleSetBlurVisible = (inventoryVisible) => {
         // TODO - gestire anche Localization!
-        setBlurVisible(()=> inventoryVisible);
+        setBlurVisible(() => inventoryVisible);
     }
 
 

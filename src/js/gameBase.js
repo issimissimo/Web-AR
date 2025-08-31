@@ -48,7 +48,6 @@ export function useGame(gameName, gameId, config = {}) {
         }
     }
 
-
     const addToScene = (asset) => {
 
         // add new property
@@ -57,10 +56,19 @@ export function useGame(gameName, gameId, config = {}) {
         }
         asset.customProps = customProps;
         gameAssets.push(asset);
-
-        // add to scene
         SceneManager.scene.add(asset);
+    }
 
+    const removePreviousFromScene = () => {
+        const assetToRemove = gameAssets.pop();
+        SceneManager.scene.remove(assetToRemove);
+    }
+
+    const removeAllFromScene = () => {
+        gameAssets.forEach(el => {
+            SceneManager.scene.remove(el);
+        })
+        gameAssets = [];
     }
 
 
@@ -101,6 +109,8 @@ export function useGame(gameName, gameId, config = {}) {
         renderLoop,
         loadGameData,
         addToScene,
+        removePreviousFromScene,
+        removeAllFromScene,
         setVisible,
         gameDetails,
         gameData,
