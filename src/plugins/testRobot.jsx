@@ -108,7 +108,7 @@ export default function testRobot(props) {
                 <Container>
                     <Message
                         style={{ "height": "auto" }}
-                        svgIcon={'/icons/tap.svg'}
+                        // svgIcon={'/icons/tap.svg'}
                         showReadMore={false}
                     >
                         Fai TAP sullo schermo per posizionare un robot su una superficie che individuo intorno a te.
