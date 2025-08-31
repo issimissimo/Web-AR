@@ -101,6 +101,7 @@ export function useGame(gameName, gameId, config = {}) {
         initialized,
         setInitialized,
         localizationCompleted,
+        blurBackground: context.blurBackground,
         referenceMatrix: context.referenceMatrix,
         getObjOffsetMatrix,
         getGlobalMatrixFromOffsetMatrix,

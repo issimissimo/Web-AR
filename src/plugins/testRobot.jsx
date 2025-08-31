@@ -17,10 +17,12 @@ export default function testRobot(props) {
     const [showInstructions, setShowInstructions] = createSignal(true);
 
 
-    
+
     const handleCloseInstructions = () => {
 
         setShowInstructions(() => false);
+
+        game.blurBackground(false);
 
         Reticle.set({
             fileName: 'models/gizmo.glb'
@@ -59,9 +61,7 @@ export default function testRobot(props) {
 
         await game.loader.load("models/RobotArmNLA_compressed.glb");
 
-        // Reticle.set({
-        //     fileName: 'models/gizmo.glb'
-        // });
+        game.blurBackground(true);
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
@@ -104,7 +104,7 @@ export default function testRobot(props) {
     return (
         <>
             {
-                showInstructions() &&
+                showInstructions() && game.initialized() &&
                 <Container>
                     <Message
                         style={{ "height": "auto" }}

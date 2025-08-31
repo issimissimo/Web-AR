@@ -252,7 +252,7 @@ const Inventory = (props) => {
 
     onMount(() => {
         setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
-        console.log(PLUGINS_LIST)
+        // console.log(PLUGINS_LIST)
     })
 
     const handleCategorySelected = (categoryName) => {
@@ -262,7 +262,7 @@ const Inventory = (props) => {
     const getPluginsAvailableByName = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find(g => g.fileName === pluginName);
         const totalAllowed = pluginSpecs.allowed;
-        console.log("totalAllowed:", totalAllowed)
+        // console.log("totalAllowed:", totalAllowed)
         let nGames = 0;
         if (props.marker.games) {
             props.marker.games.map(game => {

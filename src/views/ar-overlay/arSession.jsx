@@ -298,6 +298,10 @@ export default function ArSession(props) {
         setBlurVisible(() => inventoryVisible);
     }
 
+    const handleBlurBackground = (value) => {
+        setBlurVisible(() => value);
+    }
+
 
     const Main = styled('div')`
           position: absolute;
@@ -323,7 +327,8 @@ export default function ArSession(props) {
             userId: props.userId,
             markerId: props.marker.id,
             referenceMatrix: referenceMatrix(),
-            localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED
+            localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED,
+            blurBackground: (value) => handleBlurBackground(value)
         }}>
             <Main id="arSession">
 
