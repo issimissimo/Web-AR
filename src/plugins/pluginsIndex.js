@@ -82,7 +82,7 @@ export const PLUGINS_LIST = [
         icon: '/icons/360.svg',
         category: '3D',
         allowed: 1,
-        localized: true,
+        localized: false,
         tags: [],
         requirements: {}
     },

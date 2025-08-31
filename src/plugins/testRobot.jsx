@@ -11,7 +11,6 @@ export default function testRobot(props) {
 
     const [spawnedModel, setSpawnedModel] = createSignal(null);
 
-    // let spawnedModel = null;
 
     /*
     * Put here derived functions from Game
@@ -22,9 +21,11 @@ export default function testRobot(props) {
 
             console.log("IS HITTING:", Reticle.isHitting());
 
-            const hitMatrix = Reticle.getHitMatrix();
-            console.log("HIT MATRIX:", hitMatrix);
-            spawnModel(hitMatrix);
+            if (Reticle.isHitting()) {
+                const hitMatrix = Reticle.getHitMatrix();
+                console.log("HIT MATRIX:", hitMatrix);
+                spawnModel(hitMatrix);
+            }
         },
 
         renderLoop: () => loop()
@@ -133,8 +134,8 @@ export default function testRobot(props) {
 
 
     function spawnModel(matrix) {
-        
-        
+
+
         const newModel = game.loader.clone();
 
 
@@ -142,8 +143,8 @@ export default function testRobot(props) {
 
         newModel.matrixAutoUpdate = false;
         newModel.matrix.copy(matrix);
-        
-     
+
+
 
         game.addToScene(newModel);
         setSpawnedModel(() => newModel);

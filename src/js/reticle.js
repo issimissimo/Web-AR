@@ -22,7 +22,7 @@ let _hitTestSource = null;
 let _hitTestSourceRequested = false;
 let _isHitting = false;
 let _surfType = null;
-let _visible = false;
+let _visible = true;
 let _reticleMode = null;
 
 
@@ -117,7 +117,6 @@ const Reticle = {
      * @param {number} [options.color] - Il colore del reticolo.
      */
     set(options = {}) {
-        _initialized = false;
         _renderer = SceneManager.renderer;
         _scene = SceneManager.scene;
         _camera = SceneManager.camera;
@@ -210,6 +209,7 @@ const Reticle = {
 
         // Check for hit source (used from PlaneMesh)
         else if (_reticleMode === MODE.PLANE) {
+            _planeMesh.visible = true;
             _circleMesh.visible = false;
 
             const session = _renderer.xr.getSession();
@@ -323,7 +323,7 @@ const Reticle = {
         _hitTestSourceRequested = false;
         _isHitting = false;
         _surfType = null;
-        _visible = false;
+        _visible = true;
         _reticleMode = null;
         _initialized = false;
 
