@@ -60,10 +60,20 @@ export default function ArSession(props) {
     //#region [lifeCycle]
     onMount(() => {
 
+        // If Debug on desktop we must set the background 
+        // to black, so to see something...
         if (config.debugOnDesktop) {
             document.getElementsByTagName("body")[0].style.backgroundColor = "black"
         }
 
+
+        // if we are "user" we must update the views number
+        // of this marker
+        if (props.appMode === AppMode.SAVE) {
+            console.log("actual views:", props.marker.views);
+            const views = props.marker.views ++;
+
+        }
 
 
         // On TAP on screen

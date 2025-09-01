@@ -30,7 +30,7 @@ class ARButton {
       .then(function (supported) {
 
         if (supported) {
-          button.textContent = "Inizia in AR";
+          button.textContent = "Entra in AR";
           button.style.pointerEvents = "auto";
           // button.style.backgroundColor = "rgba(0, 123, 255, 0.8)";
           initializeButton();

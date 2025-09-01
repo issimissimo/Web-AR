@@ -191,7 +191,9 @@ export default function Main() {
         const marker = {
             id: markerId,
             name: markerName,
-            games: markerGames
+            games: markerGames,
+            views: 0,
+            like: 0,
         }
 
         setCurrentMarker(() => marker);

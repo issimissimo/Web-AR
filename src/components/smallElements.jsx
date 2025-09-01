@@ -31,7 +31,7 @@ export const FitHeightScrollable = styled(FitHeight)`
 export const BigTitle = styled(Motion.p)`
     font-size: 2.6rem;
     font-family: "Montessori";
-    line-height: 100%;
+    line-height: 120%;
     margin: 0;
   `;
 

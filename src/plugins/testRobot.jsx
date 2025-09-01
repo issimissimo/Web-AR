@@ -8,6 +8,10 @@ import Button from '@components/Button';
 
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
+import { Matrix4 } from 'three';
+import { config } from '@js/config';
+
+
 
 
 
@@ -61,7 +65,7 @@ export default function testRobot(props) {
 
         await game.loader.load("models/RobotArmNLA_compressed.glb");
 
-        game.blurBackground(true);
+        // game.blurBackground(true);
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
@@ -108,13 +112,14 @@ export default function testRobot(props) {
                 <Container>
                     <Message
                         style={{ "height": "auto" }}
-                        // svgIcon={'/icons/tap.svg'}
+                        svgIcon={'icons/tap.svg'}
                         showReadMore={false}
                     >
                         Fai TAP sullo schermo per posizionare un robot su una superficie che individuo intorno a te.
                     </Message>
                     <Button
-                        onClick={handleCloseInstructions}
+                        // onClick={handleCloseInstructions}
+                        onClick={spawnModelForDebug}
                         small={true}
                         active={true}
                         icon={faCheck}
@@ -131,6 +136,14 @@ export default function testRobot(props) {
         const newModel = game.loader.clone();
         newModel.matrixAutoUpdate = false;
         newModel.matrix.copy(matrix);
+        game.addToScene(newModel);
+    }
+
+
+    function spawnModelForDebug() {
+        const newModel = game.loader.clone();
+        newModel.position.z = -1;
+        newModel.position.y = -0.5;
         game.addToScene(newModel);
     }
 

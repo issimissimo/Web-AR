@@ -1,10 +1,10 @@
-import { onMount, createSignal } from 'solid-js';
+import { onMount } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 import { faSadCry } from '@fortawesome/free-solid-svg-icons';
 import { init } from '@hooks/useQRCode';
 
-import { Container, Centered } from '@components/smallElements'
+import { Centered } from '@components/smallElements'
 import Message from '@components/Message';
 
 const QrCodeContainer = styled(Motion.div)`

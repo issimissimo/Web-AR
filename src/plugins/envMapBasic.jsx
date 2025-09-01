@@ -6,12 +6,12 @@ import SceneManager from '@js/sceneManager';
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import { EquirectangularReflectionMapping } from 'three';
 
-export default function EnvLight(props) {
+export default function envMapBasic(props) {
 
     /*
     * Put here derived functions from Game
     */
-    const { game } = useGame("envLight", props.id, {
+    const { game } = useGame("envMapBasic", props.id, {
 
         onTap: () => {
 

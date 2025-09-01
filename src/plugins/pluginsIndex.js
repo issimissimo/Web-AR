@@ -43,6 +43,17 @@ export const PLUGINS_LIST = [
         requirements: {}
     },
     {
+        fileName: "envMapBasic",
+        title: "Immagine HDRI semplice",
+        description: "Inserisci un'immagine HDRI 360 come luce ambientale, senza localizzazione",
+        icon: '/icons/360.svg',
+        category: 'Luci',
+        allowed: 1,
+        localized: false,
+        tags: [],
+        requirements: {}
+    },
+    {
         fileName: "basicRotCube",
         title: 'Cubo che ruota',
         description: 'Da eliminare, solo di test',
@@ -60,7 +71,7 @@ export const PLUGINS_LIST = [
         icon: '/icons/360.svg',
         category: 'Giochi',
         allowed: 1,
-        localized: true,
+        localized: false,
         tags: [],
         requirements: {}
     },

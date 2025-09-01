@@ -2,7 +2,7 @@ import { createSignal, onMount } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 
-import { Container, Centered, BigTitle } from '@components/smallElements'
+import { Container, Centered, BigTitle, FitHeight } from '@components/smallElements'
 import Message from '@components/Message';
 
 import { faSadCry } from '@fortawesome/free-solid-svg-icons';
@@ -15,7 +15,7 @@ const Welcome = (props) => {
 
   const ArButtonContainer = styled(Motion.div)`
     z-index: 1000;
-`;
+  `;
 
   return (
     <Container>
@@ -29,18 +29,28 @@ const Welcome = (props) => {
         animate={{ opacity: [0, 1] }}
         transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.25 }}
       >
-        <span style={{ color: 'var(--color-secondary)' }}>nel </span>
-        <span style={{ color: 'var(--color-white)' }}>tuo spazio </span>
+        <span style={{ color: 'var(--color-secondary)' }}>nella </span>
+        <span style={{ color: 'var(--color-white)' }}>tua esperienza di</span>
       </BigTitle>
       <BigTitle
         color={'var(--color-primary)'}
         animate={{ opacity: [0, 1] }}
         transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.5 }}
       >
-        <span style={{ color: 'var(--color-primary)' }}>web AR</span>
+        <span style={{ color: 'var(--color-primary)' }}>Realtà Aumentata</span>
       </BigTitle>
 
-      <ArButtonContainer id="ArButtonContainer" />
+
+      <FitHeight>
+
+      </FitHeight>
+
+
+      <ArButtonContainer
+        id="ArButtonContainer"
+        animate={{ opacity: [0, 1] }}
+        transition={{ duration: 1, easing: "ease-in-out", delay: 1 }}
+      />
     </Container>
   )
 }
@@ -69,6 +79,7 @@ export default function Main(props) {
   const [markerValid, setMarkerValid] = createSignal(false)
 
   onMount(() => {
+
     if (props.marker.games != null) {
 
 

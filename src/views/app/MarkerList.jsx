@@ -111,8 +111,8 @@ const Marker = (props) => {
       </NameContainer>
 
       <BottomContainer>
-        <Statistic icon={faEye}>10</Statistic>
-        <Statistic icon={faThumbsUp}>2</Statistic>
+        <Statistic icon={faEye}>{props.marker.views}</Statistic>
+        <Statistic icon={faThumbsUp}>{props.marker.like}</Statistic>
         <EditButtonContainer>
           <Button
             active={true}
