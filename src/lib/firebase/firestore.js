@@ -7,7 +7,8 @@ import {
     setDoc,
     getDoc,
     updateDoc,
-    serverTimestamp
+    serverTimestamp,
+    increment
 } from "firebase/firestore";
 import { firestore } from "./init";
 
@@ -125,6 +126,31 @@ export const updateMarker = async (userId, markerId, name) => {
             });
     } catch (error) {
         console.error("Errore nell'aggiornamento marker:", error);
+        throw error;
+    }
+};
+
+export const updateMarkerViews = async (userId, markerId) => {
+    try {
+        const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
+        await updateDoc(markerRef, {
+            views: increment(1)
+        });
+        console.log("Views incrementate con successo");
+    } catch (error) {
+        console.error("Errore nell'incremento views:", error);
+        throw error;
+    }
+};
+
+export const updateMarkerLike = async (userId, markerId) => {
+    try {
+        const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
+        await updateDoc(markerRef, {
+            like: increment(1)
+        });
+    } catch (error) {
+        console.error("Errore nell'incremento like:", error);
         throw error;
     }
 };

@@ -68,11 +68,9 @@ export default function ArSession(props) {
 
 
         // if we are "user" we must update the views number
-        // of this marker
-        if (props.appMode === AppMode.SAVE) {
-            console.log("actual views:", props.marker.views);
-            const views = props.marker.views ++;
-
+        // of this marker (+1)
+        if (props.appMode === AppMode.LOAD) {
+            firebase.firestore.updateMarkerViews(props.userId, props.marker.id);
         }
 
 
