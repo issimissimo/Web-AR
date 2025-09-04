@@ -147,15 +147,8 @@ export default function Main() {
         setUserId(() => params.get('userId'));
         const markerId = params.get('markerId');
         const data = await firebase.firestore.fetchMarker(userId(), markerId);
-        
-        
-        // setupMarker(markerId, null, null, () => goToAnonymous());
 
-        // TODO: qui dobbiamo fare il setup del marker con il nuovo modo (setupMarker2)
-        setupMarker2({
-            id: markerId,
-            data: data,
-        }, () => goToAnonymous());
+        setupMarker({ id: markerId, data: data }, () => goToAnonymous());
     }
 
 
@@ -189,32 +182,7 @@ export default function Main() {
     * Add a new marker to the App 
     * and set it as currentMarker
     */
-    const setupMarker = async (markerId = null, markerName = null, markerGames = null, callback = null) => {
-
-        // If no Games are provided, load the all the Games basic properties
-        // from firestore for this marker
-        if (markerId && !markerGames) {
-            console.log("carico games da Firestore...")
-            markerGames = await firebase.firestore.fetchGames(userId(), markerId);
-        }
-
-        // Setup this marker
-        const marker = {
-            id: markerId,
-            name: markerName,
-            coverTitle: "",
-            games: markerGames
-        }
-
-        setCurrentMarker(() => marker);
-        console.log("current marker:", currentMarker())
-
-        if (loading()) setLoading(() => false);
-        if (callback) callback();
-    }
-
-
-    const setupMarker2 = async (marker, callback = null) => {
+    const setupMarker = async (marker = null, callback = null) => {
 
         // If no Games are provided, load the all the Games basic properties
         // from firestore for this marker
@@ -224,12 +192,12 @@ export default function Main() {
 
         const newMarker = {
             id: marker.id ?? null,
-            created: marker.data.created ?? null,
-            name: marker.data.name ?? null,
-            coverTitle: marker.data.coverTitle ?? null,
-            views: marker.data.views ?? null,
-            like: marker.data.like ?? null,
-            games: marker.data.games ?? null,
+            created: marker?.data?.created ?? null,
+            name: marker?.data?.name ?? null,
+            coverTitle: marker?.data?.coverTitle ?? null,
+            views: marker?.data?.views ?? null,
+            like: marker?.data?.like ?? null,
+            games: marker?.data?.games ?? null,
         }
 
         setCurrentMarker(() => newMarker);
@@ -344,7 +312,7 @@ export default function Main() {
     const handleReset = () => {
         if (Reticle.initialized()) Reticle.destroy();
         SceneManager.destroy();
-        setupMarker();
+        setupMarker({ id: null, data: null });
         setGamesRunning(() => []);
         setBackgroundVisible(true);
         if (currentAppMode() === AppMode.SAVE) goToMarkerList();
@@ -383,11 +351,13 @@ export default function Main() {
                 return <MarkerList
                     setLoading={(value) => setLoading(() => value)}
                     onCreateNewMarker={() => {
-                        setupMarker();
+                        setupMarker({ id: null, data: null });
                         goToEditMarker();
                     }}
                     onMarkerClicked={(marker) => {
-                        setupMarker(marker.id, marker.name, null, () => goToEditMarker())
+                        // setupMarker(marker.id, marker.name, null, () => goToEditMarker())
+                        const markerData = { name: marker.name, coverTitle: marker.coverTitle, created: marker.created, like: marker.like, views: marker.views };
+                        setupMarker({ id: marker.id, data: markerData }, () => goToEditMarker());
                     }}
                     goToUserProfile={goToUserProfile()}
                 />;
@@ -396,8 +366,16 @@ export default function Main() {
                 return <EditMarker
                     userId={userId()}
                     marker={currentMarker()}
-                    onNewMarkerCreated={(id, name) => setupMarker(id, name, [])}
-                    onMarkerUpdated={(name, games) => setupMarker(currentMarker().id, name, games)}
+                    onNewMarkerCreated={(id, name) => {
+                        // setupMarker(id, name, []);
+                        const markerData = { name: name };
+                        setupMarker({ id: id, data: markerData });
+                    }}
+                    onMarkerUpdated={(name, games) => {
+                        // setupMarker(currentMarker().id, name, games)
+                        const markerData = { name: name, games: games };
+                        setupMarker({ id: currentMarker().id, data: markerData });
+                    }}
                     initScene={handleInitScene}
                     destroyScene={handleDestroyScene}
                     onBack={handleReset}
@@ -424,7 +402,11 @@ export default function Main() {
                             planeFound={planeFound()}
                             gamesRunning={gamesRunning()}
                             addGame={el => setGamesRunning(prev => [...prev, el])}
-                            onNewGameSaved={() => setupMarker(currentMarker().id, currentMarker().name)}
+                            onNewGameSaved={() => {
+                                // setupMarker(currentMarker().id, currentMarker().name)
+                                const markerData = { name: currentMarker().name };
+                                setupMarker({ id: currentMarker().id, data: markerData });
+                            }}
                         />
                     </Portal>
                 );

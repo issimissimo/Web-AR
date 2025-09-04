@@ -414,26 +414,26 @@ const EditMarker = (props) => {
       />
 
       {/* TITLE */}
-      <Title
+      {/* <Title
         animate={{ opacity: [0, 1] }}
         transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
       >
         <span style={{ color: 'var(--color-secondary)' }}>{id() ? 'Modifica' : 'Nuovo'} </span>
         <span style={{ color: 'var(--color-white)' }}>ambiente AR </span>
-      </Title>
+      </Title> */}
 
 
       <FitHeightScrollable
         style={{ "padding-top": "3rem" }}
         animate={{ opacity: [0, 1] }}
-        transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.25 }}
+        transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
       >
 
         {/* INPUT NAME */}
         <InputField
           type="none"
           name="none"
-          label="Nome"
+          label="Nome Ambiente"
           value={name()}
           onInput={e => setName(e.target.value)}
           onBlur={handleUpdateMarker()}

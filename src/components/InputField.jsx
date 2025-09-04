@@ -136,7 +136,7 @@ const InputField = (props) => {
             x: isFocused() || props.value ? -20 : 0,
             y: isFocused() || props.value ? -35 : 0,
             scale: isFocused() || props.value ? 0.8 : 1,
-            color: isFocused() ? (props['data-error'] ? 'var(--color-primary)' : 'var(--color-grey)') : 'var(--color-grey)',
+            color: isFocused() ? (props['data-error'] ? 'var(--color-primary)' : 'var(--color-grey)') : 'var(--color-secondary)',
           }}
           transition={{ duration: 0.3, easing: 'ease-in-out' }}
         >
