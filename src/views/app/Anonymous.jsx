@@ -1,11 +1,11 @@
 import { createSignal, onMount } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
-
+import Fa from 'solid-fa';
 import { Container, Centered, BigTitle, Title, FitHeight } from '@components/smallElements'
 import Message from '@components/Message';
 
-import { faSadCry } from '@fortawesome/free-solid-svg-icons';
+import { faSadCry, faStar } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -15,6 +15,12 @@ const Welcome = (props) => {
 
   const ArButtonContainer = styled(Motion.div)`
     z-index: 1000;
+  `;
+
+  const CoverTitle = styled(Motion.p)`
+    text-align: center;
+    display: flex;
+    flex-direction: column;
   `;
 
   return (
@@ -40,13 +46,21 @@ const Welcome = (props) => {
         <span style={{ color: 'var(--color-primary)' }}>Realtà Aumentata</span>
       </BigTitle>
 
-      <Title>
-        {props.title ?? null}
-      </Title>
 
 
 
-      <FitHeight>
+
+      <FitHeight style={{ "justify-content": "center" }}>
+
+        {props.coverTitle !== null && (
+          <CoverTitle id="cover"
+            animate={{ opacity: [0, 1] }}
+            transition={{ duration: 1, easing: "ease-in-out", delay: 1 }}
+          >
+            <Fa icon={faStar} color={"var(--color-secondary)"} translateY={-0.5} size="3x" class="icon" />
+            {props.coverTitle}
+          </CoverTitle>
+        )}
 
       </FitHeight>
 
@@ -82,7 +96,6 @@ const Unavailable = () => {
 //#region [Main]
 export default function Main(props) {
   const [markerValid, setMarkerValid] = createSignal(false);
-  const [coverTitle, setCoverTitle] = createSignal(null);
 
   onMount(() => {
 
@@ -90,11 +103,6 @@ export default function Main(props) {
 
       if (props.marker.games.length > 0) {
         setMarkerValid(() => true);
-
-        if (typeof props.marker.coverTitle !== 'undefined') {
-          console.log("cover title:", props.marker.coverTitle);
-          setCoverTitle(props.marker.coverTitle);
-        }
 
         setTimeout(() => {
           props.initScene();
@@ -108,7 +116,7 @@ export default function Main(props) {
       {
         markerValid() ?
           <Welcome
-            title={props.marker.coverTitle}
+            coverTitle={props.marker.coverTitle}
           />
           :
           <Unavailable />
