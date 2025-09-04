@@ -57,7 +57,7 @@ const SceneManager = {
             domOverlay: { root: document.getElementById("ar-overlay") },
         })
         document.getElementById("ArButtonContainer").appendChild(this.arButton);
-        
+
         console.log("SceneManager initialized");
         this._initialized = true;
     },
@@ -132,6 +132,19 @@ const SceneManager = {
         this.gizmo = await this.loadGltf("models/gizmo.glb");
     },
 
+    updateStandardCamera(frame) {
+        const referenceSpace = this.renderer.xr.getReferenceSpace();
+        const pose = frame.getViewerPose(referenceSpace);
+        if (pose) {
+            const view = framePose.views[0];
+            this.camera.projectionMatrix.fromArray(view.projectionMatrix);
+            const position = pose.transform.position;
+            const rotation = pose.transform.orientation;
+            this.camera.position.set(position.x, position.y, position.z);
+            this.camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+            this.camera.updateMatrixWorld();
+        }
+    },
 
     update() {
         if (!this._initialized) {

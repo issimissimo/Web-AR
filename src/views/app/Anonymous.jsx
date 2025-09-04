@@ -2,7 +2,7 @@ import { createSignal, onMount } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 
-import { Container, Centered, BigTitle, FitHeight } from '@components/smallElements'
+import { Container, Centered, BigTitle, Title, FitHeight } from '@components/smallElements'
 import Message from '@components/Message';
 
 import { faSadCry } from '@fortawesome/free-solid-svg-icons';
@@ -40,6 +40,11 @@ const Welcome = (props) => {
         <span style={{ color: 'var(--color-primary)' }}>Realtà Aumentata</span>
       </BigTitle>
 
+      <Title>
+        {props.title ?? null}
+      </Title>
+
+
 
       <FitHeight>
 
@@ -76,15 +81,20 @@ const Unavailable = () => {
 
 //#region [Main]
 export default function Main(props) {
-  const [markerValid, setMarkerValid] = createSignal(false)
+  const [markerValid, setMarkerValid] = createSignal(false);
+  const [coverTitle, setCoverTitle] = createSignal(null);
 
   onMount(() => {
 
     if (props.marker.games != null) {
 
-
       if (props.marker.games.length > 0) {
         setMarkerValid(() => true);
+
+        if (typeof props.marker.coverTitle !== 'undefined') {
+          console.log("cover title:", props.marker.coverTitle);
+          setCoverTitle(props.marker.coverTitle);
+        }
 
         setTimeout(() => {
           props.initScene();
@@ -97,7 +107,9 @@ export default function Main(props) {
     <Centered>
       {
         markerValid() ?
-          <Welcome />
+          <Welcome
+            title={props.marker.coverTitle}
+          />
           :
           <Unavailable />
       }

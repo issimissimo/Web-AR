@@ -139,12 +139,23 @@ export default function Main() {
     * Anonymous access
     */
     const accessAnonymous = async (params) => {
+
         if (!firebase.auth.user()) {
             await firebase.auth.loginAnonymous();
         }
+
         setUserId(() => params.get('userId'));
         const markerId = params.get('markerId');
-        setupMarker(markerId, null, null, () => goToAnonymous());
+        const data = await firebase.firestore.fetchMarker(userId(), markerId);
+        
+        
+        // setupMarker(markerId, null, null, () => goToAnonymous());
+
+        // TODO: qui dobbiamo fare il setup del marker con il nuovo modo (setupMarker2)
+        setupMarker2({
+            id: markerId,
+            data: data,
+        }, () => goToAnonymous());
     }
 
 
@@ -191,6 +202,7 @@ export default function Main() {
         const marker = {
             id: markerId,
             name: markerName,
+            coverTitle: "",
             games: markerGames
         }
 
@@ -199,6 +211,33 @@ export default function Main() {
 
         if (loading()) setLoading(() => false);
         if (callback) callback();
+    }
+
+
+    const setupMarker2 = async (marker, callback = null) => {
+
+        // If no Games are provided, load the all the Games basic properties
+        // from firestore for this marker
+        if (marker.id && !marker.data.games) {
+            marker.data.games = await firebase.firestore.fetchGames(userId(), marker.id);
+        }
+
+        const newMarker = {
+            id: marker.id ?? null,
+            created: marker.data.created ?? null,
+            name: marker.data.name ?? null,
+            coverTitle: marker.data.coverTitle ?? null,
+            views: marker.data.views ?? null,
+            like: marker.data.like ?? null,
+            games: marker.data.games ?? null,
+        }
+
+        setCurrentMarker(() => newMarker);
+        console.log("current marker:", currentMarker())
+
+        if (loading()) setLoading(() => false);
+
+        callback?.();
     }
 
 
@@ -252,6 +291,12 @@ export default function Main() {
     function render(timestamp, frame) {
         if (SceneManager.initialized()) {
 
+            // Update the the standard camera on XR camera
+            // (just used if we have to put another scene on top of AR)
+            if (frame) {
+                SceneManager.updateStandardCamera(frame);
+            }
+
             // Update Reticle
             if (frame && Reticle.initialized()) {
                 Reticle.update(frame, (surfType) => {
@@ -259,10 +304,8 @@ export default function Main() {
                 setPlaneFound(Reticle.isHitting())
             }
 
-            // render the animation of the running Games
-            if (gamesRunning().length > 0) {
-                gamesRunning().forEach((el) => el.renderLoop());
-            }
+            // render the loop of the running Games
+            gamesRunning().forEach((el) => el.renderLoop());
 
             // Update Scene
             SceneManager.update();
