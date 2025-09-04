@@ -6,6 +6,8 @@ import SceneManager from '@js/sceneManager';
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import { EquirectangularReflectionMapping } from 'three';
 
+import decodeImageFormat from 'src/tools/three/decodeImageFormat';
+
 export default function EnvLight(props) {
 
     /*
@@ -69,13 +71,14 @@ export default function EnvLight(props) {
     function setupScene() {
 
         // initialize environment
-        const rgbeLoader = new RGBELoader()
+        const rgbeLoader = new RGBELoader();
         rgbeLoader.load(game.gameData().fileName, (envMap) => {
-            const environment = envMap;
-            environment.mapping = EquirectangularReflectionMapping;
-            SceneManager.scene.environment = environment;
+            envMap.mapping = EquirectangularReflectionMapping;
+            SceneManager.scene.environment = envMap;
             SceneManager.scene.environmentRotation = game.gameData().rotation;
-            SceneManager.scene.remove(SceneManager.light);
+            // SceneManager.scene.remove(SceneManager.light);
+
+            decodeImageFormat(envMap);
 
             /*
             * Don't forget to call "game.setInitialized(true)" at finish 

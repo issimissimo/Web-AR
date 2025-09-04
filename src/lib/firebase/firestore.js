@@ -108,7 +108,8 @@ export const addMarker = async (userId, name) => {
                 name,
                 created: serverTimestamp(),
                 views: 0,
-                like: 0
+                like: 0,
+                coverTitle: null,
             });
         return newMarkerRef.id;
     } catch (error) {

@@ -79,6 +79,10 @@ const QrCodeImg = styled('img')`
 
 const EditMarker = (props) => {
 
+  onMount(()=>{
+    console.log("ON MOUNT EDIT MARKER")
+  })
+
   const firebase = useFirebase();
 
   // const [saved, setSaved] = createSignal(props.marker.id ? true : false);

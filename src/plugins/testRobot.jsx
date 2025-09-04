@@ -41,6 +41,8 @@ export default function testRobot(props) {
 
         onTap: () => {
 
+            console.log("testRobot -- onTap")
+            
             if (Reticle.isHitting() && !showInstructions()) {
                 const hitMatrix = Reticle.getHitMatrix();
                 spawnModel(hitMatrix);
@@ -65,7 +67,7 @@ export default function testRobot(props) {
 
         await game.loader.load("models/RobotArmNLA_compressed.glb");
 
-        // game.blurBackground(true);
+        game.blurBackground(true);
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
@@ -118,8 +120,8 @@ export default function testRobot(props) {
                         Fai TAP sullo schermo per posizionare un robot su una superficie che individuo intorno a te.
                     </Message>
                     <Button
-                        // onClick={handleCloseInstructions}
-                        onClick={spawnModelForDebug}
+                        onClick={handleCloseInstructions}
+                        // onClick={spawnModelForDebug}
                         small={true}
                         active={true}
                         icon={faCheck}

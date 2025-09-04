@@ -259,11 +259,11 @@ export default function Main() {
     function render(timestamp, frame) {
         if (SceneManager.initialized()) {
 
-            // Update the the standard camera on XR camera
-            // (just used if we have to put another scene on top of AR)
-            if (frame) {
-                SceneManager.updateStandardCamera(frame);
-            }
+            // // Update the the standard camera on XR camera
+            // // (just used if we have to put another scene on top of AR)
+            // if (frame) {
+            //     SceneManager.updateStandardCamera(frame);
+            // }
 
             // Update Reticle
             if (frame && Reticle.initialized()) {
@@ -312,12 +312,17 @@ export default function Main() {
     const handleReset = () => {
         if (Reticle.initialized()) Reticle.destroy();
         SceneManager.destroy();
-        setupMarker({ id: null, data: null });
+
+        if (currentAppMode() === AppMode.SAVE) {
+            goToMarkerList();
+            setupMarker({ id: null, data: null });
+        }
+        else if (currentAppMode() === AppMode.LOAD) {
+            goToAnonymous();
+        }
+
         setGamesRunning(() => []);
         setBackgroundVisible(true);
-        if (currentAppMode() === AppMode.SAVE) goToMarkerList();
-        else if (currentAppMode() === AppMode.LOAD) goToAnonymous();
-        else console.error("AppMode not defined!")
     }
 
 
