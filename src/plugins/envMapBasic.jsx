@@ -28,7 +28,7 @@ export default function envMapBasic(props) {
     */
     const defaultGameData = {
         fileName: "images/hdr/spree_bank.hdr",
-        exposure: 2
+        exposure: 5
     }
 
 

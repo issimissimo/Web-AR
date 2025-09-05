@@ -6,6 +6,8 @@ import Message from '@components/Message';
 import Button from '@components/Button';
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
+import { MeshStandardMaterial, PlaneGeometry, MeshBasicMaterial, Mesh, TextureLoader, Vector3, Euler } from "three";
+
 
 export default function testRobot(props) {
 
@@ -43,7 +45,7 @@ export default function testRobot(props) {
     * DATA
     */
 
-
+    let planeShadow;
 
     /*
     * On mount
@@ -55,7 +57,40 @@ export default function testRobot(props) {
         });
         Reticle.setVisible(false);
 
-        await game.loader.load("models/RobotArmNLA_compressed.glb");
+
+        const planeTexture = await loadTexture('models/shadow.jpg');
+        const planeGeo = new PlaneGeometry(0.7, 0.7);
+        planeGeo.rotateX(- Math.PI / 2);
+        const planeMat = new MeshBasicMaterial({
+            alphaMap: planeTexture,
+            transparent: true,
+            color: 0x000000,
+        });
+        planeShadow = new Mesh(planeGeo, planeMat);
+
+
+        const aoTexture = await loadTexture("models/robot_AO_02.png")
+        aoTexture.flipY = false;
+
+
+        const model = await game.loader.load("models/robot_unwrapped.glb");
+        // now we NEED to recreate the materials
+        // of the unwrapped model... :/
+        model.traverse((child) => {
+            if (child.isMesh) {
+                const mat = new MeshStandardMaterial({
+                    aoMap: aoTexture,
+                    aoMapIntensity: 1,
+                    color: child.material.color,
+                    metalness: child.material.metalness,
+                    roughness: child.material.roughness
+                });
+                child.material = mat;
+                child.material.needsUpdate = true;
+            }
+        });
+
+
 
         game.blurBackground(true);
 
@@ -72,8 +107,8 @@ export default function testRobot(props) {
     * LOOP
     */
     function loop() {
-        if (game.loader.loaded())
-            game.loader.animate();
+        // if (game.loader.loaded())
+        //     game.loader.animate();
     }
 
 
@@ -125,9 +160,39 @@ export default function testRobot(props) {
 
     function spawnModel(matrix) {
         const newModel = game.loader.clone();
-        newModel.matrixAutoUpdate = false;
-        newModel.matrix.copy(matrix);
+        // newModel.matrixAutoUpdate = false;
+
+        const position = new Vector3();
+        position.setFromMatrixPosition(matrix);
+
+        const rotation = new Euler();
+        rotation.setFromRotationMatrix(matrix);
+
+        const scale = new Vector3(1.5, 1.5, 1.5);
+
+        // newModel.matrix.copy(matrix);
+
+        newModel.position.copy(position);
+        newModel.rotation.copy(rotation);
+        newModel.scale.copy(scale);
+
         game.addToScene(newModel);
+
+        // planeShadow.matrixAutoUpdate = false;
+        // planeShadow.matrix.copy(matrix);
+        planeShadow.position.copy(position);
+        planeShadow.rotation.copy(rotation);
+
+        game.addToScene(planeShadow);
+
+        Reticle.setVisible(false);
+    }
+
+
+    async function loadTexture(url) {
+        return new Promise((resolve, reject) => {
+            new TextureLoader().load(url, resolve, undefined, reject);
+        });
     }
 
 }
