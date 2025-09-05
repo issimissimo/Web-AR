@@ -2,28 +2,13 @@ import { onMount, createSignal } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import Reticle from '@js/reticle';
-
 import Message from '@components/Message';
 import Button from '@components/Button';
-
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-
-import { Matrix4 } from 'three';
-import { config } from '@js/config';
-
-
-import SceneManager from '@js/sceneManager';
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
-import { EquirectangularReflectionMapping } from 'three';
-import decodeImageFormat from '@tools/three/decodeImageFormat';
-
-
-
 
 
 export default function testRobot(props) {
 
-    // const [spawnedModel, setSpawnedModel] = createSignal(null);
     const [showInstructions, setShowInstructions] = createSignal(true);
 
 
@@ -126,7 +111,6 @@ export default function testRobot(props) {
                     </Message>
                     <Button
                         onClick={handleCloseInstructions}
-                        // onClick={spawnModelForDebug}
                         small={true}
                         active={true}
                         icon={faCheck}
@@ -143,14 +127,6 @@ export default function testRobot(props) {
         const newModel = game.loader.clone();
         newModel.matrixAutoUpdate = false;
         newModel.matrix.copy(matrix);
-        game.addToScene(newModel);
-    }
-
-
-    function spawnModelForDebug() {
-        const newModel = game.loader.clone();
-        newModel.position.z = -1;
-        newModel.position.y = -0.5;
         game.addToScene(newModel);
     }
 

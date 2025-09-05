@@ -28,6 +28,7 @@ export default function envMapBasic(props) {
     */
     const defaultGameData = {
         fileName: "images/hdr/spree_bank.hdr",
+        exposure: 2
     }
 
 
@@ -35,10 +36,6 @@ export default function envMapBasic(props) {
     * On mount
     */
     onMount(() => {
-
-        // console.log("App MODE:", game.appMode);
-        // console.log("stored:", props.stored);
-        // console.log("DETAILS:", game.gameDetails)
 
         // if (props.stored) {
         //     // Load the game data from RealtimeDB
@@ -48,7 +45,6 @@ export default function envMapBasic(props) {
         //     // Set default gameData
         //     game.setGameData(() => defaultGameData)
         // }
-
 
         game.setGameData(() => defaultGameData)
     });
@@ -70,10 +66,10 @@ export default function envMapBasic(props) {
         // initialize environment
         const rgbeLoader = new RGBELoader()
         rgbeLoader.load(game.gameData().fileName, (envMap) => {
-            const environment = envMap;
-            environment.mapping = EquirectangularReflectionMapping;
-            SceneManager.scene.environment = environment;
-            SceneManager.scene.remove(SceneManager.light);
+            envMap.mapping = EquirectangularReflectionMapping;
+            SceneManager.scene.environment = envMap;
+            SceneManager.scene.environmentIntensity = game.gameData().exposure;
+            // SceneManager.scene.remove(SceneManager.light);
 
             /*
             * Don't forget to call "game.setInitialized(true)" at finish 

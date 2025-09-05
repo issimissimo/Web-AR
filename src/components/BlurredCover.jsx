@@ -32,7 +32,7 @@ const BlurredCover = (props) => {
     return (
         <BlurredContainer
             animate={props.direction === "in" ? animIn : animOut}
-            transition={{ duration: 1, easing: "ease-in-out", delay: 0 }}
+            transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
             initial={false}
         />
     )

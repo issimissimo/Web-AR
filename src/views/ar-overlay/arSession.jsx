@@ -5,29 +5,18 @@ import { Matrix4 } from 'three';
 import { styled } from 'solid-styled-components';
 
 // Main components
-import MainUI from './MainUI';
 import Localization from './Localization';
 import Inventory from './Inventory';
 
 import Header from '@components/Header';
 import Loader from '@components/Loader';
 import BlurredCover from '@components/BlurredCover';
-import { Container, Centered } from '@components/smallElements'
-
-
-
-
 
 import { PLUGINS_LIST } from '@plugins/pluginsIndex';
-
 import { AppMode } from '@/main';
-
 
 // XR
 import SceneManager from '@js/sceneManager';
-import Reticle from '@js/reticle';
-
-
 
 // ===== CONTEXT =====
 export const Context = createContext();
