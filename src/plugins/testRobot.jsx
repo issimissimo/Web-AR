@@ -12,6 +12,12 @@ import { Matrix4 } from 'three';
 import { config } from '@js/config';
 
 
+import SceneManager from '@js/sceneManager';
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import { EquirectangularReflectionMapping } from 'three';
+import decodeImageFormat from '@tools/three/decodeImageFormat';
+
+
 
 
 
@@ -21,16 +27,10 @@ export default function testRobot(props) {
     const [showInstructions, setShowInstructions] = createSignal(true);
 
 
-
     const handleCloseInstructions = () => {
-
         setShowInstructions(() => false);
-
         game.blurBackground(false);
-
-        Reticle.set({
-            fileName: 'models/reticle_v1.glb'
-        });
+        Reticle.setVisible(true);
     }
 
 
@@ -42,7 +42,7 @@ export default function testRobot(props) {
         onTap: () => {
 
             console.log("testRobot -- onTap")
-            
+
             if (Reticle.isHitting() && !showInstructions()) {
                 const hitMatrix = Reticle.getHitMatrix();
                 spawnModel(hitMatrix);
@@ -64,6 +64,11 @@ export default function testRobot(props) {
     * On mount
     */
     onMount(async () => {
+
+        Reticle.set({
+            fileName: 'models/reticle_v1.glb'
+        });
+        Reticle.setVisible(false);
 
         await game.loader.load("models/RobotArmNLA_compressed.glb");
 

@@ -25,7 +25,7 @@
     "solid-fa": "^0.2.0",
     "solid-motionone": "^1.0.4",
     "solid-styled-components": "^0.28.5",
-    "three": "^0.153.0"
+    "three": "^0.180.0"
   },
   "coloredRegions": {
     "namedColors": {

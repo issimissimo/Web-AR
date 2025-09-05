@@ -109,14 +109,11 @@ export default function ArSession(props) {
     * In this way we keep the main bundle as small as possible!
     */
     async function loadAllModules() {
-        if (props.marker.games, length > 0) {
-
-            for (const el of props.marker.games) {
-                if (el.enabled) {
-                    // load dynamically the module
-                    setGamesInitializing(() => true);
-                    await loadModule(el.id, el.name, true);
-                }
+        for (const el of props.marker.games) {
+            if (el.enabled) {
+                // load dynamically the module
+                setGamesInitializing(() => true);
+                await loadModule(el.id, el.name, true);
             }
         }
         setLoading(() => false);
@@ -180,6 +177,9 @@ export default function ArSession(props) {
         if (_gamesInitialized === modules().length) {
             console.log("all games initialized!")
             setGamesInitializing(() => false);
+
+            // it should not be necessary here... :/
+            updateClickableDomElements();
 
 
             // If just one of the game need localization,

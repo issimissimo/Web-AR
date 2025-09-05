@@ -54,7 +54,8 @@ const Statistic = (props) => {
 //
 
 const MarkerContainer = styled(Motion.div)`
-    margin-top: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   `;
 
 const TimestampContainer = styled('div')`

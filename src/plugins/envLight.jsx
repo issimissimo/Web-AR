@@ -5,8 +5,7 @@ import SceneManager from '@js/sceneManager';
 
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import { EquirectangularReflectionMapping } from 'three';
-
-import decodeImageFormat from 'src/tools/three/decodeImageFormat';
+import decodeImageFormat from '@tools/three/decodeImageFormat';
 
 export default function EnvLight(props) {
 

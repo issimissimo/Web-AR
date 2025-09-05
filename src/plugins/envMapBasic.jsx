@@ -28,7 +28,6 @@ export default function envMapBasic(props) {
     */
     const defaultGameData = {
         fileName: "images/hdr/spree_bank.hdr",
-        rotation: 0
     }
 
 
@@ -74,7 +73,6 @@ export default function envMapBasic(props) {
             const environment = envMap;
             environment.mapping = EquirectangularReflectionMapping;
             SceneManager.scene.environment = environment;
-            SceneManager.scene.environmentRotation = game.gameData().rotation;
             SceneManager.scene.remove(SceneManager.light);
 
             /*
