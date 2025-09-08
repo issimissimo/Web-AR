@@ -259,17 +259,12 @@ export default function Main() {
     function render(timestamp, frame) {
         if (SceneManager.initialized()) {
 
-            // // Update the the standard camera on XR camera
-            // // (just used if we have to put another scene on top of AR)
-            // if (frame) {
-            //     SceneManager.updateStandardCamera(frame);
-            // }
-
             // Update Reticle
             if (frame && Reticle.initialized()) {
                 Reticle.update(frame, (surfType) => {
                 });
                 setPlaneFound(Reticle.isHitting())
+                console.log("PLANE FOUND:", Reticle.isHitting())
             }
 
             // render the loop of the running Games

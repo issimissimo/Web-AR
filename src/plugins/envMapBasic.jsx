@@ -27,8 +27,8 @@ export default function envMapBasic(props) {
     * DATA
     */
     const defaultGameData = {
-        fileName: "images/hdr/spree_bank.hdr",
-        exposure: 5
+        fileName: "images/hdr/empty_warehouse_1k.hdr",
+        exposure: 1
     }
 
 
@@ -69,7 +69,7 @@ export default function envMapBasic(props) {
             envMap.mapping = EquirectangularReflectionMapping;
             SceneManager.scene.environment = envMap;
             SceneManager.scene.environmentIntensity = game.gameData().exposure;
-            // SceneManager.scene.remove(SceneManager.light);
+            SceneManager.scene.remove(SceneManager.light);
 
             /*
             * Don't forget to call "game.setInitialized(true)" at finish 

@@ -5,6 +5,7 @@ import { Matrix4 } from 'three';
 import { styled } from 'solid-styled-components';
 
 // Main components
+import InitialPlaneDetection from './InitialPlaneDetection';
 import Localization from './Localization';
 import Inventory from './Inventory';
 

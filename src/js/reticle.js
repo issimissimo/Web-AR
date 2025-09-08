@@ -24,7 +24,7 @@ let _hitTestSource = null;
 let _hitTestSourceRequested = false;
 let _isHitting = false;
 let _surfType = null;
-let _visible = true;
+let _enabled = true;
 let _reticleMode = null;
 
 
@@ -119,67 +119,87 @@ const Reticle = {
      * @param {number} [options.color] - Il colore del reticolo.
      */
     set(options = {}) {
-        _renderer = SceneManager.renderer;
-        _scene = SceneManager.scene;
-        _camera = SceneManager.camera;
+        return new Promise((resolve, reject) => {
+            _renderer = SceneManager.renderer;
+            _scene = SceneManager.scene;
+            _camera = SceneManager.camera;
 
-        if (!SceneManager.initialized() || !_renderer || !_scene || !_camera) {
-            console.error("XrReticle: renderer or scene not set");
-            alert("XrReticle: renderer or scene not set")
-            return;
-        }
+            if (!SceneManager.initialized() || !_renderer || !_scene || !_camera) {
+                const errorMsg = "XrReticle: renderer or scene not set";
+                console.error(errorMsg);
+                alert(errorMsg);
+                reject(new Error(errorMsg));
+                return;
+            }
 
-        if (options.radius) _options.radius = options.radius;
-        if (options.innerRadius) _options.innerRadius = options.innerRadius;
-        if (options.segments) _options.segments = options.segments;
-        if (options.color) _options.color = options.color;
+            // Configura le opzioni
+            if (options.radius) _options.radius = options.radius;
+            if (options.innerRadius) _options.innerRadius = options.innerRadius;
+            if (options.segments) _options.segments = options.segments;
+            if (options.color) _options.color = options.color;
 
-        if (options.fileName) {
-            console.log("loading GLTF")
-            const loader = new GLTFLoader();
+            // Funzione helper per completare la configurazione
+            const completeSetup = () => {
+                // Add the circle target in front of the camera
+                // to use in place of plane detection
+                const circleGeometry = new RingGeometry(0, 0.02, 24);
+                const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
+                _circleMesh = new Mesh(circleGeometry, circleMaterial);
+                _camera.add(_circleMesh);
+                _circleMesh.position.z = -1;
+                _scene.add(_camera);
 
-            const draco = new DRACOLoader()
-            draco.setDecoderConfig({ type: "js" })
-            draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/")
-            loader.setDRACOLoader(draco)
+                // At the end, we set the default mode
+                this.setUsePlaneDetection(true);
 
-            loader.load(
-                options.fileName,
-                (gltf) => {
-                    const r = gltf.scene;
-                    const ref = r.children[0];
-                    _planeMesh = ref.clone();
+                // Risolvi la Promise
+                resolve();
+            };
+
+            if (options.fileName) {
+                console.log("loading GLTF");
+                const loader = new GLTFLoader();
+
+                const draco = new DRACOLoader();
+                draco.setDecoderConfig({ type: "js" });
+                draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+                loader.setDRACOLoader(draco);
+
+                loader.load(
+                    options.fileName,
+                    (gltf) => {
+                        try {
+                            const r = gltf.scene;
+                            const ref = r.children[0];
+                            _planeMesh = ref.clone();
+                            _setReticleProperties();
+                            completeSetup();
+                        } catch (error) {
+                            console.error('Error processing GLTF:', error);
+                            reject(error);
+                        }
+                    },
+                    (xhr) => {
+                        // console.log((xhr.loaded / xhr.total * 100) + '% loaded of reticle');
+                    },
+                    (error) => {
+                        console.error('An error happened loading GLTF:', error);
+                        reject(error);
+                    }
+                );
+            } else {
+                try {
+                    const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
+                    const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
+                    _planeMesh = new Mesh(ringGeometry, material);
                     _setReticleProperties();
-                },
-                (xhr) => {
-                    // console.log((xhr.loaded / xhr.total * 100) + '% loaded of reticle');
-                },
-                (error) => {
-                    console.error('An error happened', error);
+                    completeSetup();
+                } catch (error) {
+                    console.error('Error creating ring geometry:', error);
+                    reject(error);
                 }
-            );
-
-
-
-        }
-        else {
-            const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
-            const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
-            _planeMesh = new Mesh(ringGeometry, material);
-            _setReticleProperties();
-        }
-
-        // Add the circle target in front of the camera
-        // to use in place of plane detection
-        const circleGeometry = new RingGeometry(0, 0.02, 24);
-        const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
-        _circleMesh = new Mesh(circleGeometry, circleMaterial);
-        _camera.add(_circleMesh);
-        _circleMesh.position.z = -1;
-        _scene.add(_camera);
-
-        // At the end, we set the default mode
-        this.setUsePlaneDetection(true)
+            }
+        });
     },
 
     /**
@@ -191,9 +211,9 @@ const Reticle = {
      * @returns {void}
      */
     update(frame, callback) {
-        if (!_visible) {
-            _planeMesh.visible = false;
-            _circleMesh.visible = false;
+        if (!_enabled) {
+            // _planeMesh.visible = false;
+            // _circleMesh.visible = false;
             return;
         }
 
@@ -202,8 +222,8 @@ const Reticle = {
 
         // Update camera from pose (used from CircleMesh)
         if (_reticleMode === MODE.FREE) {
-            _planeMesh.visible = false;
-            _circleMesh.visible = true;
+            // _planeMesh.visible = false;
+            // _circleMesh.visible = true;
             const framePose = frame.getViewerPose(referenceSpace);
             if (framePose) {
                 const position = framePose.transform.position;
@@ -217,8 +237,8 @@ const Reticle = {
 
         // Check for hit source (used from PlaneMesh)
         else if (_reticleMode === MODE.PLANE) {
-            _planeMesh.visible = true;
-            _circleMesh.visible = false;
+            // _planeMesh.visible = true;
+            // _circleMesh.visible = false;
 
             const session = _renderer.xr.getSession();
 
@@ -331,7 +351,7 @@ const Reticle = {
         _hitTestSourceRequested = false;
         _isHitting = false;
         _surfType = null;
-        _visible = true;
+        _enabled = true;
         _reticleMode = null;
         _initialized = false;
 
@@ -365,11 +385,30 @@ const Reticle = {
     },
 
     setVisible(value) {
-        _visible = value;
+        if (value) {
+            if (_reticleMode === MODE.PLANE) {
+                _planeMesh.visible = true;
+                _circleMesh.visible = false;
+            }
+            if (_reticleMode === MODE.FREE) {
+                _planeMesh.visible = false;
+                _circleMesh.visible = true;
+            }
+        }
+        else {
+            _planeMesh.visible = false;
+            _circleMesh.visible = false;
+        }
+        // _visible = value;
     },
 
     visible() {
-        return _visible;
+        if (_planeMesh.visible || _circleMesh.visible) return true;
+        return false;
+    },
+
+    setEnabled(value) {
+        _enabled = value;
     },
 
     surfType() {
@@ -378,6 +417,7 @@ const Reticle = {
 
     setUsePlaneDetection(value) {
         _reticleMode = value ? MODE.PLANE : MODE.FREE;
+        this.setVisible(true)
     },
 }
 

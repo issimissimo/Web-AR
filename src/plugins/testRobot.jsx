@@ -6,13 +6,16 @@ import Message from '@components/Message';
 import Button from '@components/Button';
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
-import { MeshStandardMaterial, PlaneGeometry, MeshBasicMaterial, Mesh, TextureLoader, Vector3, Euler } from "three";
+import { TextureLoader, Vector3, Euler } from "three";
+
+import RecreateMaterials from '@tools/three/recreateMaterials';
 
 
 export default function testRobot(props) {
 
     const [showInstructions, setShowInstructions] = createSignal(true);
 
+    let model;
 
     const handleCloseInstructions = () => {
         setShowInstructions(() => false);
@@ -30,7 +33,7 @@ export default function testRobot(props) {
 
             console.log("testRobot -- onTap")
 
-            if (Reticle.isHitting() && !showInstructions()) {
+            if (Reticle.visible() && Reticle.isHitting() && !showInstructions()) {
                 const hitMatrix = Reticle.getHitMatrix();
                 spawnModel(hitMatrix);
             }
@@ -45,49 +48,53 @@ export default function testRobot(props) {
     * DATA
     */
 
-    let planeShadow;
+
 
     /*
     * On mount
     */
     onMount(async () => {
 
-        Reticle.set({
+        await Reticle.set({
             fileName: 'models/reticle_v1.glb'
         });
         Reticle.setVisible(false);
 
 
-        const planeTexture = await loadTexture('models/shadow.jpg');
-        const planeGeo = new PlaneGeometry(0.7, 0.7);
-        planeGeo.rotateX(- Math.PI / 2);
-        const planeMat = new MeshBasicMaterial({
-            alphaMap: planeTexture,
-            transparent: true,
-            color: 0x000000,
-        });
-        planeShadow = new Mesh(planeGeo, planeMat);
+        // const planeTexture = await loadTexture('models/shadow.jpg');
+        // const planeGeo = new PlaneGeometry(0.7, 0.7);
+        // planeGeo.rotateX(- Math.PI / 2);
+        // const planeMat = new MeshBasicMaterial({
+        //     alphaMap: planeTexture,
+        //     transparent: true,
+        //     color: 0x000000,
+        // });
+        // planeShadow = new Mesh(planeGeo, planeMat);
 
 
-        const aoTexture = await loadTexture("models/robot_AO_02.png")
+        const aoTexture = await loadTexture("models/RACER_UNWRAP_ANIM.png")
         aoTexture.flipY = false;
 
 
-        const model = await game.loader.load("models/robot_unwrapped.glb");
+        model = await game.loader.load("models/RACER_UNWRAP_ANIM.glb");
         // now we NEED to recreate the materials
         // of the unwrapped model... :/
-        model.traverse((child) => {
-            if (child.isMesh) {
-                const mat = new MeshStandardMaterial({
-                    aoMap: aoTexture,
-                    aoMapIntensity: 1,
-                    color: child.material.color,
-                    metalness: child.material.metalness,
-                    roughness: child.material.roughness
-                });
-                child.material = mat;
-                child.material.needsUpdate = true;
-            }
+        // model.traverse((child) => {
+        //     if (child.isMesh) {
+        //         const mat = new MeshStandardMaterial({
+        //             aoMap: aoTexture,
+        //             aoMapIntensity: 1,
+        //             color: child.material.color,
+        //             metalness: child.material.metalness,
+        //             roughness: child.material.roughness
+        //         });
+        //         child.material = mat;
+        //         child.material.needsUpdate = true;
+        //     }
+        // });
+        model = RecreateMaterials(model, {
+            aoMap: aoTexture,
+            aoMapIntensity: 1.4
         });
 
 
@@ -107,8 +114,8 @@ export default function testRobot(props) {
     * LOOP
     */
     function loop() {
-        // if (game.loader.loaded())
-        //     game.loader.animate();
+        if (game.loader.loaded())
+            game.loader.animate();
     }
 
 
@@ -168,22 +175,17 @@ export default function testRobot(props) {
         const rotation = new Euler();
         rotation.setFromRotationMatrix(matrix);
 
-        const scale = new Vector3(1.5, 1.5, 1.5);
 
         // newModel.matrix.copy(matrix);
 
         newModel.position.copy(position);
         newModel.rotation.copy(rotation);
-        newModel.scale.copy(scale);
+        
 
         game.addToScene(newModel);
 
-        // planeShadow.matrixAutoUpdate = false;
-        // planeShadow.matrix.copy(matrix);
-        planeShadow.position.copy(position);
-        planeShadow.rotation.copy(rotation);
 
-        game.addToScene(planeShadow);
+
 
         Reticle.setVisible(false);
     }
