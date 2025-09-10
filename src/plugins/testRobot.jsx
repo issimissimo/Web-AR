@@ -105,7 +105,7 @@ export default function testRobot(props) {
         
         if (game.loader.loaded() && spawnedModel !== null){
 
-            // game.loader.animate();
+            game.loader.animate();
 
             if (shadows) shadows.update();
         }
@@ -183,7 +183,8 @@ export default function testRobot(props) {
             position: position,
             resolution: 512,
             blur: 2,
-            animate: false
+            animate: true,
+            updateFrequency: 2,
         });
 
 

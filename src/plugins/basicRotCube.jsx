@@ -1,13 +1,14 @@
 import { onMount } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
-import { BoxGeometry, MeshBasicMaterial, Mesh, MeshPhysicalMaterial } from 'three';
+import { BoxGeometry, MeshStandardMaterial, Mesh, HemisphereLight, Vector3 } from 'three';
 import Reticle from '@js/reticle';
 
+import ContactShadowsXR from '@tools/three/contactShadowsXR';
+import SceneManager from '@js/sceneManager';
 
 
-
-export default function BasicRotCube(props) {
+export default function basicRotCube(props) {
 
     /*
     * Put here derived functions from Game
@@ -40,26 +41,36 @@ export default function BasicRotCube(props) {
     /*
     * SETUP SCENE
     */
-    let cube;
+    let cube, shadows;
     function setupScene() {
 
+        console.log("SETUP!")
         Reticle.setEnabled(false);
 
-        const cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-        const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-        cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        const cubeGeometry = new BoxGeometry(0.5, 0.5, 0.5);
+        const cubeMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
+        cube = new Mesh(cubeGeometry, cubeMaterial);
         cube.position.set(0, -0.5, -1);
         game.addToScene(cube);
 
 
-        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+        const light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
         light.position.set(0, 2, 0);
         game.addToScene(light);
 
+
+        shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
+            position: new Vector3(0, -1, -1),
+            resolution: 512,
+            blur: 2,
+            animate: true,
+            updateFrequency: 2,
+        });
+
         /*
-        * Don't forget to call "game.initialized()" at finish 
+        * Don't forget to call "game.setInitialized(true)" at finish 
         */
-        game.initialized();
+        game.setInitialized(true)
     }
 
 
@@ -69,6 +80,8 @@ export default function BasicRotCube(props) {
     function loop() {
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.01;
+
+        shadows.update();
     }
 
 

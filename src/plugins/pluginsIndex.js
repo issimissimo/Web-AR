@@ -59,7 +59,7 @@ export const PLUGINS_LIST = [
         description: 'Da eliminare, solo di test',
         icon: '/icons/360.svg',
         category: '3D',
-        allowed: 0,
+        allowed: 1,
         localized: false,
         tags: [],
         requirements: {}
