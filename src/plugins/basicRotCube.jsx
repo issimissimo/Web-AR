@@ -2,6 +2,7 @@ import { onMount } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { BoxGeometry, MeshBasicMaterial, Mesh, MeshPhysicalMaterial } from 'three';
+import Reticle from '@js/reticle';
 
 
 
@@ -41,12 +42,19 @@ export default function BasicRotCube(props) {
     */
     let cube;
     function setupScene() {
-        const geometry = new BoxGeometry(0.5, 0.5, 0.5);
-        const material = new MeshBasicMaterial({ color: 0x00ff00 });
-        const material2 = new MeshPhysicalMaterial({ color: 0x00ff00, metalness: 0, roughness: 0.1 });
-        cube = new Mesh(geometry, material2);
-        cube.position.z = -1;
+
+        Reticle.setEnabled(false);
+
+        const cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+        cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.position.set(0, -0.5, -1);
         game.addToScene(cube);
+
+
+        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+        light.position.set(0, 2, 0);
+        game.addToScene(light);
 
         /*
         * Don't forget to call "game.initialized()" at finish 

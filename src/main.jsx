@@ -260,7 +260,7 @@ export default function Main() {
         if (SceneManager.initialized()) {
 
             // Update Reticle
-            if (frame && Reticle.initialized()) {
+            if (frame && Reticle.initialized() && Reticle.enabled()) {
                 Reticle.update(frame, (surfType) => {
                 });
                 setPlaneFound(Reticle.isHitting())

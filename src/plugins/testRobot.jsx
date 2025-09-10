@@ -8,14 +8,19 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { TextureLoader, Vector3, Euler } from "three";
 
+import { LoadTexture } from '@tools/three/textureUtils';
 import RecreateMaterials from '@tools/three/recreateMaterials';
+import ContactShadowsXR from '@tools/three/contactShadowsXR';
+import SceneManager from '@js/sceneManager';
 
 
 export default function testRobot(props) {
 
     const [showInstructions, setShowInstructions] = createSignal(true);
 
-    let model;
+    let loadedModel;
+    let spawnedModel;
+    let shadows;
 
     const handleCloseInstructions = () => {
         setShowInstructions(() => false);
@@ -55,47 +60,30 @@ export default function testRobot(props) {
     */
     onMount(async () => {
 
-        await Reticle.set({
-            fileName: 'models/reticle_v1.glb'
-        });
+        await Reticle.set(
+            {
+                fileName: 'models/reticle_v1.glb'
+            });
+            
         Reticle.setVisible(false);
 
 
-        // const planeTexture = await loadTexture('models/shadow.jpg');
-        // const planeGeo = new PlaneGeometry(0.7, 0.7);
-        // planeGeo.rotateX(- Math.PI / 2);
-        // const planeMat = new MeshBasicMaterial({
-        //     alphaMap: planeTexture,
-        //     transparent: true,
-        //     color: 0x000000,
-        // });
-        // planeShadow = new Mesh(planeGeo, planeMat);
+
+        // const aoTexture = await loadTexture("models/RACER_UNWRAP_ANIM.png")
+        // aoTexture.flipY = false;ù
+
+        const aoTexture = await LoadTexture("models/RACER_UNWRAP_ANIM.png",
+            {
+                flipY: false
+            });
 
 
-        const aoTexture = await loadTexture("models/RACER_UNWRAP_ANIM.png")
-        aoTexture.flipY = false;
-
-
-        model = await game.loader.load("models/RACER_UNWRAP_ANIM.glb");
-        // now we NEED to recreate the materials
-        // of the unwrapped model... :/
-        // model.traverse((child) => {
-        //     if (child.isMesh) {
-        //         const mat = new MeshStandardMaterial({
-        //             aoMap: aoTexture,
-        //             aoMapIntensity: 1,
-        //             color: child.material.color,
-        //             metalness: child.material.metalness,
-        //             roughness: child.material.roughness
-        //         });
-        //         child.material = mat;
-        //         child.material.needsUpdate = true;
-        //     }
-        // });
-        model = RecreateMaterials(model, {
-            aoMap: aoTexture,
-            aoMapIntensity: 1.4
-        });
+        loadedModel = await game.loader.load("models/RACER_UNWRAP_ANIM.glb");
+        loadedModel = RecreateMaterials(loadedModel,
+            {
+                aoMap: aoTexture,
+                aoMapIntensity: 1.4
+            });
 
 
 
@@ -114,8 +102,13 @@ export default function testRobot(props) {
     * LOOP
     */
     function loop() {
-        if (game.loader.loaded())
-            game.loader.animate();
+        
+        if (game.loader.loaded() && spawnedModel !== null){
+
+            // game.loader.animate();
+
+            if (shadows) shadows.update();
+        }
     }
 
 
@@ -149,7 +142,7 @@ export default function testRobot(props) {
                         svgIcon={'icons/tap.svg'}
                         showReadMore={false}
                     >
-                        Fai TAP sullo schermo per posizionare un robot su una superficie che individuo intorno a te.
+                        Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano. <br></br> Evita i piani troppo riflettenti o uniformi.
                     </Message>
                     <Button
                         onClick={handleCloseInstructions}
@@ -166,7 +159,7 @@ export default function testRobot(props) {
 
 
     function spawnModel(matrix) {
-        const newModel = game.loader.clone();
+        spawnedModel = game.loader.clone();
         // newModel.matrixAutoUpdate = false;
 
         const position = new Vector3();
@@ -178,23 +171,38 @@ export default function testRobot(props) {
 
         // newModel.matrix.copy(matrix);
 
-        newModel.position.copy(position);
-        newModel.rotation.copy(rotation);
-        
-
-        game.addToScene(newModel);
+        spawnedModel.position.copy(position);
+        spawnedModel.rotation.copy(rotation);
+        spawnedModel.rotateY(Math.PI / 2);
 
 
+        game.addToScene(spawnedModel);
+
+
+        shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
+            position: position,
+            resolution: 512,
+            blur: 2,
+            animate: false
+        });
 
 
         Reticle.setVisible(false);
     }
 
 
-    async function loadTexture(url) {
-        return new Promise((resolve, reject) => {
-            new TextureLoader().load(url, resolve, undefined, reject);
-        });
-    }
+    // async function loadTexture(url, options = {}) {
+    //     return new Promise((resolve, reject) => {
+    //         new TextureLoader().load(
+    //             url,
+    //             (texture) => {
+    //                 texture.flipY = options.flipY ?? true;
+    //                 resolve(texture);
+    //             },
+    //             undefined,
+    //             reject
+    //         );
+    //     });
+    // }
 
 }

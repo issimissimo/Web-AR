@@ -152,6 +152,8 @@ const Reticle = {
                 // At the end, we set the default mode
                 this.setUsePlaneDetection(true);
 
+                this.setVisible(true);
+
                 // Risolvi la Promise
                 resolve();
             };
@@ -212,8 +214,8 @@ const Reticle = {
      */
     update(frame, callback) {
         if (!_enabled) {
-            // _planeMesh.visible = false;
-            // _circleMesh.visible = false;
+            _planeMesh.visible = false;
+            _circleMesh.visible = false;
             return;
         }
 
@@ -222,8 +224,10 @@ const Reticle = {
 
         // Update camera from pose (used from CircleMesh)
         if (_reticleMode === MODE.FREE) {
-            // _planeMesh.visible = false;
-            // _circleMesh.visible = true;
+
+            _planeMesh.visible = false;
+            _circleMesh.visible = _circleMesh._shouldDisplay;
+
             const framePose = frame.getViewerPose(referenceSpace);
             if (framePose) {
                 const position = framePose.transform.position;
@@ -237,8 +241,8 @@ const Reticle = {
 
         // Check for hit source (used from PlaneMesh)
         else if (_reticleMode === MODE.PLANE) {
-            // _planeMesh.visible = true;
-            // _circleMesh.visible = false;
+            
+            _circleMesh.visible = false;
 
             const session = _renderer.xr.getSession();
 
@@ -264,7 +268,8 @@ const Reticle = {
                 if (hitTestResults.length) {
 
                     _isHitting = true;
-                    _planeMesh.visible = true;
+
+                    if (_planeMesh._shouldDisplay) _planeMesh.visible = true;
 
                     const hit = hitTestResults[0];
                     const pose = hit.getPose(referenceSpace);
@@ -387,28 +392,31 @@ const Reticle = {
     setVisible(value) {
         if (value) {
             if (_reticleMode === MODE.PLANE) {
-                _planeMesh.visible = true;
-                _circleMesh.visible = false;
+                _planeMesh._shouldDisplay = true;
+                _circleMesh._shouldDisplay = false;
             }
             if (_reticleMode === MODE.FREE) {
-                _planeMesh.visible = false;
-                _circleMesh.visible = true;
+                _planeMesh._shouldDisplay = false;
+                _circleMesh._shouldDisplay = true;
             }
         }
         else {
-            _planeMesh.visible = false;
-            _circleMesh.visible = false;
+            _planeMesh._shouldDisplay = false;
+            _circleMesh._shouldDisplay = false;
         }
-        // _visible = value;
     },
 
     visible() {
-        if (_planeMesh.visible || _circleMesh.visible) return true;
+        if (_planeMesh._shouldDisplay || _circleMesh._shouldDisplay) return true;
         return false;
     },
 
     setEnabled(value) {
         _enabled = value;
+    },
+
+    enabled(){
+        return _enabled;
     },
 
     surfType() {
@@ -417,7 +425,6 @@ const Reticle = {
 
     setUsePlaneDetection(value) {
         _reticleMode = value ? MODE.PLANE : MODE.FREE;
-        this.setVisible(true)
     },
 }
 

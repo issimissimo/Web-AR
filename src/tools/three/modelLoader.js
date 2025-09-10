@@ -16,7 +16,7 @@ class modelLoader {
         this._loaded = false;
     }
 
-    _setupAnimations(model) {
+    _setupAnimations(model, randomizeTime) {
         if (this.gltf.animations.length > 0) {
             if (!this.clock) this.clock = new Clock();
             const mixer = new AnimationMixer(model);
@@ -25,16 +25,17 @@ class modelLoader {
                 action.play();
 
                 // Shift casuale dell’animazione
-                action.time = Math.random() * clip.duration;
+                if (randomizeTime) action.time = Math.random() * clip.duration;
             });
             this.mixers.push(mixer);
         }
     }
 
-    async load(fileUrl) {
+    async load(fileUrl, options = {}) {
+        const randomizeTime = options.randomizeTime ?? false;
         this.gltf = await this.loader.loadAsync(fileUrl);
         this.model = this.gltf.scene;
-        this._setupAnimations(this.model);
+        this._setupAnimations(this.model, randomizeTime);
         this._loaded = true;
         return this.model;
     }
