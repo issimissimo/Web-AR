@@ -6,7 +6,7 @@ import Message from '@components/Message';
 import Button from '@components/Button';
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
-import { TextureLoader, Vector3, Euler } from "three";
+import { Vector3, Euler } from "three";
 
 import { LoadTexture } from '@tools/three/textureUtils';
 import RecreateMaterials from '@tools/three/recreateMaterials';
@@ -40,7 +40,13 @@ export default function testRobot(props) {
 
             if (Reticle.visible() && Reticle.isHitting() && !showInstructions()) {
                 const hitMatrix = Reticle.getHitMatrix();
+
+                // tap sound
+                game.super.onTap();
+
                 spawnModel(hitMatrix);
+
+                Reticle.setEnabled(false);
             }
         },
 
@@ -68,10 +74,6 @@ export default function testRobot(props) {
         Reticle.setVisible(false);
 
 
-
-        // const aoTexture = await loadTexture("models/RACER_UNWRAP_ANIM.png")
-        // aoTexture.flipY = false;ù
-
         const aoTexture = await LoadTexture("models/RACER_UNWRAP_ANIM.png",
             {
                 flipY: false
@@ -84,7 +86,6 @@ export default function testRobot(props) {
                 aoMap: aoTexture,
                 aoMapIntensity: 1.4
             });
-
 
 
         game.blurBackground(true);
@@ -160,24 +161,17 @@ export default function testRobot(props) {
 
     function spawnModel(matrix) {
         spawnedModel = game.loader.clone();
-        // newModel.matrixAutoUpdate = false;
-
+        
         const position = new Vector3();
         position.setFromMatrixPosition(matrix);
 
         const rotation = new Euler();
         rotation.setFromRotationMatrix(matrix);
 
-
-        // newModel.matrix.copy(matrix);
-
         spawnedModel.position.copy(position);
         spawnedModel.rotation.copy(rotation);
         spawnedModel.rotateY(Math.PI / 2);
-
-
         game.addToScene(spawnedModel);
-
 
         shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
             position: position,
@@ -188,22 +182,6 @@ export default function testRobot(props) {
         });
 
 
-        Reticle.setVisible(false);
+        
     }
-
-
-    // async function loadTexture(url, options = {}) {
-    //     return new Promise((resolve, reject) => {
-    //         new TextureLoader().load(
-    //             url,
-    //             (texture) => {
-    //                 texture.flipY = options.flipY ?? true;
-    //                 resolve(texture);
-    //             },
-    //             undefined,
-    //             reject
-    //         );
-    //     });
-    // }
-
 }

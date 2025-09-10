@@ -8,6 +8,8 @@ import ContactShadowsXR from '@tools/three/contactShadowsXR';
 import SceneManager from '@js/sceneManager';
 
 
+
+
 export default function basicRotCube(props) {
 
     /*
@@ -16,7 +18,6 @@ export default function basicRotCube(props) {
     const { game } = useGame("basicRotCube", props.id, {
 
         onTap: () => {
-
         },
 
         renderLoop: () => loop()

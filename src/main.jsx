@@ -260,11 +260,13 @@ export default function Main() {
         if (SceneManager.initialized()) {
 
             // Update Reticle
-            if (frame && Reticle.initialized() && Reticle.enabled()) {
+            if (frame && Reticle.initialized()) {
                 Reticle.update(frame, (surfType) => {
                 });
-                setPlaneFound(Reticle.isHitting())
-                console.log("PLANE FOUND:", Reticle.isHitting())
+                if (Reticle.enabled()) {
+                    setPlaneFound(Reticle.isHitting())
+                    console.log("PLANE FOUND:", Reticle.isHitting())
+                }
             }
 
             // render the loop of the running Games
