@@ -132,13 +132,13 @@ const Reticle = {
                 return;
             }
 
-            // Configura le opzioni
+            
             if (options.radius) _options.radius = options.radius;
             if (options.innerRadius) _options.innerRadius = options.innerRadius;
             if (options.segments) _options.segments = options.segments;
             if (options.color) _options.color = options.color;
 
-            // Funzione helper per completare la configurazione
+            
             const completeSetup = () => {
                 // Add the circle target in front of the camera
                 // to use in place of plane detection
@@ -190,16 +190,11 @@ const Reticle = {
                     }
                 );
             } else {
-                try {
-                    const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
-                    const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
-                    _planeMesh = new Mesh(ringGeometry, material);
-                    _setReticleProperties();
-                    completeSetup();
-                } catch (error) {
-                    console.error('Error creating ring geometry:', error);
-                    reject(error);
-                }
+                const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
+                const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
+                _planeMesh = new Mesh(ringGeometry, material);
+                _setReticleProperties();
+                completeSetup();
             }
         });
     },
@@ -241,7 +236,7 @@ const Reticle = {
 
         // Check for hit source (used from PlaneMesh)
         else if (_reticleMode === MODE.PLANE) {
-            
+
             _circleMesh.visible = false;
 
             const session = _renderer.xr.getSession();
@@ -389,6 +384,11 @@ const Reticle = {
         return _circleMesh.matrixWorld;
     },
 
+    // If NOT visible,
+    // the Reticle is not displayed BUT it keep running,
+    // so it keep to be updated and detect surfaces
+    // DON't confuse with "mesh.visible" internal property
+    // that's handled internally
     setVisible(value) {
         if (value) {
             if (_reticleMode === MODE.PLANE) {
@@ -406,16 +406,22 @@ const Reticle = {
         }
     },
 
+
     visible() {
         if (_planeMesh._shouldDisplay || _circleMesh._shouldDisplay) return true;
         return false;
     },
 
+    // If NOT enabled,
+    // the Reticle is not displayed AND it does not run,
+    // so it's NOT updated and doesn't detect surfaces
     setEnabled(value) {
         _enabled = value;
+        _planeMesh._shouldDisplay = value;
+        _circleMesh._shouldDisplay = value;
     },
 
-    enabled(){
+    enabled() {
         return _enabled;
     },
 

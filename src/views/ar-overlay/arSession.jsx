@@ -51,19 +51,20 @@ export default function ArSession(props) {
     //#region [lifeCycle]
     onMount(() => {
 
+        // Let's show immediately the dark background
+        setBlurVisible(true);
+
         // If Debug on desktop we must set the background 
         // to black, so to see something...
         if (config.debugOnDesktop) {
             document.getElementsByTagName("body")[0].style.backgroundColor = "black"
         }
 
-
         // if we are "user" we must update the views number
         // of this marker (+1)
         if (props.appMode === AppMode.LOAD) {
             firebase.firestore.updateMarkerViews(props.userId, props.marker.id);
         }
-
 
         // On TAP on screen
         // event listener
@@ -96,13 +97,14 @@ export default function ArSession(props) {
 
 
 
-    /**
-    * When a Game has Reticle enabled on mount...
-    */
     // TODO: valutare se non far partire subito il reticle, anzichè lasciare che sia un game a settarlo per iniziare lo scanning delle superfici...
+    /** As soon as the Reticle find a surface
+    * we want to hide the "InitDetection" component
+    * and set prop "enabled={true}" on the games
+    */
     createEffect(() => {
         if (props.planeFound) {
-            setInitDetectionCompleted(true);
+            setInitDetectionCompleted(() => true);
         }
     })
 
@@ -114,8 +116,10 @@ export default function ArSession(props) {
     async function loadAllModules() {
         for (const el of props.marker.games) {
             if (el.enabled) {
-                // load dynamically the module
+
                 setGamesInitializing(() => true);
+
+                // load dynamically the module
                 await loadModule(el.id, el.name, true);
             }
         }
@@ -177,7 +181,9 @@ export default function ArSession(props) {
 
         _gamesInitialized++;
 
+        // When all games have finished to load their assets...
         if (_gamesInitialized === modules().length) {
+
             console.log("all games initialized!")
             setGamesInitializing(() => false);
 
@@ -383,6 +389,7 @@ export default function ArSession(props) {
                                     return <Component
                                         id={item.id}
                                         stored={item.stored}
+                                        enabled={initDetectionCompleted()}
                                         selected={item.id === selectedGameId() &&
                                             localizationState() !== LOCALIZATION_STATE.REQUIRED ?
                                             true : false}

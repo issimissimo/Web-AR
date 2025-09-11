@@ -64,6 +64,7 @@ export default function testRobot(props) {
 
 
         close: () => {
+            shadows.dispose();
             audio.stop();
         }
 
@@ -145,7 +146,7 @@ export default function testRobot(props) {
     return (
         <>
             {
-                showInstructions() && game.initialized() &&
+                props.enabled && showInstructions() &&
                 <Container>
                     <Message
                         style={{ "height": "auto" }}
