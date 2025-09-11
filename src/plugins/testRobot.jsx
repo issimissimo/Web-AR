@@ -1,17 +1,19 @@
 import { onMount, createSignal } from 'solid-js';
-import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
+
+import { useGame } from '@js/gameBase';
 import Reticle from '@js/reticle';
+import SceneManager from '@js/sceneManager';
+
 import Message from '@components/Message';
 import Button from '@components/Button';
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { Vector3, Euler } from "three";
-
-import { LoadTexture } from '@tools/three/textureUtils';
-import RecreateMaterials from '@tools/three/recreateMaterials';
+import { LoadTexture } from '@tools/three/textureTools';
+import { RecreateMaterials } from '@tools/three/materialTools';
 import ContactShadowsXR from '@tools/three/contactShadowsXR';
-import SceneManager from '@js/sceneManager';
+
 
 
 export default function testRobot(props) {
@@ -19,7 +21,7 @@ export default function testRobot(props) {
     const [showInstructions, setShowInstructions] = createSignal(true);
 
     let loadedModel;
-    let spawnedModel;
+    let spawnedModel = null;
     let shadows;
 
     const handleCloseInstructions = () => {
@@ -46,7 +48,7 @@ export default function testRobot(props) {
 
                 spawnModel(hitMatrix);
 
-                Reticle.setEnabled(false);
+                // Reticle.setEnabled(false);
             }
         },
 
@@ -70,7 +72,8 @@ export default function testRobot(props) {
             {
                 fileName: 'models/reticle_v1.glb'
             });
-            
+
+        // hide the Reticle but keep it working
         Reticle.setVisible(false);
 
 
@@ -87,7 +90,7 @@ export default function testRobot(props) {
                 aoMapIntensity: 1.4
             });
 
-
+        // blur background for instructions
         game.blurBackground(true);
 
         /*
@@ -103,12 +106,12 @@ export default function testRobot(props) {
     * LOOP
     */
     function loop() {
-        
-        if (game.loader.loaded() && spawnedModel !== null){
+
+        if (game.loader.loaded() && spawnedModel !== null) {
 
             game.loader.animate();
 
-            if (shadows) shadows.update();
+            shadows.update();
         }
     }
 
@@ -131,7 +134,7 @@ export default function testRobot(props) {
 
 
     /*
-    * RENDER
+    * RENDER (Will be shown ONLY after initialization completed)
     */
     return (
         <>
@@ -159,9 +162,11 @@ export default function testRobot(props) {
     );
 
 
+    //#region [functions]
+
     function spawnModel(matrix) {
         spawnedModel = game.loader.clone();
-        
+
         const position = new Vector3();
         position.setFromMatrixPosition(matrix);
 
@@ -182,6 +187,6 @@ export default function testRobot(props) {
         });
 
 
-        
+
     }
 }

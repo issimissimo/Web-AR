@@ -1,7 +1,7 @@
-export default function decodeImageFormat (image) {
+export default function decodeImageFormat (texture) {
     
-    const type = image.type;
-    const format = image.format;
+    const type = texture.type;
+    const format = texture.format;
     
     // Decodifica TYPE (profondità di bit)
     const typeMap = {

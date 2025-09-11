@@ -1,6 +1,6 @@
-import { MeshStandardMaterial } from 'three';
+import { MeshStandardMaterial, MeshPhysicalMaterial } from 'three';
 
-export default function RecreateMaterials(model, options = {
+export function RecreateMaterials(model, options = {
     aoMap: null,
     aoMapIntensity: 1,
     lightMap: null,

@@ -5,7 +5,7 @@ import { Matrix4 } from 'three';
 import { styled } from 'solid-styled-components';
 
 // Main components
-import InitialPlaneDetection from './InitialPlaneDetection';
+import InitialDetection from './InitialDetection';
 import Localization from './Localization';
 import Inventory from './Inventory';
 
@@ -35,6 +35,7 @@ export default function ArSession(props) {
 
     //#region [constants]
     const firebase = useFirebase();
+    const [initDetectionCompleted, setInitDetectionCompleted] = createSignal(false);
     const [localizationState, setLocalizationState] = createSignal(LOCALIZATION_STATE.NONE);
     const [referenceMatrix, setReferenceMatrix] = createSignal(new Matrix4());
     const [loading, setLoading] = createSignal(true);
@@ -91,6 +92,18 @@ export default function ArSession(props) {
         // console.log("---- Games imported:", gamesImported());
         console.log("---- Game id selected:", selectedGameId());
         // console.log("---- Games initializing:", gamesInitializing());
+    })
+
+
+
+    /**
+    * When a Game has Reticle enabled on mount...
+    */
+    // TODO: valutare se non far partire subito il reticle, anzichè lasciare che sia un game a settarlo per iniziare lo scanning delle superfici...
+    createEffect(() => {
+        if (props.planeFound) {
+            setInitDetectionCompleted(true);
+        }
     })
 
 
@@ -197,11 +210,12 @@ export default function ArSession(props) {
     //#region [functions]
 
 
+    /**
+    * This function is called when all games are initialized,
+    * but, since it's very unpredictable yo know the interactable DOM elements
+    * on the page, it should be called also when something on the page change
+    */
     let _clickableDomElements = [];
-    function disableTap(e) {
-        _tapEnabled = false;
-        e.stopPropagation();
-    };
     function updateClickableDomElements() {
         removeClickableDomElements();
         _clickableDomElements = document.querySelectorAll('#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]');
@@ -219,10 +233,17 @@ export default function ArSession(props) {
             element.removeEventListener('touchstart', disableTap, { passive: true });
         });
     };
+    function disableTap(e) {
+        _tapEnabled = false;
+        e.stopPropagation();
+    };
 
 
 
-
+    /**
+    * Hide (or show) all the objects inside all the games,
+    * or inside a specific game
+    */
     const setGamesVisible = (value, gameName = null) => {
         props.gamesRunning.forEach(el => {
             // only one game
@@ -301,6 +322,13 @@ export default function ArSession(props) {
     }
 
 
+
+
+
+
+
+    //#region [style]
+
     const Main = styled('div')`
           position: absolute;
           top: 0;
@@ -315,6 +343,10 @@ export default function ArSession(props) {
 
 
 
+
+
+
+
     //#region [return]
 
     return (
@@ -326,7 +358,8 @@ export default function ArSession(props) {
             markerId: props.marker.id,
             referenceMatrix: referenceMatrix(),
             localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED,
-            blurBackground: (value) => handleBlurBackground(value)
+            blurBackground: (value) => handleBlurBackground(value),
+            forceUpdateDomElements: updateClickableDomElements
         }}>
             <Main id="arSession">
 

@@ -6,7 +6,7 @@ import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
 import modelLoader from '@tools/three/modelLoader';
 import { getObjOffsetMatrix, getGlobalMatrixFromOffsetMatrix } from '@tools/three/maths';
-import { Howl } from 'howler';
+import { LoadAudio } from '@tools/three/audioTools';
 
 
 
@@ -19,12 +19,12 @@ export function useGame(gameName, gameId, config = {}) {
     const gameAssets = [];
     const [initialized, setInitialized] = createSignal(false);
     const [gameData, setGameData] = createSignal(null);
+
     const loader = new modelLoader();
-    let sounds = {};
-    sounds.tap = new Howl({ src: ['sounds/tap.mp3'] });
+    let audioTap;
 
-
-    onMount(() => {
+    onMount(async () => {
+        audioTap = await new LoadAudio('sounds/tap.mp3', SceneManager.listener);
         context.onLoaded(game);
     });
 
@@ -85,9 +85,9 @@ export function useGame(gameName, gameId, config = {}) {
 
     // Define base functions
     const _onTapBase = () => {
-        console.log(`${gameName} onTapBase`);
-        sounds.tap.play();
+        audioTap.play();
     };
+
     const _renderLoopBase = () => {
         console.log(`${gameName} renderLoopBase`);
     };

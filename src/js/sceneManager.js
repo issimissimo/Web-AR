@@ -8,6 +8,7 @@ import {
     BoxGeometry,
     MeshBasicMaterial,
     Mesh,
+    AudioListener
 } from 'three';
 
 
@@ -49,6 +50,10 @@ const SceneManager = {
             this.renderer.setSize(window.innerWidth, window.innerHeight);
         };
         window.addEventListener("resize", this.resizeHandler);
+
+        // Audio
+        this.listener = new AudioListener();
+        this.camera.add(this.listener);
 
         // Creazione AR Button
         this.arButton = ARButton.createButton(this.renderer, {
@@ -122,6 +127,7 @@ const SceneManager = {
         this.container = null;
         this.controller = null;
         this.arButton = null;
+        this.listener = null;
         this._initialized = false;
 
         console.log("SceneManager destroyed");
@@ -132,24 +138,21 @@ const SceneManager = {
         this.gizmo = await this.loadGltf("models/gizmo.glb");
     },
 
-    updateStandardCamera(frame) {
-        const referenceSpace = this.renderer.xr.getReferenceSpace();
-        const pose = frame.getViewerPose(referenceSpace);
-        if (pose) {
-            const view = framePose.views[0];
-            this.camera.projectionMatrix.fromArray(view.projectionMatrix);
-            const position = pose.transform.position;
-            const rotation = pose.transform.orientation;
-            this.camera.position.set(position.x, position.y, position.z);
-            this.camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
-            this.camera.updateMatrixWorld();
-        }
+    _updateDefaultCamera() {
+        const xrCamera = this.renderer.xr.getCamera();
+        // console.log("XR:", xrCamera.position, xrCamera.quaternion);
+        this.camera.position.copy(xrCamera.position);
+        this.camera.quaternion.copy(xrCamera.quaternion);
+        // console.log("STD:", this.camera.position, this.camera.quaternion);
     },
 
     update() {
         if (!this._initialized) {
             console.error("SceneManager not initialized");
             return;
+        }
+        if (this.renderer.xr.isPresenting) {
+            this._updateDefaultCamera();
         }
         this.renderer.render(this.scene, this.camera);
     },

@@ -116,7 +116,7 @@ export default function basicRotCube(props) {
 
 
     /*
-    * RENDER
+    * RENDER (Will be shown ONLY after initialization completed)
     */
     return (
         props.selected ?
