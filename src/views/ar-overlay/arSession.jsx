@@ -18,6 +18,7 @@ import { AppMode } from '@/main';
 
 // XR
 import SceneManager from '@js/sceneManager';
+import Reticle from '@js/reticle';
 
 // ===== CONTEXT =====
 export const Context = createContext();
@@ -49,10 +50,16 @@ export default function ArSession(props) {
 
 
     //#region [lifeCycle]
-    onMount(() => {
+    onMount(async () => {
 
-        // Let's show immediately the dark background
+        // Let's start immediately darkening the background
+        // and running the Reticle, to detect the space around us
+        // (we start the Reticle here, and not in the games, because
+        // we want to be the 1st detection as quick as possible)
         setBlurVisible(true);
+        await Reticle.set();
+        Reticle.setVisible(false);
+
 
         // If Debug on desktop we must set the background 
         // to black, so to see something...
@@ -88,16 +95,15 @@ export default function ArSession(props) {
     });
 
 
-    createEffect(() => {
-        console.log("---- Games running:", props.gamesRunning)
-        // console.log("---- Games imported:", gamesImported());
-        console.log("---- Game id selected:", selectedGameId());
-        // console.log("---- Games initializing:", gamesInitializing());
-    })
+    // createEffect(() => {
+    //     console.log("---- Games running:", props.gamesRunning)
+    //     // console.log("---- Games imported:", gamesImported());
+    //     console.log("---- Game id selected:", selectedGameId());
+    //     // console.log("---- Games initializing:", gamesInitializing());
+    // })
 
 
 
-    // TODO: valutare se non far partire subito il reticle, anzichè lasciare che sia un game a settarlo per iniziare lo scanning delle superfici...
     /** As soon as the Reticle find a surface
     * we want to hide the "InitDetection" component
     * and set prop "enabled={true}" on the games
@@ -383,6 +389,8 @@ export default function ArSession(props) {
                         <>
                             {gamesInitializing() && <Loader text="Inizializzo" />}
 
+
+                            {/* GAMES */}
                             <For each={modules()}>
                                 {item => {
                                     const Component = item.component;
@@ -397,22 +405,30 @@ export default function ArSession(props) {
                                 }}
                             </For>
 
+
                             {!gamesInitializing() && (
-                                localizationState() === LOCALIZATION_STATE.REQUIRED ?
-                                    <Localization
-                                        planeFound={props.planeFound}
-                                        setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
-                                    />
+
+                                !initDetectionCompleted() ?
+
+                                    <InitialDetection />
                                     :
-                                    props.appMode === AppMode.SAVE &&
-                                    <Inventory
-                                        marker={props.marker}
-                                        addNewModule={(id, name) => loadModule(id, name, false, true)}
-                                        saveEnabled={selectedGameId() !== null ? true : false}
-                                        saveGame={handleSaveSelectedGame}
-                                        onToggleUi={(showed) => handleSetBlurVisible(showed)}
-                                    />
+                                    localizationState() === LOCALIZATION_STATE.REQUIRED ?
+                                        <Localization
+                                            planeFound={props.planeFound}
+                                            setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
+                                        />
+                                        :
+                                        props.appMode === AppMode.SAVE &&
+                                        <Inventory
+                                            marker={props.marker}
+                                            addNewModule={(id, name) => loadModule(id, name, false, true)}
+                                            saveEnabled={selectedGameId() !== null ? true : false}
+                                            saveGame={handleSaveSelectedGame}
+                                            onToggleUi={(showed) => handleSetBlurVisible(showed)}
+                                        />
                             )}
+
+
                         </>
                 }
             </Main>

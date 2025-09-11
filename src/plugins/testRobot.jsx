@@ -87,7 +87,6 @@ export default function testRobot(props) {
                 fileName: 'models/reticle_v1.glb'
             });
 
-        // hide the Reticle but keep it working
         Reticle.setVisible(false);
 
 

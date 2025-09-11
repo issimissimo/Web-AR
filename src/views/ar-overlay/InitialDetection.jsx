@@ -2,11 +2,9 @@ import { onMount, createSignal } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import Message from '@components/Message';
 
+
 export default function InitialDetection() {
 
-    // onMount(() => {
-
-    // });
 
     /*
    * STYLE
