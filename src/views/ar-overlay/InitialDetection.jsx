@@ -24,10 +24,10 @@ export default function InitialDetection() {
         <Container>
             <Message
                 style={{ "height": "auto" }}
-                svgIcon={'icons/tap.svg'}
+                svgIcon={'icons/phone.svg'}
                 showReadMore={false}
             >
-                Muovi il telefono in giro per farmi rilevare l'ambiente
+                Muovi un pò il telefono intorno per farmi rilevare le superfici
             </Message>
         </Container>
     )

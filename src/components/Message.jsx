@@ -49,7 +49,7 @@ const Message = (props) => {
       transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.25 }}
     >
       {props.icon && <Icon />}
-      {props.svgIcon && <SvgIcon src={props.svgIcon} size={80} color={'var(--color-secondary)'} />}
+      {props.svgIcon && <SvgIcon src={props.svgIcon} color={'var(--color-secondary)'} size={65} translateY={0.2} />}
 
       <MessageBLock>
         <Fa icon={faExclamation} color={"var(--color-secondary)"} size="2.5x" translateY={0.2} class="icon" />

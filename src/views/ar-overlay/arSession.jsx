@@ -59,6 +59,9 @@ export default function ArSession(props) {
         setBlurVisible(true);
         await Reticle.set();
         Reticle.setVisible(false);
+        setInitDetectionCompleted(false); // When reopening the ARSession it seem to stay "true"... let's force (not clear why I have to do that)
+
+        console.log("initDetectionCompleted:", initDetectionCompleted())
 
 
         // If Debug on desktop we must set the background 
