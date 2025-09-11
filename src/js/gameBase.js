@@ -92,10 +92,15 @@ export function useGame(gameName, gameId, config = {}) {
         console.log(`${gameName} renderLoopBase`);
     };
 
+    const _closeBase = () => {
+        console.log(`${gameName} closeBase`);
+    }
+
 
     // Define overridable / super functions
     const onTap = config.onTap || _onTapBase;
     const renderLoop = config.renderLoop || _renderLoopBase;
+    const close = config.close || _closeBase;
 
     // This
     const game = {
@@ -112,6 +117,7 @@ export function useGame(gameName, gameId, config = {}) {
         onTap,
         super: { onTap: _onTapBase },
         renderLoop,
+        close,
         loadGameData,
         addToScene,
         removePreviousFromScene,

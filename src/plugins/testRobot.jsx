@@ -41,21 +41,31 @@ export default function testRobot(props) {
 
         onTap: () => {
 
-            console.log("testRobot -- onTap")
-
             if (Reticle.visible() && Reticle.isHitting() && !showInstructions()) {
-                const hitMatrix = Reticle.getHitMatrix();
 
-                // tap sound
+                // Tap sound
                 game.super.onTap();
 
+                const hitMatrix = Reticle.getHitMatrix();
                 spawnModel(hitMatrix);
 
-                // Reticle.setEnabled(false);
+                Reticle.setEnabled(false);
             }
         },
 
-        renderLoop: () => loop()
+
+        renderLoop: () => {
+            if (game.loader.loaded() && spawnedModel) {
+
+                game.loader.animate();
+                shadows.update();
+            }
+        },
+
+
+        close: () => {
+            audio.stop();
+        }
 
     });
 
@@ -110,20 +120,6 @@ export default function testRobot(props) {
         game.setInitialized(true)
 
     });
-
-
-
-    /*
-    * LOOP
-    */
-    function loop() {
-
-        if (game.loader.loaded() && spawnedModel) {
-
-            game.loader.animate();
-            shadows.update();
-        }
-    }
 
 
 

@@ -307,6 +307,10 @@ export default function Main() {
      * go back to 1st screen
      */
     const handleReset = () => {
+
+        // handle the closing of the running Games
+        gamesRunning().forEach((el) => el.close());
+
         if (Reticle.initialized()) Reticle.destroy();
         SceneManager.destroy();
 
