@@ -50,11 +50,11 @@ export class LoadAudio {
 
 
 export class LoadPositionalAudio {
-    constructor(filePath, model, listener, options = {}) {
+    constructor(filePath, listener, options = {}) {
         this.filePath = filePath;
         this.listener = listener;
-        this.model = model;
 
+        this.model = options.model ?? null;
         this.loop = options.loop ?? false;
         this.volume = options.volume ?? 1;
         this.autoPlay = options.play ?? false;
@@ -89,7 +89,10 @@ export class LoadPositionalAudio {
                         sound.play();
                     }
 
-                    this.model.add(sound);
+                    if (this.model) {
+                        this.model.add(sound);
+                    }
+
                     resolve(sound);
                 },
                 function (progress) {

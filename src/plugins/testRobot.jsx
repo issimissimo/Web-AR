@@ -11,6 +11,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { Vector3, Euler } from "three";
 import { LoadTexture } from '@tools/three/textureTools';
+import { LoadPositionalAudio } from '@tools/three/audioTools';
 import { RecreateMaterials } from '@tools/three/materialTools';
 import ContactShadowsXR from '@tools/three/contactShadowsXR';
 
@@ -20,9 +21,11 @@ export default function testRobot(props) {
 
     const [showInstructions, setShowInstructions] = createSignal(true);
 
-    let loadedModel;
-    let spawnedModel = null;
-    let shadows;
+    let loadedModel,
+        spawnedModel = null,
+        shadows,
+        audio;
+
 
     const handleCloseInstructions = () => {
         setShowInstructions(() => false);
@@ -90,6 +93,14 @@ export default function testRobot(props) {
                 aoMapIntensity: 1.4
             });
 
+
+        audio = await new LoadPositionalAudio("models/RACER_UNWRAP_ANIM.mp3", SceneManager.listener,
+            {
+                loop: true
+            }
+        );
+        console.log("audio loaded!", audio)
+
         // blur background for instructions
         game.blurBackground(true);
 
@@ -107,10 +118,9 @@ export default function testRobot(props) {
     */
     function loop() {
 
-        if (game.loader.loaded() && spawnedModel !== null) {
+        if (game.loader.loaded() && spawnedModel) {
 
             game.loader.animate();
-
             shadows.update();
         }
     }
@@ -177,6 +187,9 @@ export default function testRobot(props) {
         spawnedModel.rotation.copy(rotation);
         spawnedModel.rotateY(Math.PI / 2);
         game.addToScene(spawnedModel);
+
+        spawnedModel.add(audio);
+        audio.play();
 
         shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
             position: position,
