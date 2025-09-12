@@ -8,7 +8,6 @@ import {
     Mesh,
     MeshBasicMaterial,
     RingGeometry,
-    TextureLoader
 } from 'three';
 import SceneManager from "./sceneManager";
 
@@ -26,6 +25,8 @@ let _isHitting = false;
 let _surfType = null;
 let _enabled = true;
 let _reticleMode = null;
+let _surfTypeNames = ["both", "floor", "wall"];
+let _detectionMode = 0;
 
 
 // Variabili per il Piano di riferimento per l'orientamento del reticolo
@@ -118,6 +119,8 @@ const Reticle = {
      * @param {number} [options.segments] - Il numero di segmenti del reticolo.
      * @param {number} [options.color] - Il colore del reticolo.
      */
+
+
     set(options = {}) {
         return new Promise((resolve, reject) => {
             _renderer = SceneManager.renderer;
@@ -132,13 +135,13 @@ const Reticle = {
                 return;
             }
 
-            
+
             if (options.radius) _options.radius = options.radius;
             if (options.innerRadius) _options.innerRadius = options.innerRadius;
             if (options.segments) _options.segments = options.segments;
             if (options.color) _options.color = options.color;
 
-            
+
             const completeSetup = () => {
                 // Add the circle target in front of the camera
                 // to use in place of plane detection
@@ -262,9 +265,14 @@ const Reticle = {
                 const hitTestResults = frame.getHitTestResults(_hitTestSource);
                 if (hitTestResults.length) {
 
-                    _isHitting = true;
 
-                    if (_planeMesh._shouldDisplay) _planeMesh.visible = true;
+
+
+
+
+                    // _isHitting = true;
+
+                    // if (_planeMesh._shouldDisplay) _planeMesh.visible = true;
 
                     const hit = hitTestResults[0];
                     const pose = hit.getPose(referenceSpace);
@@ -280,8 +288,24 @@ const Reticle = {
                     _planeMesh.updateMatrix(); ////// NON QUI!!!!!!!!
 
                     _surfType = _getReticleSurface();
-                    if (_surfType == 'wall' && !window.iOS) _alignZAxisWithUp();
 
+
+                    // Check if is the right surface...
+                    if (_detectionMode !== 0) {
+                        if (_surfType !== _surfTypeNames[_detectionMode]) {
+
+                            // Not the surface we are looking for!
+                            console.log("Not the surface we are looking for!")
+                            _isHitting = false;
+                            _planeMesh.visible = false;
+                            return false;
+                        }
+                    }
+
+                    _isHitting = true;
+
+                    if (_surfType == 'wall' && !window.iOS) _alignZAxisWithUp();
+                    if (_planeMesh._shouldDisplay) _planeMesh.visible = true;
                     if (callback) callback(_surfType);
 
                 } else {
@@ -354,6 +378,7 @@ const Reticle = {
         _enabled = true;
         _reticleMode = null;
         _initialized = false;
+        _detectionMode = 0;
 
         // Reset dei riferimenti
         _renderer = null;
@@ -423,6 +448,11 @@ const Reticle = {
 
     enabled() {
         return _enabled;
+    },
+
+    // Set detection mode: 0=both, 1=floor, 2=wall
+    setDetectionMode(modeNumber) {
+        _detectionMode = modeNumber;
     },
 
     surfType() {

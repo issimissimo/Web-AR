@@ -51,7 +51,13 @@ const Header = (props) => {
                 }
 
             </div>
-            <Title>{props.children}</Title>
+
+            <Title
+                animate={{ opacity: [0, 1] }}
+                transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
+            >
+                {props.children}
+            </Title>
 
             <div style="flex: 1;">
                 {

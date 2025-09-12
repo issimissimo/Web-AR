@@ -41,7 +41,6 @@ export default function ArSession(props) {
     const [referenceMatrix, setReferenceMatrix] = createSignal(new Matrix4());
     const [loading, setLoading] = createSignal(true);
     const [modules, setModules] = createSignal([]);
-    const [gamesInitializing, setGamesInitializing] = createSignal(false);
     const [gamesInitialized, setGamesInitialized] = createSignal(false);
     const [selectedGameId, setSelectedGameId] = createSignal(null);
     const [blurVisible, setBlurVisible] = createSignal(false);
@@ -129,8 +128,6 @@ export default function ArSession(props) {
         for (const el of props.marker.games) {
             if (el.enabled) {
 
-                // setGamesInitializing(() => true);
-
                 // load dynamically the module
                 await loadModule(el.id, el.name, true);
             }
@@ -197,7 +194,6 @@ export default function ArSession(props) {
         if (_gamesInitialized === modules().length) {
 
             console.log("all games initialized!")
-            // setGamesInitializing(() => false);
             setGamesInitialized(true);
 
             // it should not be necessary here... :/

@@ -265,7 +265,6 @@ export default function Main() {
                 });
                 if (Reticle.enabled()) {
                     setPlaneFound(Reticle.isHitting())
-                    console.log("PLANE FOUND:", Reticle.isHitting())
                 }
             }
 

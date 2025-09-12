@@ -64,8 +64,8 @@ export default function testRobot(props) {
 
 
         close: () => {
-            if(shadows) shadows.dispose();
-            if(audio) audio.stop();
+            if (shadows) shadows.dispose();
+            if (audio) audio.stop();
         }
 
     });
@@ -87,6 +87,7 @@ export default function testRobot(props) {
                 fileName: 'models/reticle_v1.glb'
             });
 
+        Reticle.setDetectionMode(1); // only floor
         Reticle.setVisible(false);
 
 
