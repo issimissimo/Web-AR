@@ -83,7 +83,7 @@ export class LoadPositionalAudio {
                     sound.setLoop(this.loop);
                     sound.setRefDistance(this.refDistance);
                     sound.setMaxDistance(this.maxDistance);
-                    sound.setVolume(this.volume);
+                    sound.setVolume(this.volume);   
 
                     if (this.autoPlay) {
                         sound.play();

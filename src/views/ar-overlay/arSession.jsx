@@ -42,6 +42,7 @@ export default function ArSession(props) {
     const [loading, setLoading] = createSignal(true);
     const [modules, setModules] = createSignal([]);
     const [gamesInitializing, setGamesInitializing] = createSignal(false);
+    const [gamesInitialized, setGamesInitialized] = createSignal(false);
     const [selectedGameId, setSelectedGameId] = createSignal(null);
     const [blurVisible, setBlurVisible] = createSignal(false);
 
@@ -94,7 +95,9 @@ export default function ArSession(props) {
         if (props.marker.games.length > 0) {
             loadAllModules();
         }
-        else setLoading(() => false);
+        else {
+            setLoading(() => false);
+        }
     });
 
 
@@ -126,7 +129,7 @@ export default function ArSession(props) {
         for (const el of props.marker.games) {
             if (el.enabled) {
 
-                setGamesInitializing(() => true);
+                // setGamesInitializing(() => true);
 
                 // load dynamically the module
                 await loadModule(el.id, el.name, true);
@@ -194,7 +197,8 @@ export default function ArSession(props) {
         if (_gamesInitialized === modules().length) {
 
             console.log("all games initialized!")
-            setGamesInitializing(() => false);
+            // setGamesInitializing(() => false);
+            setGamesInitialized(true);
 
             // it should not be necessary here... :/
             updateClickableDomElements();
@@ -390,7 +394,7 @@ export default function ArSession(props) {
                     loading() ? (<Loader />)
                         :
                         <>
-                            {gamesInitializing() && <Loader text="Inizializzo" />}
+                            {!gamesInitialized() && <Loader text="Inizializzo" />}
 
 
                             {/* GAMES */}
@@ -400,7 +404,8 @@ export default function ArSession(props) {
                                     return <Component
                                         id={item.id}
                                         stored={item.stored}
-                                        enabled={initDetectionCompleted()}
+                                        enabled={gamesInitialized() && initDetectionCompleted() &&
+                                            localizationState !== LOCALIZATION_STATE.REQUIRED ? true : false}
                                         selected={item.id === selectedGameId() &&
                                             localizationState() !== LOCALIZATION_STATE.REQUIRED ?
                                             true : false}
@@ -409,7 +414,7 @@ export default function ArSession(props) {
                             </For>
 
 
-                            {!gamesInitializing() && (
+                            {gamesInitialized() && (
 
                                 !initDetectionCompleted() ?
 

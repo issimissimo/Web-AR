@@ -47,16 +47,19 @@ const UserProfile = (props) => {
                 showUser={false}
                 showBack={true}
                 onClickBack={props.onBack}
-            />
+            >
+                <span style={{ color: 'var(--color-secondary)' }}>Il tuo </span>
+                <span style={{ color: 'var(--color-white)' }}>account</span>
+            </Header>
 
-            {/* TITLE */}
-            <Title
+           
+            {/* <Title
                 animate={{ opacity: [0, 1] }}
                 transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
             >
                 <span style={{ color: 'var(--color-secondary)' }}>Il tuo </span>
                 <span style={{ color: 'var(--color-white)' }}>account</span>
-            </Title>
+            </Title> */}
 
             {props.user ?
                 <FitHeight>

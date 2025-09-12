@@ -181,21 +181,16 @@ const MarkersList = (props) => {
       <Header
         showBack={false}
         onClickUser={props.goToUserProfile}
-      />
-
-      {/* TITLE */}
-      <Title
-        animate={{ opacity: [0, 1] }}
-        transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
       >
         <span style={{ color: 'var(--color-secondary)' }}>I tuoi </span>
         <span style={{ color: 'var(--color-white)' }}>ambienti AR</span>
-      </Title>
+      </Header>
 
+      
       {/* CONTENT */}
       {loading() ?
 
-        <Loader/>
+        <Loader />
 
         :
 

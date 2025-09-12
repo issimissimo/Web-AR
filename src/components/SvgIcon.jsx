@@ -58,7 +58,9 @@ export default function SvgIcon(props) {
       }}
     >
       {/* Quando la resource è pronta, innerHTML riceve UNA stringa, non una Promise */}
-      <div innerHTML={processed()} />
+      <div style={{
+        transform: props.translateY ? `translateY(${props.translateY}em)` : undefined,
+      }} innerHTML={processed()} />
     </Wrapper>
   );
 }

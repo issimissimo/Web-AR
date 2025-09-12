@@ -145,7 +145,7 @@ export default function testRobot(props) {
     return (
         <>
             {
-                props.enabled && game.initialized() && showInstructions() &&
+                props.enabled && showInstructions() &&
                 <Container>
                     <Message
                         style={{ "height": "auto" }}

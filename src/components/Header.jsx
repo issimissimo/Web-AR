@@ -4,6 +4,7 @@ import { Motion } from 'solid-motionone';
 import ButtonCircle from './ButtonCircle';
 import Fa from 'solid-fa';
 import { faUser, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { Title } from '@components/smallElements'
 
 
 const HeaderContainer = styled('div')`
@@ -11,6 +12,7 @@ const HeaderContainer = styled('div')`
     margin-bottom: 0;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     height: 40px;
   `;
 
@@ -35,7 +37,7 @@ const Header = (props) => {
     return (
         <HeaderContainer>
 
-            <div style="flex: 1;">
+            <div style="">
                 {
                     showBack() &&
                     <LeftButtonContainer >
@@ -49,6 +51,7 @@ const Header = (props) => {
                 }
 
             </div>
+            <Title>{props.children}</Title>
 
             <div style="flex: 1;">
                 {
