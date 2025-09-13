@@ -2,7 +2,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { AnimationMixer, Clock } from 'three';
 
-class modelLoader {
+class glbLoader {
     constructor() {
         this.loader = new GLTFLoader()
         const draco = new DRACOLoader()
@@ -75,4 +75,4 @@ class modelLoader {
     }
 }
 
-export default modelLoader;
+export default glbLoader;

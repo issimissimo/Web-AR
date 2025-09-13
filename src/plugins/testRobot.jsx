@@ -46,12 +46,10 @@ export default function testRobot(props) {
         game.removePreviousFromScene();
         spawnedModel = null;
         setIsSpawned(false);
-        game.loader.stopAndReset();
-
-        _shouldResetAnim = true;
+        game.loader.resetAnimations();
     }
 
-    let _shouldResetAnim = false;
+   
 
     /*
     * Put here derived functions from Game
@@ -61,8 +59,6 @@ export default function testRobot(props) {
         onTap: () => {
 
             if (Reticle.visible() && Reticle.isHitting() && !showInstructions()) {
-
-                console.log("TAPPPP")
 
                 // Tap sound
                 game.super.onTap();
@@ -79,13 +75,6 @@ export default function testRobot(props) {
 
         renderLoop: () => {
             if (game.loader.loaded() && spawnedModel) {
-
-                console.log("animate.....")
-
-                if (_shouldResetAnim){
-                    game.loader.resetAnimations();
-                    _shouldResetAnim = false;
-                } 
 
                 game.loader.animate();
                 shadows.update();
@@ -263,8 +252,5 @@ export default function testRobot(props) {
             animate: true,
             updateFrequency: 2,
         });
-
-
-
     }
 }
