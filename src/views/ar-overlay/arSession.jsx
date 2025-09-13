@@ -8,8 +8,8 @@ import { styled } from 'solid-styled-components';
 import InitialDetection from './InitialDetection';
 import Localization from './Localization';
 import Inventory from './Inventory';
+import Header from './Header';
 
-import Header from '@components/Header';
 import Loader from '@components/Loader';
 import BlurredCover from '@components/BlurredCover';
 
@@ -382,7 +382,6 @@ export default function ArSession(props) {
 
                 {/* HEADER */}
                 <Header
-                    showUser={false}
                     onClickBack={handleGoBack}
                 />
 

@@ -3,7 +3,8 @@ import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 import { useFirebase } from '@hooks/useFirebase';
 
-import Header from '@components/Header';
+import Header from './Header';
+
 import Button from '@components/Button';
 import { Container, FitHeight, Title } from '@components/smallElements'
 
@@ -53,14 +54,6 @@ const UserProfile = (props) => {
             </Header>
 
            
-            {/* <Title
-                animate={{ opacity: [0, 1] }}
-                transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
-            >
-                <span style={{ color: 'var(--color-secondary)' }}>Il tuo </span>
-                <span style={{ color: 'var(--color-white)' }}>account</span>
-            </Title> */}
-
             {props.user ?
                 <FitHeight>
                     <FitHeight style={{ "margin-top": "2rem", "margin-bottom": "1rem" }}>

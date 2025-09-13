@@ -118,6 +118,7 @@ export function useGame(gameName, gameId, config = {}) {
         super: { onTap: _onTapBase },
         renderLoop,
         close,
+        forceUpdateDomElements: context.forceUpdateDomElements,
         loadGameData,
         addToScene,
         removePreviousFromScene,

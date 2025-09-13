@@ -4,7 +4,8 @@ import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 import { generateQRCodeForForMarker } from '@hooks/useQRCode';
 
-import Header from '@components/Header';
+import Header from './Header';
+
 import { Container, FitHeight, FitHeightScrollable, Title } from '@components/smallElements'
 import InputField from '@components/inputField';
 import Button from '@components/button';
@@ -79,7 +80,7 @@ const QrCodeImg = styled('img')`
 
 const EditMarker = (props) => {
 
-  onMount(()=>{
+  onMount(() => {
     console.log("ON MOUNT EDIT MARKER")
   })
 
@@ -415,7 +416,10 @@ const EditMarker = (props) => {
       <Header
         onClickBack={props.onBack}
         onClickUser={props.goToUserProfile}
-      />
+      >
+        <span style={{ color: 'var(--color-secondary)' }}>{id() ? 'Modifica ' : 'Nuovo '}</span>
+        <span style={{ color: 'var(--color-white)' }}>ambiente</span>
+      </Header>
 
       {/* TITLE */}
       {/* <Title

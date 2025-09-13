@@ -1,10 +1,9 @@
 import { onMount, createSignal } from 'solid-js';
 import { styled } from 'solid-styled-components';
-import { Motion } from 'solid-motionone';
-import ButtonCircle from './ButtonCircle';
+import ButtonCircle from '../../components/ButtonCircle';
 import Fa from 'solid-fa';
-import { faUser, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
-import { Title } from '@components/smallElements'
+import { faClose } from "@fortawesome/free-solid-svg-icons";
+
 
 
 const HeaderContainer = styled('div')`
@@ -15,8 +14,6 @@ const HeaderContainer = styled('div')`
     align-items: center;
     height: 40px;
   `;
-
-
 
 const LeftButtonContainer = styled('div')`
     display: flex;
@@ -31,35 +28,26 @@ const RightButtonContainer = styled('div')`
 
 const Header = (props) => {
 
-    const [showUser, setShowUser] = createSignal(props.showUser ?? true);
-    const [showBack, setShowBack] = createSignal(props.showBack ?? true);
+    // const [showUser, setShowUser] = createSignal(props.showUser ?? true);
 
     return (
         <HeaderContainer>
 
             <div style="">
                 {
-                    showBack() &&
                     <LeftButtonContainer >
                         <ButtonCircle
                             onClick={props.onClickBack}
                             border={false}
                         >
-                            <Fa icon={faChevronLeft} size="1x" class="icon" />
+                            <Fa icon={faClose} size="1x" class="icon" />
                         </ButtonCircle>
                     </LeftButtonContainer>
                 }
 
             </div>
 
-            <Title
-                animate={{ opacity: [0, 1] }}
-                transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
-            >
-                {props.children}
-            </Title>
-
-            <div style="flex: 1;">
+            {/* <div style="flex: 1;">
                 {
                     showUser() &&
                     <RightButtonContainer>
@@ -72,7 +60,7 @@ const Header = (props) => {
                     </RightButtonContainer>
                 }
 
-            </div>
+            </div> */}
 
         </HeaderContainer>
     )

@@ -3,7 +3,8 @@ import { useFirebase } from '@hooks/useFirebase';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 
-import Header from '@components/Header';
+import Header from './Header';
+
 import { Container, FitHeightScrollable, Title } from '@components/smallElements'
 import Button from '@components/button';
 import Message from '@components/Message';

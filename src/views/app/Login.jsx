@@ -3,7 +3,8 @@ import { useFirebase } from '@hooks/useFirebase';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 
-import Header from '@components/Header';
+import Header from './Header';
+
 import { Container, Title } from '@components/smallElements'
 import InputField from '@components/inputField';
 import Button from '@components/button';
@@ -84,16 +85,10 @@ const Login = (props) => {
       <Header
         showBack={false}
         showUser={false}
-      />
-
-      {/* TITLE */}
-      <Title
-        animate={{ opacity: [0, 1] }}
-        transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
       >
         <span style={{ color: 'var(--color-secondary)' }}>Accedi </span>
         <span style={{ color: 'var(--color-white)' }}>al tuo spazio AR</span>
-      </Title>
+      </Header>
 
       <Form
         onSubmit={handleLogin}

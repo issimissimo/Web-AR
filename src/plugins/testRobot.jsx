@@ -1,4 +1,4 @@
-import { onMount, createSignal } from 'solid-js';
+import { onMount, createSignal, createEffect } from 'solid-js';
 import { styled } from 'solid-styled-components';
 
 import { useGame } from '@js/gameBase';
@@ -7,6 +7,9 @@ import SceneManager from '@js/sceneManager';
 
 import Message from '@components/Message';
 import Button from '@components/Button';
+import ButtonCircle from '@components/ButtonCircle';
+import SvgIcon from '@components/SvgIcon';
+
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { Vector3, Euler } from "three";
@@ -20,6 +23,7 @@ import ContactShadowsXR from '@tools/three/contactShadowsXR';
 export default function testRobot(props) {
 
     const [showInstructions, setShowInstructions] = createSignal(true);
+    const [isSpawned, setIsSpawned] = createSignal(false);
 
     let loadedModel,
         spawnedModel = null,
@@ -31,8 +35,23 @@ export default function testRobot(props) {
         setShowInstructions(() => false);
         game.blurBackground(false);
         Reticle.setVisible(true);
+        game.forceUpdateDomElements();
     }
 
+
+    const handleUndo = () => {
+        if (shadows) shadows.dispose();
+        if (audio) audio.stop();
+        Reticle.setEnabled(true);
+        game.removePreviousFromScene();
+        spawnedModel = null;
+        setIsSpawned(false);
+        game.loader.stopAndReset();
+
+        _shouldResetAnim = true;
+    }
+
+    let _shouldResetAnim = false;
 
     /*
     * Put here derived functions from Game
@@ -43,11 +62,15 @@ export default function testRobot(props) {
 
             if (Reticle.visible() && Reticle.isHitting() && !showInstructions()) {
 
+                console.log("TAPPPP")
+
                 // Tap sound
                 game.super.onTap();
 
                 const hitMatrix = Reticle.getHitMatrix();
                 spawnModel(hitMatrix);
+                 
+                setIsSpawned(true);
 
                 Reticle.setEnabled(false);
             }
@@ -56,6 +79,13 @@ export default function testRobot(props) {
 
         renderLoop: () => {
             if (game.loader.loaded() && spawnedModel) {
+
+                console.log("animate.....")
+
+                if (_shouldResetAnim){
+                    game.loader.resetAnimations();
+                    _shouldResetAnim = false;
+                } 
 
                 game.loader.animate();
                 shadows.update();
@@ -87,11 +117,11 @@ export default function testRobot(props) {
                 fileName: 'models/reticle_v1.glb'
             });
 
-        Reticle.setDetectionMode(1); // only floor
+        // Reticle.setDetectionMode(1); // only floor
         Reticle.setVisible(false);
 
 
-        const aoTexture = await LoadTexture("models/RACER_UNWRAP_ANIM.png",
+        const aoTexture = await LoadTexture("models/RACER_UNWRAP_ANIM.jpg",
             {
                 flipY: false
             });
@@ -105,8 +135,9 @@ export default function testRobot(props) {
             });
 
 
-        audio = await new LoadPositionalAudio("models/RACER_UNWRAP_ANIM.mp3", SceneManager.listener,
+        audio = await new LoadPositionalAudio("models/RACER_UNWRAP_ANIM.ogg", SceneManager.listener,
             {
+                volume: 2,
                 loop: true
             }
         );
@@ -121,6 +152,15 @@ export default function testRobot(props) {
         game.setInitialized(true)
 
     });
+
+
+
+    createEffect(async () => {
+        if (props.enabled) {
+            console.log("***** testRobot is enabled *****")
+            Reticle.setDetectionMode(1); // only floor
+        }
+    })
 
 
 
@@ -139,6 +179,17 @@ export default function testRobot(props) {
         padding: 2em;
     `
 
+    const ContainerToolbar = styled('div')`
+        position: absolute;
+        left:1.5em;
+        top:20%;
+        height: 50vh;
+        display: flex;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    `
+
 
     /*
     * RENDER (Will be shown ONLY after initialization completed)
@@ -146,24 +197,41 @@ export default function testRobot(props) {
     return (
         <>
             {
-                props.enabled && showInstructions() &&
-                <Container>
-                    <Message
-                        style={{ "height": "auto" }}
-                        svgIcon={'icons/tap.svg'}
-                        showReadMore={false}
-                    >
-                        Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano. <br></br> Evita i piani troppo riflettenti o uniformi.
-                    </Message>
-                    <Button
-                        onClick={handleCloseInstructions}
-                        small={true}
-                        active={true}
-                        icon={faCheck}
-                    >
-                        Ho capito
-                    </Button>
-                </Container>
+                props.enabled && (
+                    showInstructions() ?
+
+                        <Container>
+                            <Message
+                                style={{ "height": "auto" }}
+                                svgIcon={'icons/tap.svg'}
+                                showReadMore={false}
+                            >
+                                Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano. <br></br> Evita i piani troppo riflettenti o uniformi.
+                            </Message>
+                            <Button
+                                onClick={handleCloseInstructions}
+                                small={true}
+                                active={true}
+                                icon={faCheck}
+                            >
+                                Ho capito
+                            </Button>
+                        </Container>
+
+                        :
+
+                        <ContainerToolbar>
+                            <ButtonCircle data-interactive
+                                active={isSpawned()}
+                                visible={true}
+                                border={false}
+                                onClick={handleUndo}
+                            >
+                                {/* <Fa icon={faUndo} size="1x" class="icon" /> */}
+                                <SvgIcon src={"icons/undo.svg"} size={18}/>
+                            </ButtonCircle>
+                        </ContainerToolbar>
+                )
             }
         </>
     );

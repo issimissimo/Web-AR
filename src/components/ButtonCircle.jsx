@@ -1,4 +1,3 @@
-import { onMount } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 import Fa from 'solid-fa';
@@ -10,7 +9,7 @@ const StyledButton = styled(Motion.button)`
   height: 40px;
   padding: ${props => props.small ? "0" : "0.7rem"};
   border-radius: 50%;
-  background: var(--color-background);
+  background: var(--color-background-transparent);
   border: ${props => props.border ? "1px solid" : "none"};
   border-color: var(--color-white);
   pointer-events: ${props => props.active ? 'auto' : 'none'};
@@ -23,7 +22,7 @@ const StyledButton = styled(Motion.button)`
   &:focus {
     outline: none;
     border-color: var(--color-white);
-    background: transparent;
+    /* background: transparent; */
   }
   &:active {
     background: var(--color-grey-dark);
@@ -53,8 +52,11 @@ const ButtonCircle = (props) => {
       active={props.active ?? true}
       visible={props.visible ?? true}
       border={props.border ?? true}
-      class={props.class}
+      class="glass"
       style={props.style}
+      animate={{ opacity: props.active || props.active === undefined ? 1 : 0.4 }}
+      transition={{ duration: 0.25 }}
+      initial={false}
     >
       {props.children}
       {props.icon && <Icon />}
