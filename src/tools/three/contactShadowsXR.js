@@ -91,6 +91,7 @@ class ContactShadowsXR {
         this.planeWithShadow = null;
         this.finalTexture = null;
         this.frame = 0;
+        this._justStarted = true;
 
         this._init();
     }
@@ -201,6 +202,14 @@ class ContactShadowsXR {
     }
 
     _render() {
+
+        // Weird workaround to avoid
+        // black plane at 1st render
+        if (this._justStarted){
+            this._justStarted = false;
+            this.planeWithShadow.visible = false;
+        }
+        else this.planeWithShadow.visible = true;
 
         // Move objects from main scene to shadowScene
         const originalObjects = [];
@@ -329,6 +338,7 @@ class ContactShadowsXR {
         this.blurPlane = null;
         this.planeWithShadow = null;
         this.finalTexture = null;
+        this._justStarted = true;
     }
 }
 

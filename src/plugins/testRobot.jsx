@@ -110,13 +110,13 @@ export default function testRobot(props) {
         Reticle.setVisible(false);
 
 
-        const aoTexture = await LoadTexture("models/RACER_UNWRAP_ANIM.jpg",
+        const aoTexture = await LoadTexture("models/demo/Comau_RACER3/Comau_RACER3.jpg",
             {
                 flipY: false
             });
 
 
-        loadedModel = await game.loader.load("models/RACER_UNWRAP_ANIM.glb");
+        loadedModel = await game.loader.load("models/demo/Comau_RACER3/Comau_RACER3.glb");
         loadedModel = RecreateMaterials(loadedModel,
             {
                 aoMap: aoTexture,
@@ -124,7 +124,7 @@ export default function testRobot(props) {
             });
 
 
-        audio = await new LoadPositionalAudio("models/RACER_UNWRAP_ANIM.ogg", SceneManager.listener,
+        audio = await new LoadPositionalAudio("models/demo/Comau_RACER3/Comau_RACER3.ogg", SceneManager.listener,
             {
                 volume: 2,
                 loop: true
@@ -170,7 +170,7 @@ export default function testRobot(props) {
 
     const ContainerToolbar = styled('div')`
         position: absolute;
-        left:1.5em;
+        right:1.5em;
         top:20%;
         height: 50vh;
         display: flex;
