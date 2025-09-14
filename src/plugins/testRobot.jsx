@@ -42,8 +42,11 @@ export default function testRobot(props) {
 
 
     const handleUndo = () => {
+        game.onUndo();
+
         if (shadows) shadows.dispose();
         if (audio) audio.stop();
+        if (clippingReveal) clippingReveal.dispose();
         Reticle.setEnabled(true);
         game.removePreviousFromScene();
         spawnedModel = null;
@@ -90,7 +93,8 @@ export default function testRobot(props) {
         close: () => {
             if (shadows) shadows.dispose();
             if (audio) audio.stop();
-        }
+        },
+
 
     });
 
@@ -260,7 +264,7 @@ export default function testRobot(props) {
 
         clippingReveal = new ClippingPlaneReveal(spawnedModel, SceneManager.renderer,
             {
-                duration: 3.0,
+                duration: 2.0,
                 direction: 'up',
                 showBelow: true,
                 autoStart: true,

@@ -22,9 +22,11 @@ export function useGame(gameName, gameId, config = {}) {
 
     const loader = new modelLoader();
     let audioTap;
+    let audioUndo;
 
     onMount(async () => {
         audioTap = await new LoadAudio('sounds/tap.mp3', SceneManager.listener);
+        audioUndo = await new LoadAudio('sounds/undo.mp3', SceneManager.listener);
         context.onLoaded(game);
     });
 
@@ -96,11 +98,16 @@ export function useGame(gameName, gameId, config = {}) {
         console.log(`${gameName} closeBase`);
     }
 
+    const onUndo = () => {
+        audioUndo.play();
+    }
+
 
     // Define overridable / super functions
     const onTap = config.onTap || _onTapBase;
     const renderLoop = config.renderLoop || _renderLoopBase;
     const close = config.close || _closeBase;
+    
 
     // This
     const game = {
@@ -118,6 +125,7 @@ export function useGame(gameName, gameId, config = {}) {
         super: { onTap: _onTapBase },
         renderLoop,
         close,
+        onUndo,
         forceUpdateDomElements: context.forceUpdateDomElements,
         loadGameData,
         addToScene,
