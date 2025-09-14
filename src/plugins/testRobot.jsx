@@ -17,6 +17,7 @@ import { LoadTexture } from '@tools/three/textureTools';
 import { LoadPositionalAudio } from '@tools/three/audioTools';
 import { RecreateMaterials } from '@tools/three/materialTools';
 import ContactShadowsXR from '@tools/three/contactShadowsXR';
+import ClippingPlaneReveal from '@tools/three/ClippingPlaneReveal';
 
 
 
@@ -28,7 +29,8 @@ export default function testRobot(props) {
     let loadedModel,
         spawnedModel = null,
         shadows,
-        audio;
+        audio,
+        clippingReveal;
 
 
     const handleCloseInstructions = () => {
@@ -49,7 +51,7 @@ export default function testRobot(props) {
         game.loader.resetAnimations();
     }
 
-   
+
 
     /*
     * Put here derived functions from Game
@@ -65,7 +67,7 @@ export default function testRobot(props) {
 
                 const hitMatrix = Reticle.getHitMatrix();
                 spawnModel(hitMatrix);
-                 
+
                 setIsSpawned(true);
 
                 Reticle.setEnabled(false);
@@ -77,7 +79,10 @@ export default function testRobot(props) {
             if (game.loader.loaded() && spawnedModel) {
 
                 game.loader.animate();
+
                 shadows.update();
+
+                clippingReveal.update();
             }
         },
 
@@ -128,9 +133,8 @@ export default function testRobot(props) {
             {
                 volume: 2,
                 loop: true
-            }
-        );
-        console.log("audio loaded!", audio)
+            });
+
 
         // blur background for instructions
         game.blurBackground(true);
@@ -217,7 +221,7 @@ export default function testRobot(props) {
                                 onClick={handleUndo}
                             >
                                 {/* <Fa icon={faUndo} size="1x" class="icon" /> */}
-                                <SvgIcon src={"icons/undo.svg"} size={18}/>
+                                <SvgIcon src={"icons/undo.svg"} size={18} />
                             </ButtonCircle>
                         </ContainerToolbar>
                 )
@@ -245,12 +249,21 @@ export default function testRobot(props) {
         spawnedModel.add(audio);
         audio.play();
 
-        shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
-            position: position,
-            resolution: 512,
-            blur: 2,
-            animate: true,
-            updateFrequency: 2,
-        });
+        shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer,
+            {
+                position: position,
+                resolution: 512,
+                blur: 2,
+                animate: true,
+                updateFrequency: 2,
+            });
+
+        clippingReveal = new ClippingPlaneReveal(spawnedModel, SceneManager.renderer,
+            {
+                duration: 3.0,
+                direction: 'up',
+                showBelow: true,
+                autoStart: true,
+            });
     }
 }
