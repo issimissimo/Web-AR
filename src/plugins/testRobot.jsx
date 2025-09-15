@@ -188,6 +188,22 @@ export default function testRobot(props) {
     `
 
 
+    const Toolbar = () => {
+        return (
+            <ContainerToolbar>
+                <ButtonCircle data-interactive
+                    active={isSpawned()}
+                    visible={true}
+                    border={false}
+                    onClick={handleUndo}
+                >
+                    <SvgIcon src={"icons/undo.svg"} size={18} />
+                </ButtonCircle>
+            </ContainerToolbar>
+        )
+    }
+
+
     /*
     * RENDER (Will be shown ONLY after initialization completed)
     */
@@ -217,17 +233,8 @@ export default function testRobot(props) {
 
                         :
 
-                        <ContainerToolbar>
-                            <ButtonCircle data-interactive
-                                active={isSpawned()}
-                                visible={true}
-                                border={false}
-                                onClick={handleUndo}
-                            >
-                                {/* <Fa icon={faUndo} size="1x" class="icon" /> */}
-                                <SvgIcon src={"icons/undo.svg"} size={18} />
-                            </ButtonCircle>
-                        </ContainerToolbar>
+                        /* <Toolbar/> */
+                        <></>
                 )
             }
         </>
@@ -274,7 +281,6 @@ export default function testRobot(props) {
                 autoStart: true,
                 startDelay: 200,
                 fadeOutDuration: 2,
-                audio: audioReveal,
                 onComplete: () => console.log('Reveal completed')
             });
     }
