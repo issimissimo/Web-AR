@@ -220,11 +220,12 @@ class ContactShadowsXR {
         });
         originalObjects.forEach(obj => {
             this.scene.remove(obj);
-            // console.log(obj)
 
-            if (obj.castShadow) console.log(obj)
+            if (obj.castShadow){
+                this.shadowScene.add(obj);
+            }
 
-            this.shadowScene.add(obj);
+            // this.shadowScene.add(obj);
         });
 
         // Render        
@@ -253,7 +254,12 @@ class ContactShadowsXR {
 
         // Restore objects in main scene
         originalObjects.forEach(obj => {
-            this.shadowScene.remove(obj);
+
+            if (obj.castShadow){
+                this.shadowScene.remove(obj);
+            }
+
+            // this.shadowScene.remove(obj);
             this.scene.add(obj);
         });
     }

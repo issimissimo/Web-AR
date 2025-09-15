@@ -253,13 +253,8 @@ export default function testRobot(props) {
         spawnedModel.position.copy(position);
         spawnedModel.rotation.copy(rotation);
         spawnedModel.rotateY(Math.PI / 2);
-
         setMaterialsShadows(spawnedModel, true)
-        console.log(spawnedModel)
-
         game.addToScene(spawnedModel);
-
-        
 
         spawnedModel.add(audioRobot);
         audioRobot.play();
@@ -272,14 +267,6 @@ export default function testRobot(props) {
                 animate: true,
                 updateFrequency: 2,
             });
-
-        // clippingReveal = new ClippingPlaneReveal(spawnedModel, SceneManager.renderer,
-        //     {
-        //         duration: 2.0,
-        //         direction: 'up',
-        //         showBelow: true,
-        //         autoStart: true,
-        //     });
 
         clippingReveal = new ClippingReveal(spawnedModel, SceneManager.renderer,
             {
