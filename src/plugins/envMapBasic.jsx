@@ -19,7 +19,11 @@ export default function envMapBasic(props) {
 
         renderLoop: () => {
 
-        }
+        },
+
+        close: () => {
+          
+        },
     });
 
 

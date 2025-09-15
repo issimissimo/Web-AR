@@ -50,19 +50,28 @@ export default function ArSession(props) {
 
 
     //#region [lifeCycle]
-    onMount(async () => {
+    onMount(() => {
 
         // Let's start immediately darkening the background
         // and running the Reticle, to detect the space around us
         // (we start the Reticle here, and not in the games, because
         // we want to be the 1st detection as quick as possible)
         setBlurVisible(true);
-        await Reticle.set();
+        Reticle.set(Reticle.MESH_TYPE.RINGS, 
+            {
+                radius: 0.2,
+                ringNumber: 4,
+                ringThickness: 0.2,
+                color: 0xf472b6,
+            });
+
+
+
+
         Reticle.setVisible(false);
         setInitDetectionCompleted(false); // When reopening the ARSession it seem to stay "true"... let's force (not clear why I have to do that)
-
+        
         console.log("initDetectionCompleted:", initDetectionCompleted())
-
 
         // If Debug on desktop we must set the background 
         // to black, so to see something...
@@ -117,6 +126,10 @@ export default function ArSession(props) {
         if (props.planeFound) {
             setInitDetectionCompleted(() => true);
         }
+    })
+
+    createEffect(()=> {
+        console.log("UEEE GUARDA INIT DETECTION!!!...", initDetectionCompleted())
     })
 
 

@@ -111,12 +111,8 @@ export default function testRobot(props) {
     */
     onMount(async () => {
 
-        await Reticle.set(
-            {
-                fileName: 'models/reticle_v1.glb'
-            });
+        // Reticle.set(Reticle.MESH_TYPE.RINGS);
 
-        // Reticle.setDetectionMode(1); // only floor
         Reticle.setVisible(false);
 
 
@@ -270,9 +266,10 @@ export default function testRobot(props) {
 
         clippingReveal = new ClippingReveal(spawnedModel, SceneManager.renderer,
             {
-                ringsRadius: 0.4,
+                ringsRadius: 0.2,
                 ringNumber: 4,
                 ringThickness: 0.2,
+                ringsColor: 0xf472b6,
                 duration: 2.0,
                 autoStart: true,
                 startDelay: 200,

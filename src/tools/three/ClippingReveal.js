@@ -1,6 +1,6 @@
 import { Plane, Vector3, Box3, Clock, DoubleSide } from 'three';
 import ConcentricRings from './ConcentricRings.js';
-import { LoadAudio } from '@tools/three/audioTools';
+
 
 export default class ClippingReveal {
     constructor(model, renderer, options = {}) {

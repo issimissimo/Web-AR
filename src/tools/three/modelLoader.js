@@ -17,27 +17,6 @@ class modelLoader {
         this._loaded = false;
     }
 
-    _setupAnimations(model, randomizeTime) {
-        if (this.gltf.animations.length > 0) {
-            if (!this.clock) this.clock = new Clock();
-            const mixer = new AnimationMixer(model);
-            const mixerActions = []; // Azioni specifiche per questo mixer
-            
-            this.gltf.animations.forEach((clip) => {
-                const action = mixer.clipAction(clip);
-                action.play();
-
-                // Shift casuale dell'animazione
-                if (randomizeTime) action.time = Math.random() * clip.duration;
-                
-                mixerActions.push(action);
-            });
-            
-            this.mixers.push(mixer);
-            this.actions.push(mixerActions);
-        }
-    }
-
     async load(fileUrl, options = {}) {
         const randomizeTime = options.randomizeTime ?? false;
         this.gltf = await this.loader.loadAsync(fileUrl);
@@ -72,6 +51,27 @@ class modelLoader {
 
     loaded() {
         return this._loaded;
+    }
+
+    _setupAnimations(model, randomizeTime) {
+        if (this.gltf.animations.length > 0) {
+            if (!this.clock) this.clock = new Clock();
+            const mixer = new AnimationMixer(model);
+            const mixerActions = []; // Azioni specifiche per questo mixer
+            
+            this.gltf.animations.forEach((clip) => {
+                const action = mixer.clipAction(clip);
+                action.play();
+
+                // Shift casuale dell'animazione
+                if (randomizeTime) action.time = Math.random() * clip.duration;
+                
+                mixerActions.push(action);
+            });
+            
+            this.mixers.push(mixer);
+            this.actions.push(mixerActions);
+        }
     }
 }
 

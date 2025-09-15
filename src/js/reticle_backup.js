@@ -1,5 +1,5 @@
-// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-// import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
 import {
     Vector3,
     Quaternion,
@@ -10,19 +10,13 @@ import {
     RingGeometry,
 } from 'three';
 import SceneManager from "./sceneManager";
-import ConcentricRings from "@tools/three/ConcentricRings";
-import { GlbLoader } from "@tools/three/modelTools";
 
 
 let _renderer = null;
 let _scene = null;
 let _camera = null;
-// let _planeMesh = null;
+let _planeMesh = null;
 let _circleMesh = null;
-
-let _reticleMesh = null;
-const _glbLoader = new GlbLoader();
-
 
 // Elementi di stato
 let _hitTestSource = null;
@@ -33,7 +27,6 @@ let _enabled = true;
 let _reticleMode = null;
 let _surfTypeNames = ["both", "floor", "wall"];
 let _detectionMode = 0;
-let _meshType = null;
 
 
 // Variabili per il Piano di riferimento per l'orientamento del reticolo
@@ -54,14 +47,13 @@ function _addPlaneForReticleSurface() {
     );
     _reticleLookAt.translateY(.3);
     _reticleLookAt.visible = false;
-    _reticleMesh.add(_reticleLookAt);
+    _planeMesh.add(_reticleLookAt);
 }
-
 
 
 function _getReticleSurface() {
     _reticleLookAt.getWorldPosition(_reticleWorldPosition);
-    _reticleMesh.getWorldPosition(_reticleLookAtWorldPosition);
+    _planeMesh.getWorldPosition(_reticleLookAtWorldPosition);
     _reticleDirection.subVectors(_reticleWorldPosition, _reticleLookAtWorldPosition).normalize();
     if (_reticleDirection.y == 1) {
         return 'floor';
@@ -76,22 +68,23 @@ function _getReticleSurface() {
 function _alignZAxisWithUp() {
     // Calcola l'attuale direzione dell'asse Z della mesh
     const zAxis = new Vector3(0, 0, 1);
-    zAxis.applyQuaternion(_reticleMesh.quaternion);
+    zAxis.applyQuaternion(_planeMesh.quaternion);
     // Vettore di riferimento per "l'alto" (solitamente l'asse Y nel sistema di coordinate globale)
     const upVector = new Vector3(0, -1, 0);
     // Calcola l'angolo tra l'asse Z attuale e il vettore UP
     const quaternion = new Quaternion();
     quaternion.setFromUnitVectors(zAxis, upVector);
     // Applica questa rotazione correttiva
-    _reticleMesh.quaternion.premultiply(quaternion);
+    _planeMesh.quaternion.premultiply(quaternion);
     // Aggiorna la matrice dell'oggetto
-    _reticleMesh.updateMatrix();
+    _planeMesh.updateMatrix();
 }
 
 
 function _setReticleProperties() {
-    _reticleMesh.matrixAutoUpdate = false;
-    _scene.add(_reticleMesh);
+    _planeMesh.matrixAutoUpdate = false;
+    _planeMesh.visible = false;
+    _scene.add(_planeMesh);
     _addPlaneForReticleSurface();
     _initialized = true;
 }
@@ -99,9 +92,9 @@ function _setReticleProperties() {
 
 const _options = {
     radius: 0.2,
-    color: 0x00ff00,
-    ringNumber: 3,
-    ringThickness: 0.1,
+    innerRadius: 0.1,
+    segments: 32,
+    color: 0x00ff00
 }
 
 const MODE = {
@@ -122,243 +115,92 @@ const Reticle = {
      * @param {Camera} [options.camera] - La camera a cui aggiungere il cerchio.
      * @param {string} [options.fileName] - Il percorso del file GLTF da caricare come mesh del reticolo.
      * @param {number} [options.radius] - Il raggio esterno del reticolo.
+     * @param {number} [options.innerRadius] - Il raggio interno del reticolo.
+     * @param {number} [options.segments] - Il numero di segmenti del reticolo.
      * @param {number} [options.color] - Il colore del reticolo.
      */
 
 
-    MESH_TYPE: {
-        RINGS: 'rings',
-        PLANE: 'plane',
-        CUSTOM: 'custom',
+    set(options = {}) {
+        return new Promise((resolve, reject) => {
+            _renderer = SceneManager.renderer;
+            _scene = SceneManager.scene;
+            _camera = SceneManager.camera;
+
+            if (!SceneManager.initialized() || !_renderer || !_scene || !_camera) {
+                const errorMsg = "XrReticle: renderer or scene not set";
+                console.error(errorMsg);
+                alert(errorMsg);
+                reject(new Error(errorMsg));
+                return;
+            }
+
+
+            if (options.radius) _options.radius = options.radius;
+            if (options.innerRadius) _options.innerRadius = options.innerRadius;
+            if (options.segments) _options.segments = options.segments;
+            if (options.color) _options.color = options.color;
+
+
+            const completeSetup = () => {
+                // Add the circle target in front of the camera
+                // to use in place of plane detection
+                const circleGeometry = new RingGeometry(0, 0.02, 24);
+                const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
+                _circleMesh = new Mesh(circleGeometry, circleMaterial);
+                _camera.add(_circleMesh);
+                _circleMesh.position.z = -1;
+                _scene.add(_camera);
+
+                // At the end, we set the default mode
+                this.setUsePlaneDetection(true);
+
+                this.setVisible(true);
+
+                // Risolvi la Promise
+                resolve();
+            };
+
+            if (options.fileName) {
+                console.log("loading GLTF");
+                const loader = new GLTFLoader();
+
+                const draco = new DRACOLoader();
+                draco.setDecoderConfig({ type: "js" });
+                draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+                loader.setDRACOLoader(draco);
+
+                loader.load(
+                    options.fileName,
+                    (gltf) => {
+                        try {
+                            const r = gltf.scene;
+                            const ref = r.children[0];
+                            _planeMesh = ref.clone();
+                            _setReticleProperties();
+                            completeSetup();
+                        } catch (error) {
+                            console.error('Error processing GLTF:', error);
+                            reject(error);
+                        }
+                    },
+                    (xhr) => {
+                        // console.log((xhr.loaded / xhr.total * 100) + '% loaded of reticle');
+                    },
+                    (error) => {
+                        console.error('An error happened loading GLTF:', error);
+                        reject(error);
+                    }
+                );
+            } else {
+                const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
+                const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
+                _planeMesh = new Mesh(ringGeometry, material);
+                _setReticleProperties();
+                completeSetup();
+            }
+        });
     },
-
-
-    // set(meshType, options = {}) {
-
-    //     return new Promise((resolve, reject) => {
-    //         _renderer = SceneManager.renderer;
-    //         _scene = SceneManager.scene;
-    //         _camera = SceneManager.camera;
-
-    //         if (!SceneManager.initialized() || !_renderer || !_scene || !_camera) {
-    //             const errorMsg = "XrReticle: renderer or scene not set";
-    //             console.error(errorMsg);
-    //             alert(errorMsg);
-    //             reject(new Error(errorMsg));
-    //             return;
-    //         }
-
-
-
-
-
-
-    //         if (options.radius) _options.radius = options.radius;
-    //         if (options.innerRadius) _options.innerRadius = options.innerRadius;
-    //         if (options.segments) _options.segments = options.segments;
-    //         if (options.color) _options.color = options.color;
-
-
-
-
-
-    //         const completeSetup = () => {
-    //             // Add the circle target in front of the camera
-    //             // to use in place of plane detection
-    //             const circleGeometry = new RingGeometry(0, 0.02, 24);
-    //             const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
-    //             _circleMesh = new Mesh(circleGeometry, circleMaterial);
-    //             _camera.add(_circleMesh);
-    //             _circleMesh.position.z = -1;
-    //             _scene.add(_camera);
-
-    //             // At the end, we set the default mode
-    //             this.setUsePlaneDetection(true);
-
-    //             this.setVisible(true);
-
-    //             // Risolvi la Promise
-    //             resolve();
-    //         };
-
-
-
-    //         if (meshType = this.MESH_TYPE.RINGS) {
-
-    //         }
-
-
-
-
-
-    //         if (options.fileName) {
-    //             console.log("loading GLTF");
-    //             const loader = new GLTFLoader();
-
-    //             const draco = new DRACOLoader();
-    //             draco.setDecoderConfig({ type: "js" });
-    //             draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
-    //             loader.setDRACOLoader(draco);
-
-    //             loader.load(
-    //                 options.fileName,
-    //                 (gltf) => {
-    //                     try {
-    //                         const r = gltf.scene;
-    //                         const ref = r.children[0];
-    //                         _planeMesh = ref.clone();
-    //                         _setReticleProperties();
-    //                         completeSetup();
-    //                     } catch (error) {
-    //                         console.error('Error processing GLTF:', error);
-    //                         reject(error);
-    //                     }
-    //                 },
-    //                 (xhr) => {
-    //                     // console.log((xhr.loaded / xhr.total * 100) + '% loaded of reticle');
-    //                 },
-    //                 (error) => {
-    //                     console.error('An error happened loading GLTF:', error);
-    //                     reject(error);
-    //                 }
-    //             );
-    //         } else {
-    //             const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
-    //             const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
-    //             _planeMesh = new Mesh(ringGeometry, material);
-    //             _setReticleProperties();
-    //             completeSetup();
-    //         }
-    //     });
-    // },
-
-
-    async set(meshType, options = {}) {
-
-        _meshType = meshType;
-        _renderer = SceneManager.renderer;
-        _scene = SceneManager.scene;
-        _camera = SceneManager.camera;
-
-        if (!SceneManager.initialized() || !_renderer || !_scene || !_camera) {
-            const errorMsg = "XrReticle: renderer or scene not set";
-            console.error(errorMsg);
-            alert(errorMsg);
-            return false;
-        }
-
-
-
-        console.log("MESH_TYPE:", _meshType)
-
-
-        if (options.radius) _options.radius = options.radius;
-        if (options.color) _options.color = options.color;
-        if (options.ringNumber) _options.ringNumber = options.ringNumber;
-        if (options.ringThickness) _options.ringThickness = options.ringThickness;
-
-
-
-        const completeSetup = () => {
-            // Setup some more properties...
-            _setReticleProperties();
-
-            // Add the circle target in front of the camera
-            // to use in place of plane detection
-            const circleGeometry = new RingGeometry(0, 0.02, 24);
-            const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
-            _circleMesh = new Mesh(circleGeometry, circleMaterial);
-            _camera.add(_circleMesh);
-            _circleMesh.position.z = -1;
-            _scene.add(_camera);
-
-            // At the end, we set the default mode
-            this.setUsePlaneDetection(true);
-
-            this.setVisible(true);
-        };
-
-
-
-
-
-        // Create Reticle from ConcentricRings
-        if (_meshType === this.MESH_TYPE.RINGS) {
-            console.log("SETTING UP RINGS RETICLE....")
-            _reticleMesh = new ConcentricRings(
-                _options.radius,
-                _options.color,
-                _options.ringNumber,
-                options.ringThickness
-            );
-            completeSetup();
-        }
-
-        // Create Reticle from a Plane with custom texture
-        if (_meshType === this.MESH_TYPE.PLANE) {
-            //TODO: setup plane with custom texture
-            completeSetup();
-        }
-
-        // Create Reticle from custom GLB file
-        if (_meshType === this.MESH_TYPE.CUSTOM) {
-            //TODO: load custom file
-            completeSetup();
-        }
-
-
-
-        // if (options.fileName) {
-        //     console.log("loading GLTF");
-        //     const loader = new GLTFLoader();
-
-        //     const draco = new DRACOLoader();
-        //     draco.setDecoderConfig({ type: "js" });
-        //     draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
-        //     loader.setDRACOLoader(draco);
-
-        //     loader.load(
-        //         options.fileName,
-        //         (gltf) => {
-        //             try {
-        //                 const r = gltf.scene;
-        //                 const ref = r.children[0];
-        //                 _planeMesh = ref.clone();
-        //                 _setReticleProperties();
-        //                 completeSetup();
-        //             } catch (error) {
-        //                 console.error('Error processing GLTF:', error);
-        //                 reject(error);
-        //             }
-        //         },
-        //         (xhr) => {
-        //             // console.log((xhr.loaded / xhr.total * 100) + '% loaded of reticle');
-        //         },
-        //         (error) => {
-        //             console.error('An error happened loading GLTF:', error);
-        //             reject(error);
-        //         }
-        //     );
-
-        // }
-
-
-        // else {
-        //     const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
-        //     const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
-        //     _planeMesh = new Mesh(ringGeometry, material);
-        //     _setReticleProperties();
-        //     completeSetup();
-        // }
-
-
-
-
-    },
-
-
-
-
 
     /**
      * Updates the reticle's position and visibility based on the current XR frame's hit test results.
@@ -370,7 +212,7 @@ const Reticle = {
      */
     update(frame, callback) {
         if (!_enabled) {
-            _reticleMesh.visible = false;
+            _planeMesh.visible = false;
             _circleMesh.visible = false;
             return;
         }
@@ -381,7 +223,7 @@ const Reticle = {
         // Update camera from pose (used from CircleMesh)
         if (_reticleMode === MODE.FREE) {
 
-            _reticleMesh.visible = false;
+            _planeMesh.visible = false;
             _circleMesh.visible = _circleMesh._shouldDisplay;
 
             const framePose = frame.getViewerPose(referenceSpace);
@@ -441,9 +283,9 @@ const Reticle = {
                     let quat = new Quaternion();
                     let scale = new Vector3();
                     threeMatrix.decompose(pos, quat, scale);
-                    _reticleMesh.position.copy(pos);
-                    _reticleMesh.quaternion.copy(quat);
-                    _reticleMesh.updateMatrix(); ////// NON QUI!!!!!!!!
+                    _planeMesh.position.copy(pos);
+                    _planeMesh.quaternion.copy(quat);
+                    _planeMesh.updateMatrix(); ////// NON QUI!!!!!!!!
 
                     _surfType = _getReticleSurface();
 
@@ -455,7 +297,7 @@ const Reticle = {
                             // Not the surface we are looking for!
                             console.log("Not the surface we are looking for!")
                             _isHitting = false;
-                            _reticleMesh.visible = false;
+                            _planeMesh.visible = false;
                             return false;
                         }
                     }
@@ -463,12 +305,12 @@ const Reticle = {
                     _isHitting = true;
 
                     if (_surfType == 'wall' && !window.iOS) _alignZAxisWithUp();
-                    if (_reticleMesh._shouldDisplay) _reticleMesh.visible = true;
+                    if (_planeMesh._shouldDisplay) _planeMesh.visible = true;
                     if (callback) callback(_surfType);
 
                 } else {
                     _isHitting = false;
-                    _reticleMesh.visible = false;
+                    _planeMesh.visible = false;
                     _surfType = null;
                 }
             }
@@ -477,30 +319,30 @@ const Reticle = {
 
     destroy() {
         // Cleanup della planeMesh e dei suoi children
-        if (_reticleMesh) {
+        if (_planeMesh) {
             // Rimuovi dalla scena
             if (_scene) {
-                _scene.remove(_reticleMesh);
+                _scene.remove(_planeMesh);
             }
 
             // Cleanup del _reticleLookAt se presente
             if (_reticleLookAt) {
-                _reticleMesh.remove(_reticleLookAt);
+                _planeMesh.remove(_reticleLookAt);
                 if (_reticleLookAt.geometry) _reticleLookAt.geometry.dispose();
                 if (_reticleLookAt.material) _reticleLookAt.material.dispose();
                 _reticleLookAt = null;
             }
 
             // Dispose della geometria e materiale della planeMesh
-            if (_reticleMesh.geometry) _reticleMesh.geometry.dispose();
-            if (_reticleMesh.material) {
-                if (Array.isArray(_reticleMesh.material)) {
-                    _reticleMesh.material.forEach(material => material.dispose());
+            if (_planeMesh.geometry) _planeMesh.geometry.dispose();
+            if (_planeMesh.material) {
+                if (Array.isArray(_planeMesh.material)) {
+                    _planeMesh.material.forEach(material => material.dispose());
                 } else {
-                    _reticleMesh.material.dispose();
+                    _planeMesh.material.dispose();
                 }
             }
-            _reticleMesh = null;
+            _planeMesh = null;
         }
 
         // Cleanup della circleMesh
@@ -563,7 +405,7 @@ const Reticle = {
             console.error("Reticle is not set");
             return;
         }
-        if (_reticleMode === MODE.PLANE) return _reticleMesh.matrix;
+        if (_reticleMode === MODE.PLANE) return _planeMesh.matrix;
         return _circleMesh.matrixWorld;
     },
 
@@ -575,23 +417,23 @@ const Reticle = {
     setVisible(value) {
         if (value) {
             if (_reticleMode === MODE.PLANE) {
-                _reticleMesh._shouldDisplay = true;
+                _planeMesh._shouldDisplay = true;
                 _circleMesh._shouldDisplay = false;
             }
             if (_reticleMode === MODE.FREE) {
-                _reticleMesh._shouldDisplay = false;
+                _planeMesh._shouldDisplay = false;
                 _circleMesh._shouldDisplay = true;
             }
         }
         else {
-            _reticleMesh._shouldDisplay = false;
+            _planeMesh._shouldDisplay = false;
             _circleMesh._shouldDisplay = false;
         }
     },
 
 
     visible() {
-        if (_reticleMesh._shouldDisplay || _circleMesh._shouldDisplay) return true;
+        if (_planeMesh._shouldDisplay || _circleMesh._shouldDisplay) return true;
         return false;
     },
 
@@ -600,7 +442,7 @@ const Reticle = {
     // so it's NOT updated and doesn't detect surfaces
     setEnabled(value) {
         _enabled = value;
-        _reticleMesh._shouldDisplay = value;
+        _planeMesh._shouldDisplay = value;
         _circleMesh._shouldDisplay = value;
     },
 

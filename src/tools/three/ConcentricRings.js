@@ -1,10 +1,10 @@
 import { Group, RingGeometry, MeshBasicMaterial, Mesh, DoubleSide } from 'three';
 
 export default class ConcentricRings extends Group {
-  constructor(outerRadius, color, numRings = 5, ringThickness = 0.1) {
+  constructor(radius, color, numRings = 5, ringThickness = 0.1) {
     super();
 
-    this.outerRadius = outerRadius;
+    this.outerRadius = radius;
     this.color = color;
     this.numRings = numRings;
     this.ringThickness = ringThickness;

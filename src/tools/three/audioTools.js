@@ -19,7 +19,6 @@ export class LoadAudio {
     }
 
     _loadAudio() {
-        console.log("loading audio...");
         return new Promise((resolve, reject) => {
             const sound = new Audio(this.listener);
             const audioLoader = new AudioLoader();
@@ -71,7 +70,6 @@ export class LoadPositionalAudio {
     }
 
     _loadPositionalAudio() {
-        console.log("loading positional audio...");
         return new Promise((resolve, reject) => {
             const sound = new PositionalAudio(this.listener);
             const audioLoader = new AudioLoader();

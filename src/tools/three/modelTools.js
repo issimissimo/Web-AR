@@ -2,7 +2,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { AnimationMixer, Clock } from 'three';
 
-class glbLoader {
+export class GlbLoader {
     constructor() {
         this.loader = new GLTFLoader()
         const draco = new DRACOLoader()
@@ -15,27 +15,6 @@ class glbLoader {
         this.gltf = null;
         this.model = null;
         this._loaded = false;
-    }
-
-    _setupAnimations(model, randomizeTime) {
-        if (this.gltf.animations.length > 0) {
-            if (!this.clock) this.clock = new Clock();
-            const mixer = new AnimationMixer(model);
-            const mixerActions = []; // Azioni specifiche per questo mixer
-            
-            this.gltf.animations.forEach((clip) => {
-                const action = mixer.clipAction(clip);
-                action.play();
-
-                // Shift casuale dell'animazione
-                if (randomizeTime) action.time = Math.random() * clip.duration;
-                
-                mixerActions.push(action);
-            });
-            
-            this.mixers.push(mixer);
-            this.actions.push(mixerActions);
-        }
     }
 
     async load(fileUrl, options = {}) {
@@ -73,6 +52,26 @@ class glbLoader {
     loaded() {
         return this._loaded;
     }
+
+    _setupAnimations(model, randomizeTime) {
+        if (this.gltf.animations.length > 0) {
+            if (!this.clock) this.clock = new Clock();
+            const mixer = new AnimationMixer(model);
+            const mixerActions = []; // Azioni specifiche per questo mixer
+            
+            this.gltf.animations.forEach((clip) => {
+                const action = mixer.clipAction(clip);
+                action.play();
+
+                // Shift casuale dell'animazione
+                if (randomizeTime) action.time = Math.random() * clip.duration;
+                
+                mixerActions.push(action);
+            });
+            
+            this.mixers.push(mixer);
+            this.actions.push(mixerActions);
+        }
+    }
 }
 
-export default glbLoader;

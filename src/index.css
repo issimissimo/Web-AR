@@ -16,7 +16,7 @@
   --color-grey-dark: #adb5bdad;
   --color-background: #000000;
   --color-background-light: #222121;
-  --color-background-transparent: #000000ce;
+  --color-background-transparent: #00000018;
   --color-dark-transparent: #1e283685;
   --color-dark-transparent-dark: #1e283636;
 
@@ -39,6 +39,7 @@ body {
   height: 100dvh;
   position: relative;
   color: var(--color-white);
+  /* background-color: #000000; */
 }
 
 
