@@ -220,6 +220,10 @@ class ContactShadowsXR {
         });
         originalObjects.forEach(obj => {
             this.scene.remove(obj);
+            // console.log(obj)
+
+            if (obj.castShadow) console.log(obj)
+
             this.shadowScene.add(obj);
         });
 

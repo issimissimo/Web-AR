@@ -22,3 +22,9 @@ export function RecreateMaterials(model, options = {
     });
     return model;
 }
+
+export function setMaterialsShadows(model, value) {
+    model.traverse((child) => {
+        child.castShadow = value;
+    });
+}

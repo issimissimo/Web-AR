@@ -15,9 +15,9 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { Vector3, Euler } from "three";
 import { LoadTexture } from '@tools/three/textureTools';
 import { LoadPositionalAudio } from '@tools/three/audioTools';
-import { RecreateMaterials } from '@tools/three/materialTools';
-import ContactShadowsXR from '@tools/three/contactShadowsXR';
-import ClippingPlaneReveal from '@tools/three/ClippingPlaneReveal';
+import { RecreateMaterials, setMaterialsShadows } from '@tools/three/materialTools';
+import ContactShadowsXR from '@tools/three/ContactShadowsXR';
+import ClippingReveal from '@tools/three/ClippingReveal';
 
 
 
@@ -29,8 +29,9 @@ export default function testRobot(props) {
     let loadedModel,
         spawnedModel = null,
         shadows,
-        audio,
-        clippingReveal;
+        audioRobot,
+        clippingReveal,
+        audioReveal
 
 
     const handleCloseInstructions = () => {
@@ -45,7 +46,7 @@ export default function testRobot(props) {
         game.onUndo();
 
         if (shadows) shadows.dispose();
-        if (audio) audio.stop();
+        if (audioRobot) audioRobot.stop();
         if (clippingReveal) clippingReveal.dispose();
         Reticle.setEnabled(true);
         game.removePreviousFromScene();
@@ -92,7 +93,7 @@ export default function testRobot(props) {
 
         close: () => {
             if (shadows) shadows.dispose();
-            if (audio) audio.stop();
+            if (audioRobot) audioRobot.stop();
         },
 
 
@@ -133,11 +134,14 @@ export default function testRobot(props) {
             });
 
 
-        audio = await new LoadPositionalAudio("models/demo/Comau_RACER3/Comau_RACER3.ogg", SceneManager.listener,
+        audioRobot = await new LoadPositionalAudio("models/demo/Comau_RACER3/Comau_RACER3.ogg", SceneManager.listener,
             {
                 volume: 2,
                 loop: true
             });
+
+
+        audioReveal = await new LoadPositionalAudio("sounds/reveal.ogg", SceneManager.listener);
 
 
         // blur background for instructions
@@ -236,6 +240,7 @@ export default function testRobot(props) {
 
     //#region [functions]
 
+
     function spawnModel(matrix) {
         spawnedModel = game.loader.clone();
 
@@ -248,10 +253,16 @@ export default function testRobot(props) {
         spawnedModel.position.copy(position);
         spawnedModel.rotation.copy(rotation);
         spawnedModel.rotateY(Math.PI / 2);
+
+        setMaterialsShadows(spawnedModel, true)
+        console.log(spawnedModel)
+
         game.addToScene(spawnedModel);
 
-        spawnedModel.add(audio);
-        audio.play();
+        
+
+        spawnedModel.add(audioRobot);
+        audioRobot.play();
 
         shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer,
             {
@@ -262,12 +273,25 @@ export default function testRobot(props) {
                 updateFrequency: 2,
             });
 
-        clippingReveal = new ClippingPlaneReveal(spawnedModel, SceneManager.renderer,
+        // clippingReveal = new ClippingPlaneReveal(spawnedModel, SceneManager.renderer,
+        //     {
+        //         duration: 2.0,
+        //         direction: 'up',
+        //         showBelow: true,
+        //         autoStart: true,
+        //     });
+
+        clippingReveal = new ClippingReveal(spawnedModel, SceneManager.renderer,
             {
+                ringsRadius: 0.4,
+                ringNumber: 4,
+                ringThickness: 0.2,
                 duration: 2.0,
-                direction: 'up',
-                showBelow: true,
                 autoStart: true,
+                startDelay: 200,
+                fadeOutDuration: 2,
+                audio: audioReveal,
+                onComplete: () => console.log('Reveal completed')
             });
     }
 }

@@ -25,8 +25,8 @@ export function useGame(gameName, gameId, config = {}) {
     let audioUndo;
 
     onMount(async () => {
-        audioTap = await new LoadAudio('sounds/tap.mp3', SceneManager.listener);
-        audioUndo = await new LoadAudio('sounds/undo.mp3', SceneManager.listener);
+        audioTap = await new LoadAudio('sounds/tap.ogg', SceneManager.listener);
+        audioUndo = await new LoadAudio('sounds/undo.ogg', SceneManager.listener);
         context.onLoaded(game);
     });
 
