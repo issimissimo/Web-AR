@@ -17,7 +17,7 @@ export default class ClippingReveal {
         this.padding = options.padding || 0.001;
         this.fadeOutDuration = options.fadeOutDuration || 0.5; // Durata dissolvenza in secondi
         this.audio = options.audio || null;
-        
+
         // Opzioni per ConcentricRings
         this.ringsRadius = options.ringsRadius || 0.5; // Raggio degli anelli
         this.ringsColor = options.ringsColor || 0xff69b4; // Rosa
@@ -35,9 +35,9 @@ export default class ClippingReveal {
         this.scene = null;
 
         // Callbacks
-        this.onStart = options.onStart || (() => {});
-        this.onUpdate = options.onUpdate || (() => {});
-        this.onComplete = options.onComplete || (() => {});
+        this.onStart = options.onStart || (() => { });
+        this.onUpdate = options.onUpdate || (() => { });
+        this.onComplete = options.onComplete || (() => { });
 
         this._init();
     }
@@ -165,14 +165,16 @@ export default class ClippingReveal {
 
         // Calcola la posizione attuale basata sulla costante del clipping plane
         const currentValue = this.clippingPlane.constant;
-        
+
         // Posiziona gli anelli concentrici
         switch (this.direction) {
             case 'up':
             case 'down':
                 this.concentricRings.position.y = currentValue;
-                this.concentricRings.position.x = this.modelBoundingBox.getCenter(new Vector3()).x;
-                this.concentricRings.position.z = this.modelBoundingBox.getCenter(new Vector3()).z;
+                // this.concentricRings.position.x = this.modelBoundingBox.getCenter(new Vector3()).x;
+                // this.concentricRings.position.z = this.modelBoundingBox.getCenter(new Vector3()).z;
+                this.concentricRings.position.x = this.model.position.x
+                this.concentricRings.position.z = this.model.position.z
                 break;
             case 'left':
             case 'right':
@@ -195,7 +197,7 @@ export default class ClippingReveal {
 
         // Calcola quando inizia la dissolvenza (negli ultimi fadeOutDuration secondi)
         const fadeStartProgress = 1.0 - (this.fadeOutDuration / this.duration);
-        
+
         if (progress >= fadeStartProgress) {
             this.concentricRings.fadeOutCascade(200, 200);
         }
@@ -261,7 +263,7 @@ export default class ClippingReveal {
         return this;
     }
 
-    
+
     update() {
         if (!this.isRevealing || !this.isSetup) return;
 
@@ -308,12 +310,12 @@ export default class ClippingReveal {
             // Ricrea il clipping plane con la nuova direzione
             const dirParams = this.getDirectionParams();
             this.clippingPlane.normal.copy(dirParams.normal);
-            
+
             // Riorienta gli anelli concentrici
             if (this.concentricRings) {
                 this._orientConcentricRings();
             }
-            
+
             if (!this.isRevealing) {
                 this.reset();
             }

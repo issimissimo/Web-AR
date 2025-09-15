@@ -57,7 +57,7 @@ export default function ArSession(props) {
         // (we start the Reticle here, and not in the games, because
         // we want to be the 1st detection as quick as possible)
         setBlurVisible(true);
-        Reticle.set(Reticle.MESH_TYPE.RINGS, 
+        Reticle.set(Reticle.MESH_TYPE.RINGS,
             {
                 radius: 0.2,
                 ringNumber: 4,
@@ -70,13 +70,18 @@ export default function ArSession(props) {
 
         Reticle.setVisible(false);
         setInitDetectionCompleted(false); // When reopening the ARSession it seem to stay "true"... let's force (not clear why I have to do that)
-        
+
         console.log("initDetectionCompleted:", initDetectionCompleted())
 
         // If Debug on desktop we must set the background 
         // to black, so to see something...
+        const body = document.getElementsByTagName("body")[0];
         if (config.debugOnDesktop) {
-            document.getElementsByTagName("body")[0].style.backgroundColor = "black"
+            body.style.backgroundColor = "black"
+        }
+        // If not, we must set it to transparent for compatibility on iOS
+        else {
+            body.style.backgroundColor = "transparent"
         }
 
         // if we are "user" we must update the views number
@@ -128,7 +133,7 @@ export default function ArSession(props) {
         }
     })
 
-    createEffect(()=> {
+    createEffect(() => {
         console.log("UEEE GUARDA INIT DETECTION!!!...", initDetectionCompleted())
     })
 

@@ -24,10 +24,10 @@ import ClippingReveal from '@tools/three/ClippingReveal';
 export default function testRobot(props) {
 
     const [showInstructions, setShowInstructions] = createSignal(true);
-    const [isSpawned, setIsSpawned] = createSignal(false);
+    const [spawned, setSpawned] = createSignal(false);
 
     let loadedModel,
-        spawnedModel = null,
+        // spawned = false,
         shadows,
         audioRobot,
         clippingReveal,
@@ -43,16 +43,17 @@ export default function testRobot(props) {
 
 
     const handleUndo = () => {
+
+        // super
         game.onUndo();
 
         if (shadows) shadows.dispose();
         if (audioRobot) audioRobot.stop();
         if (clippingReveal) clippingReveal.dispose();
         Reticle.setEnabled(true);
-        game.removePreviousFromScene();
-        spawnedModel = null;
-        setIsSpawned(false);
         game.loader.resetAnimations();
+        game.removePreviousFromScene();
+        setSpawned(false);
     }
 
 
@@ -71,8 +72,7 @@ export default function testRobot(props) {
 
                 const hitMatrix = Reticle.getHitMatrix();
                 spawnModel(hitMatrix);
-
-                setIsSpawned(true);
+                setSpawned(true);
 
                 Reticle.setEnabled(false);
             }
@@ -80,13 +80,11 @@ export default function testRobot(props) {
 
 
         renderLoop: () => {
-            if (game.loader.loaded() && spawnedModel) {
+            if (game.loader.loaded() && spawned()) {
 
                 game.loader.animate();
-
-                shadows.update();
-
-                clippingReveal.update();
+                if (shadows) shadows.update();
+                if (clippingReveal) clippingReveal.update();
             }
         },
 
@@ -192,7 +190,7 @@ export default function testRobot(props) {
         return (
             <ContainerToolbar>
                 <ButtonCircle data-interactive
-                    active={isSpawned()}
+                    active={spawned()}
                     visible={true}
                     border={false}
                     onClick={handleUndo}
@@ -233,8 +231,8 @@ export default function testRobot(props) {
 
                         :
 
-                        /* <Toolbar/> */
-                        <></>
+                        <Toolbar />
+
                 )
             }
         </>
@@ -245,7 +243,8 @@ export default function testRobot(props) {
 
 
     function spawnModel(matrix) {
-        spawnedModel = game.loader.clone();
+        // spawnedModel = game.loader.clone();
+        // spawnedModel = game.loader.model;
 
         const position = new Vector3();
         position.setFromMatrixPosition(matrix);
@@ -253,14 +252,16 @@ export default function testRobot(props) {
         const rotation = new Euler();
         rotation.setFromRotationMatrix(matrix);
 
-        spawnedModel.position.copy(position);
-        spawnedModel.rotation.copy(rotation);
-        spawnedModel.rotateY(Math.PI / 2);
-        setMaterialsShadows(spawnedModel, true)
-        game.addToScene(spawnedModel);
+        loadedModel.position.copy(position);
+        loadedModel.rotation.copy(rotation);
+        loadedModel.rotateY(Math.PI / 2);
+        setMaterialsShadows(loadedModel, true)
+        game.addToScene(loadedModel);
 
-        spawnedModel.add(audioRobot);
+        loadedModel.add(audioRobot);
         audioRobot.play();
+
+        setSpawned(true);
 
         shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer,
             {
@@ -271,7 +272,7 @@ export default function testRobot(props) {
                 updateFrequency: 2,
             });
 
-        clippingReveal = new ClippingReveal(spawnedModel, SceneManager.renderer,
+        clippingReveal = new ClippingReveal(loadedModel, SceneManager.renderer,
             {
                 ringsRadius: 0.2,
                 ringNumber: 4,

@@ -44,8 +44,18 @@ export class GlbLoader {
     }
 
     resetAnimations() {
-        // I don't think it's the right way to reset animations to frame 0,
-        // but it work... all other methods didn't work :/
+        this.actions.forEach(mixerActions => {
+            mixerActions.forEach(action => {
+                action.reset();
+                action.play();
+            });
+        });
+
+        if (this.mixers.length > 0) {
+            // Forza un update con deltaTime = 0 per applicare il frame corrente
+            this.mixers.forEach(mixer => mixer.update(0));
+        }
+        
         this.clock = new Clock();
     }
 
@@ -58,17 +68,17 @@ export class GlbLoader {
             if (!this.clock) this.clock = new Clock();
             const mixer = new AnimationMixer(model);
             const mixerActions = []; // Azioni specifiche per questo mixer
-            
+
             this.gltf.animations.forEach((clip) => {
                 const action = mixer.clipAction(clip);
                 action.play();
 
                 // Shift casuale dell'animazione
                 if (randomizeTime) action.time = Math.random() * clip.duration;
-                
+
                 mixerActions.push(action);
             });
-            
+
             this.mixers.push(mixer);
             this.actions.push(mixerActions);
         }

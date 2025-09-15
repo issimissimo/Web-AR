@@ -34,12 +34,6 @@ export default class ConcentricRings extends Group {
     }
   }
 
-  setVisible(visible) {
-    this.rings.forEach(ring => {
-      ring.visible = visible;
-    });
-  }
-
   fadeOutCascade(duration = 1000, delay = 200) {
     this.rings.forEach((ring, index) => {
       setTimeout(() => {
