@@ -1,25 +1,25 @@
 import { TextureLoader } from "three";
 
-export async function LoadTexture(url, options = {}) {
-    return new Promise((resolve, reject) => {
-        new TextureLoader().load(
-            url,
-            (texture) => {
-                texture.flipY = options.flipY ?? true;
-                resolve(texture);
-            },
-            undefined,
-            reject
-        );
-    });
-}
+// export async function LoadTexture(url, options = {}) {
+//     return new Promise((resolve, reject) => {
+//         new TextureLoader().load(
+//             url,
+//             (texture) => {
+//                 texture.flipY = options.flipY ?? true;
+//                 resolve(texture);
+//             },
+//             undefined,
+//             reject
+//         );
+//     });
+// }
 
 
 
-export class LoadTexture2 {
+export class LoadTexture {
     constructor(filePath, options = {}) {
         this.filePath = filePath;
-        this.flipY = options.flipY ?? false;
+        this.flipY = options.flipY || false;
         this.texture = null;
         return this._init();
     }

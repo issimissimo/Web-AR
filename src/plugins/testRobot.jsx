@@ -114,7 +114,7 @@ export default function testRobot(props) {
         Reticle.setVisible(false);
 
 
-        const aoTexture = await LoadTexture("models/demo/Comau_RACER3/Comau_RACER3.jpg",
+        const aoTexture = await new LoadTexture("models/demo/Comau_RACER3/Comau_RACER3.jpg",
             {
                 flipY: false
             });
@@ -135,7 +135,7 @@ export default function testRobot(props) {
             });
 
 
-        audioReveal = await new LoadPositionalAudio("sounds/reveal.ogg", SceneManager.listener);
+        // audioReveal = await new LoadPositionalAudio("sounds/reveal.ogg", SceneManager.listener);
 
 
         // blur background for instructions
@@ -153,7 +153,8 @@ export default function testRobot(props) {
     createEffect(async () => {
         if (props.enabled) {
             console.log("***** testRobot is enabled *****")
-            Reticle.setDetectionMode(1); // only floor
+            // Reticle.setDetectionMode(1); // only floor
+            Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR);
         }
     })
 

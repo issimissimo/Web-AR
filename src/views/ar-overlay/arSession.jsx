@@ -31,7 +31,6 @@ const LOCALIZATION_STATE = {
 }
 
 
-
 export default function ArSession(props) {
 
     //#region [constants]
@@ -52,24 +51,26 @@ export default function ArSession(props) {
     //#region [lifeCycle]
     onMount(() => {
 
-        // Let's start immediately darkening the background
-        // and running the Reticle, to detect the space around us
-        // (we start the Reticle here, and not in the games, because
-        // we want to be the 1st detection as quick as possible)
+        // Let's start immediately darkening the background...
         setBlurVisible(true);
-        Reticle.set(Reticle.MESH_TYPE.RINGS,
+
+        // ...and Starting the Reticle, to detect the space around us.
+        // We start the Reticle here, and not in the games, because
+        // we want the 1st detection to be as quick as possible!
+        Reticle.setup(Reticle.MESH_TYPE.RINGS,
             {
-                radius: 0.2,
+                size: 0.4,
                 ringNumber: 4,
                 ringThickness: 0.2,
                 color: 0xf472b6,
             });
 
-
-
-
+        // We don't want to show the Reticle now!
         Reticle.setVisible(false);
-        setInitDetectionCompleted(false); // When reopening the ARSession it seem to stay "true"... let's force (not clear why I have to do that)
+
+        // When reopening the ARSession it seem to stay "true"... 
+        // let's force (not clear why I have to do that)
+        setInitDetectionCompleted(false); 
 
         console.log("initDetectionCompleted:", initDetectionCompleted())
 

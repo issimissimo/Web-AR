@@ -18,9 +18,9 @@ export default function Localization(props) {
 
 
     onMount(() => {
-        Reticle.set({
-            fileName: 'models/gizmo.glb'
-        });
+        // Reticle.set({
+        //     fileName: 'models/gizmo.glb'
+        // });
     });
 
 
