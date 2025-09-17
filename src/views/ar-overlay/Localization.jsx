@@ -1,20 +1,21 @@
-import { onMount, onCleanup, createEffect, createSignal } from 'solid-js';
+import { onMount, onCleanup, createEffect, createSignal, useContext } from 'solid-js';
 import { config } from '@js/config';
 import { styled } from 'solid-styled-components';
 import Reticle from '@js/reticle';
 import { Matrix4 } from 'three';
-
-
-const VIEWS = {
-    SEARCHING: 'searching',
-    TARGETING: 'targeting'
-}
+import Message from '@components/Message';
+import { Centered } from '@components/smallElements';
+import { Context } from '@views/ar-overlay/arSession';
+import Button from '@components/Button';
+import { Motion } from 'solid-motionone';
+import Fa from 'solid-fa';
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 
 export default function Localization(props) {
 
-    const [difficult, setDifficult] = createSignal(false)
-
+    const [showInstructions, setShowInstructions] = createSignal(true);
+    const context = useContext(Context);
 
 
     onMount(() => {
@@ -23,6 +24,17 @@ export default function Localization(props) {
         // });
         console.log("***Localitazion mounted***")
     });
+
+
+    const handleCloseInstructions = () => {
+        setShowInstructions(false);
+
+        // Reticle.setVisible(true);
+        // game.handleBlurredCover({ visible: false });
+        // game.forceUpdateDomElements();
+
+        context.handleBlurredCover({ showHole: true });
+    }
 
 
 
@@ -41,24 +53,69 @@ export default function Localization(props) {
 
 
 
-    let timeout = null;
+    /*
+    * STYLE
+    */
+    const AAA = styled(Motion.div)`
+        width: 100%;
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+    `
 
 
+
+    // return (
+    //     <div>
+    //         {props.planeFound ?
+    //             <div>
+    //                 FOUND!
+    //             </div>
+    //             :
+    //             <div>
+    //                 LOOK...
+    //             </div>
+    //         }
+
+    //         <button
+    //             onClick={handleOnDone}
+    //         >DONE</button>
+    //     </div>
+    // );
     return (
-        <div>
-            {props.planeFound ?
-                <div>
-                    FOUND!
-                </div>
-                :
-                <div>
-                    LOOK...
-                </div>
-            }
+        <Centered>
+            {
+                showInstructions() ?
 
-            <button
-                onClick={handleOnDone}
-            >DONE</button>
-        </div>
+                    <Message
+                        style={{ "height": "auto" }}
+                        svgIcon={'icons/phone.svg'}
+                        showReadMore={false}
+                        showDoneButton={true}
+                        onDone={handleCloseInstructions}
+                    >
+                        Per permettermi di localizzarti nell'ambiente circostante dovrai inquadrare il QR-Code di riferimento.<br></br>
+                        Cerca di essere il più preciso possibile!
+                    </Message>
+
+                    :
+
+                    <AAA>
+                        Inquadra il QR-Code
+                        <Button
+                            onClick={handleOnDone}
+                            small={true}
+                            active={config.debugOnDesktop ? true : props.planeFound}
+                            icon={faCheck}
+                            width={"65%"}
+                        >
+                            Fatto!
+                        </Button>
+                    </AAA>
+
+            }
+        </Centered>
     );
 }

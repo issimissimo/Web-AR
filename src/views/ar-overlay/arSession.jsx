@@ -403,7 +403,6 @@ export default function ArSession(props) {
             markerId: props.marker.id,
             referenceMatrix: referenceMatrix(),
             localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED,
-            // blurBackground: (value) => handleBlurBackground(value),
             handleBlurredCover: (state) => handleBlurredCover(state),
             forceUpdateDomElements: updateClickableDomElements
         }}>

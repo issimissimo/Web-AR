@@ -15,6 +15,7 @@ export const Container = styled(Motion.div)`
 export const Centered = styled(Container)`
     align-items: center;
     justify-content: space-evenly;
+    margin: auto;
   `;
 
 export const FitHeight = styled(Motion.div)`

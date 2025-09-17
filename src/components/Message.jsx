@@ -2,7 +2,9 @@ import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
 import Fa from 'solid-fa';
 import { faExclamation, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import Button from '@components/Button';
 import ButtonSecondary from './ButtonSecondary';
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import SvgIcon from './SvgIcon';
 
 
@@ -61,6 +63,18 @@ const Message = (props) => {
           Scopri di più
           <Fa icon={faChevronRight} size="1x" translateX={0.8} class="icon" />
         </ButtonSecondary>
+      )}
+
+      {props.showDoneButton && (
+        <Button
+          onClick={props.onDone}
+          small={true}
+          active={true}
+          icon={faCheck}
+          width={"65%"}
+        >
+          Ho capito
+        </Button>
       )}
 
     </MessageContainer>

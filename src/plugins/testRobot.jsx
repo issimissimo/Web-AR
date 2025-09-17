@@ -6,11 +6,8 @@ import Reticle from '@js/reticle';
 import SceneManager from '@js/sceneManager';
 
 import Message from '@components/Message';
-import Button from '@components/Button';
 import ButtonCircle from '@components/ButtonCircle';
 import SvgIcon from '@components/SvgIcon';
-
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { Vector3, Euler } from "three";
 import { LoadTexture } from '@tools/three/textureTools';
@@ -30,7 +27,7 @@ export default function testRobot(props) {
         shadows,
         audioRobot,
         clippingReveal
-        // audioReveal
+    // audioReveal
 
 
     const handleCloseInstructions = () => {
@@ -218,17 +215,11 @@ export default function testRobot(props) {
                                 style={{ "height": "auto" }}
                                 svgIcon={'icons/tap.svg'}
                                 showReadMore={false}
+                                showDoneButton={true}
+                                onDone={handleCloseInstructions}
                             >
                                 Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano. <br></br> Evita i piani troppo riflettenti o uniformi.
                             </Message>
-                            <Button
-                                onClick={handleCloseInstructions}
-                                small={true}
-                                active={true}
-                                icon={faCheck}
-                            >
-                                Ho capito
-                            </Button>
                         </Container>
 
                         :
