@@ -5,6 +5,11 @@ import { Centered } from '@components/smallElements';
 
 
 export default function InitialDetection() {
+    
+
+    onMount(()=>{
+        console.log("**** INTIAL DETECTION - ON MOUNT")
+    })
 
 
     /*

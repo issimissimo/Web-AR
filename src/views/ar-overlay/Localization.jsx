@@ -1,4 +1,4 @@
-import { onMount, onCleanup, createEffect, createSignal, useContext } from 'solid-js';
+import { onMount, createSignal, useContext } from 'solid-js';
 import { config } from '@js/config';
 import { styled } from 'solid-styled-components';
 import Reticle from '@js/reticle';
@@ -8,7 +8,6 @@ import { Centered } from '@components/smallElements';
 import { Context } from '@views/ar-overlay/arSession';
 import Button from '@components/Button';
 import { Motion } from 'solid-motionone';
-import Fa from 'solid-fa';
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 
@@ -18,18 +17,26 @@ export default function Localization(props) {
     const context = useContext(Context);
 
 
-    onMount(() => {
-        // Reticle.set({
-        //     fileName: 'models/gizmo.glb'
-        // });
-        console.log("***Localitazion mounted***")
+    onMount(async () => {
+        console.log("**** LOCALIZATION - ON MOUNT")
+        // await Reticle.setup(Reticle.MESH_TYPE.PLANE,
+        //     {
+        //         size: 0.3,
+        //         texturePath: "images/reticle_v1.png",
+        //         color: 0xf472b6,
+        //     });
+        await Reticle.setup(Reticle.MESH_TYPE.CUSTOM,
+            {
+                glbFilePath: "models/reticle_v1.glb"
+            });
+        Reticle.setVisible(true);
     });
 
 
     const handleCloseInstructions = () => {
         setShowInstructions(false);
 
-        // Reticle.setVisible(true);
+        Reticle.setVisible(true);
         // game.handleBlurredCover({ visible: false });
         // game.forceUpdateDomElements();
 

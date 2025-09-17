@@ -354,23 +354,26 @@ export default function ArSession(props) {
     }
 
 
-    const handleSetBlurVisible = (inventoryVisible) => {
-        // TODO - gestire anche Localization!
-        setBlurVisible(() => inventoryVisible);
-    }
 
     const handleBlurredCover = (state = {}) => {
+
+        // TODO: gestire chiamate multiple incoerenti da script diversi...
+
+
+        const priority = state.priority ?? 0;
+
+
+
         setBlurVisible(() => state.visible ?? blurVisible());
         setBlurShowHole(() => state.showHole ?? blurShowHole());
 
-
+        // Reset
         if (!blurVisible() && blurShowHole()) {
             setTimeout(() => {
                 console.log("RESET")
                 setBlurShowHole(false);
             }, 1000);
         }
-
     }
 
 
@@ -437,8 +440,8 @@ export default function ArSession(props) {
                                         stored={item.stored}
                                         enabled={gamesInitialized() && initDetectionCompleted() &&
                                             localizationState() !== LOCALIZATION_STATE.REQUIRED}
-                                        selected={item.id === selectedGameId() &&
-                                            localizationState() !== LOCALIZATION_STATE.REQUIRED}
+                                        selected={item.id === selectedGameId() && gamesInitialized() &&
+                                            initDetectionCompleted() && localizationState() !== LOCALIZATION_STATE.REQUIRED}
                                     />;
                                 }}
                             </For>
@@ -468,7 +471,6 @@ export default function ArSession(props) {
                                             addNewModule={(id, name) => loadModule(id, name, false, true)}
                                             saveEnabled={selectedGameId() !== null ? true : false}
                                             saveGame={handleSaveSelectedGame}
-                                            onToggleUi={(showed) => handleSetBlurVisible(showed)}
                                         />
                             )}
                         </>

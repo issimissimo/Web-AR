@@ -1,4 +1,4 @@
-import { onMount, createSignal } from 'solid-js';
+import { onMount, createSignal, useContext } from 'solid-js';
 import { styled } from "solid-styled-components";
 import { Motion } from 'solid-motionone';
 
@@ -6,8 +6,7 @@ import { Container, FitHeight, FitHeightScrollable } from '@components/smallElem
 import Button from '@components/button';
 import ButtonSecondary from '@components/ButtonSecondary';
 import SvgIcon from '@components/SvgIcon';
-import BlurredCover from '@components/BlurredCover';
-
+import { Context } from '@views/ar-overlay/arSession';
 import Fa from 'solid-fa';
 import { faPlus, faXmark, faLocationCrosshairs, faSadTear, faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
 
@@ -234,10 +233,12 @@ const Inventory = (props) => {
 
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null);
     const [visible, setVisible] = createSignal(false);
+    const context = useContext(Context);
 
     const handleSetVisible = () => {
         setVisible(() => !visible());
-        props.onToggleUi(visible());
+        // props.onToggleUi(visible());
+        context.handleBlurredCover({ visible: visible() });
     }
 
     const InventoryContainer = styled('div')`

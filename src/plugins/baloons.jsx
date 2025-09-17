@@ -2,6 +2,7 @@ import { onMount, createEffect, createSignal } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4 } from 'three';
+import Reticle from '@js/reticle';
 
 
 const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080];
@@ -36,19 +37,13 @@ export default function Baloons(props) {
 
         await game.loader.load("models/baloon.glb");
 
-
         if (props.stored) {
             // Load the game data from RealtimeDB
             await game.loadGameData();
-
-            // loadAllModels();
-
         }
         else {
             game.setGameData(defaultGameData);
         }
-
-
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
@@ -64,40 +59,37 @@ export default function Baloons(props) {
     */
     createEffect(() => {
         if (props.enabled) {
-            if (props.stored) {
-                loadAllModels();
-            }
+            setupScene();
         }
-
-        //     async function waitForGltf() {
-        //         while (!game.loader.loaded()) {
-        //             await new Promise(resolve => setTimeout(resolve, 50));
-        //         }
-        //         setupScene();
-        //     }
-
-        //     waitForGltf();
-        //     // setupScene();
-        // }
     })
 
 
     /*
     * SETUP SCENE
     */
-    // async function setupScene() {
+    function setupScene() {
 
-    //     const model = game.loader.model;
-    //     model.position.z = -3;
-    //     game.addToScene(model);
+        Reticle.setEnabled(false);
+
+        setTimeout(() => {
+            if (props.stored) {
+                // loadAllModels();
+            }
+        },1000)
 
 
 
-    //     game.setGameData(defaultGameData);
+        //     const model = game.loader.model;
+        //     model.position.z = -3;
+        //     game.addToScene(model);
 
-    //     // /// test per spawn
-    //     // spawnModel();
-    // }
+
+
+        //     game.setGameData(defaultGameData);
+
+        //     // /// test per spawn
+        //     // spawnModel();
+    }
 
 
     /*
@@ -165,7 +157,7 @@ export default function Baloons(props) {
     return (
         <>
             {
-                props.selected && game.initialized() && (
+                props.selected && (
                     (() => {
                         switch (game.appMode) {
                             case game.AppMode.SAVE:
@@ -186,32 +178,83 @@ export default function Baloons(props) {
     */
     //#region [functions]
 
+    // function loadAllModels() {
+    //     game.gameData().forEach(assetData => {
+
+    //         const newModel = game.loader.clone({ randomizeTime: true });
+    //         newModel.matrixAutoUpdate = false;
+
+    //         // position
+    //         const offsetMatrix = new Matrix4();
+    //         offsetMatrix.fromArray(assetData.diffMatrix.elements);
+
+    //         const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
+    //             (game.referenceMatrix, offsetMatrix);
+    //         newModel.matrix.copy(globalMatrix);
+
+    //         // color
+    //         const colorIndex = assetData.color;
+    //         newModel.traverse((child) => {
+    //             if (child.isMesh && child.material && child.material.name === "baloon") {
+    //                 const newModelColor = balloonColors[colorIndex];
+    //                 child.material = child.material.clone(); // clone per non cambiare il materiale originale
+    //                 child.material.color = new Color(newModelColor);
+    //             }
+    //         });
+
+    //         game.addToScene(newModel);
+    //     });
+    // }
+
     function loadAllModels() {
-        game.gameData().forEach(assetData => {
+        const gameData = game.gameData();
+        let currentIndex = 0;
 
-            const newModel = game.loader.clone({ randomizeTime: true });
-            newModel.matrixAutoUpdate = false;
+        function loadNextBatch() {
+            const batchSize = 1; // Carica 1 modello per frame
+            const endIndex = Math.min(currentIndex + batchSize, gameData.length);
 
-            // position
-            const offsetMatrix = new Matrix4();
-            offsetMatrix.fromArray(assetData.diffMatrix.elements);
-            const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
-                (game.referenceMatrix, offsetMatrix);
-            newModel.matrix.copy(globalMatrix);
+            for (let i = currentIndex; i < endIndex; i++) {
+                const assetData = gameData[i];
 
-            // color
-            const colorIndex = assetData.color;
-            newModel.traverse((child) => {
-                if (child.isMesh && child.material && child.material.name === "baloon") {
-                    const newModelColor = balloonColors[colorIndex];
-                    child.material = child.material.clone(); // clone per non cambiare il materiale originale
-                    child.material.color = new Color(newModelColor);
-                }
-            });
+                const newModel = game.loader.clone({ randomizeTime: true });
+                newModel.matrixAutoUpdate = false;
 
-            game.addToScene(newModel);
-        });
+                // position
+                const offsetMatrix = new Matrix4();
+                offsetMatrix.fromArray(assetData.diffMatrix.elements);
+
+                const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
+                    (game.referenceMatrix, offsetMatrix);
+                newModel.matrix.copy(globalMatrix);
+
+                // color
+                const colorIndex = assetData.color;
+                newModel.traverse((child) => {
+                    if (child.isMesh && child.material && child.material.name === "baloon") {
+                        const newModelColor = balloonColors[colorIndex];
+                        child.material = child.material.clone();
+                        child.material.color = new Color(newModelColor);
+                    }
+                });
+
+                game.addToScene(newModel);
+            }
+
+            currentIndex = endIndex;
+
+            // Se ci sono ancora modelli da caricare, continua nel prossimo frame
+            if (currentIndex < gameData.length) {
+                requestAnimationFrame(loadNextBatch);
+            } else {
+                console.log("Tutti i modelli caricati!");
+            }
+        }
+
+        loadNextBatch();
     }
+
+
 
 
     function spawnModelOnTap() {

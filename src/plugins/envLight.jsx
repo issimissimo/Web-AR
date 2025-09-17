@@ -38,6 +38,8 @@ export default function EnvLight(props) {
     */
     onMount(() => {
 
+        console.log("**** ENV LIGHT - ON MOUNT")
+
         // console.log("App MODE:", game.appMode);
         // console.log("stored:", props.stored);
         // console.log("DETAILS:", game.gameDetails)

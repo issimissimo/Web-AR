@@ -6,10 +6,13 @@ import {
     Mesh,
     MeshBasicMaterial,
     RingGeometry,
+    DoubleSide
 } from 'three';
 import SceneManager from "./sceneManager";
 import ConcentricRings from "@tools/three/ConcentricRings";
 import { GlbLoader } from "@tools/three/modelTools";
+import { LoadTexture } from "@tools/three/textureTools";
+import decodeImageFormat from '@tools/three/decodeImageFormat';
 
 
 let _renderer = null;
@@ -19,6 +22,7 @@ let _circleMesh = null;
 
 let _reticleMesh = null;
 const _glbLoader = new GlbLoader();
+const _loadTexture = null;
 
 
 // Elementi di stato
@@ -148,6 +152,9 @@ const Reticle = {
             return false;
         }
 
+        if (_reticleMesh) _scene.remove(_reticleMesh);
+        _initialized = false;
+
         // main
         _renderer = SceneManager.renderer;
         _scene = SceneManager.scene;
@@ -181,13 +188,25 @@ const Reticle = {
 
 
             case this.MESH_TYPE.PLANE:
-                //TODO: setup plane with custom texture
+                console.log("SETTING UP PLANE RETICLE....")
+                const opacityTexture = await new LoadTexture(_options.texturePath);
+                decodeImageFormat(opacityTexture)
+                // const planeGeo = new PlaneGeometry(_options.size, _options.size).rotateX(Math.PI / 2);
+                const planeGeo = new PlaneGeometry(_options.size, _options.size);
+                const planeMat = new MeshBasicMaterial({
+                    color: _options.color,
+                    opacity: opacityTexture,
+                    transparent: true,
+                    side: DoubleSide
+                });
+                _reticleMesh = new Mesh(planeGeo, planeMat);
                 this._completeSetup();
                 break;
 
 
             case this.MESH_TYPE.CUSTOM:
-                //TODO: load custom file
+                console.log("SETTING UP CUSTOM RETICLE....")
+                _reticleMesh = await _glbLoader.load(_options.glbFilePath);
                 this._completeSetup();
                 break;
 
@@ -450,7 +469,7 @@ const Reticle = {
         _workingMode = workingMode;
     },
 
-  
+
 }
 
 export default Reticle;   
