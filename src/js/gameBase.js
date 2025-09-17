@@ -36,11 +36,6 @@ export function useGame(gameName, gameId, config = {}) {
         }
     })
 
-    // const localizationCompleted = () => {
-    //     return context.localizationCompleted();
-    // }
-
-
 
     // Load game data from Realtime Database
     const loadGameData = async () => {
@@ -116,8 +111,6 @@ export function useGame(gameName, gameId, config = {}) {
         appMode: context.appMode,
         initialized,
         setInitialized,
-        // localizationCompleted,
-        // blurBackground: context.blurBackground,
         handleBlurredCover: context.handleBlurredCover,
         referenceMatrix: context.referenceMatrix,
         getObjOffsetMatrix,

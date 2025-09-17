@@ -359,14 +359,18 @@ export default function ArSession(props) {
         setBlurVisible(() => inventoryVisible);
     }
 
-    // const handleBlurBackground = (value) => {
-    //     setBlurVisible(() => value);
-    // }
-
-
     const handleBlurredCover = (state = {}) => {
         setBlurVisible(() => state.visible ?? blurVisible());
         setBlurShowHole(() => state.showHole ?? blurShowHole());
+
+
+        if (!blurVisible() && blurShowHole()) {
+            setTimeout(() => {
+                console.log("RESET")
+                setBlurShowHole(false);
+            }, 1000);
+        }
+
     }
 
 
@@ -402,7 +406,6 @@ export default function ArSession(props) {
             userId: props.userId,
             markerId: props.marker.id,
             referenceMatrix: referenceMatrix(),
-            localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED,
             handleBlurredCover: (state) => handleBlurredCover(state),
             forceUpdateDomElements: updateClickableDomElements
         }}>

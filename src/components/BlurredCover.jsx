@@ -24,16 +24,11 @@ export default function BlurredCover(props) {
 
     createEffect(() => {
 
-        console.log("visible:",props.visible )
         // Here we receive props changes!
         setVisible(props.visible);
         setShowHole(props.showHole);
 
-        if (!visible() && showHole()) {
-            setTimeout(() => {
-                setShowHole(false);
-            }, dur());
-        }
+        
     });
 
 

@@ -189,7 +189,7 @@ export default function Baloons(props) {
     function loadAllModels() {
         game.gameData().forEach(assetData => {
 
-            const newModel = game.loader.clone();
+            const newModel = game.loader.clone({ randomizeTime: true });
             newModel.matrixAutoUpdate = false;
 
             // position

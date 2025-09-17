@@ -47,7 +47,7 @@ export default function Localization(props) {
         else {
             props.setReferenceMatrix(Reticle.getHitMatrix());
         }
-        // context.handleBlurredCover({ visible: false });
+        context.handleBlurredCover({ visible: false });
     }
 
 
