@@ -36,9 +36,9 @@ export function useGame(gameName, gameId, config = {}) {
         }
     })
 
-    const localizationCompleted = () => {
-        return context.localizationCompleted();
-    }
+    // const localizationCompleted = () => {
+    //     return context.localizationCompleted();
+    // }
 
 
 
@@ -116,7 +116,7 @@ export function useGame(gameName, gameId, config = {}) {
         appMode: context.appMode,
         initialized,
         setInitialized,
-        localizationCompleted,
+        // localizationCompleted,
         // blurBackground: context.blurBackground,
         handleBlurredCover: context.handleBlurredCover,
         referenceMatrix: context.referenceMatrix,

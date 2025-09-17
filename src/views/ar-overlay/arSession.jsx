@@ -123,12 +123,12 @@ export default function ArSession(props) {
     });
 
 
-    // createEffect(() => {
-    //     console.log("---- Games running:", props.gamesRunning)
-    //     // console.log("---- Games imported:", gamesImported());
-    //     console.log("---- Game id selected:", selectedGameId());
-    //     // console.log("---- Games initializing:", gamesInitializing());
-    // })
+    createEffect(() => {
+        // console.log("---- Games running:", props.gamesRunning)
+        // // console.log("---- Games imported:", gamesImported());
+        // console.log("---- Game id selected:", selectedGameId());
+        // // console.log("---- Games initializing:", gamesInitializing());
+    })
 
 
 
@@ -433,10 +433,9 @@ export default function ArSession(props) {
                                         id={item.id}
                                         stored={item.stored}
                                         enabled={gamesInitialized() && initDetectionCompleted() &&
-                                            localizationState !== LOCALIZATION_STATE.REQUIRED ? true : false}
+                                            localizationState() !== LOCALIZATION_STATE.REQUIRED}
                                         selected={item.id === selectedGameId() &&
-                                            localizationState() !== LOCALIZATION_STATE.REQUIRED ?
-                                            true : false}
+                                            localizationState() !== LOCALIZATION_STATE.REQUIRED}
                                     />;
                                 }}
                             </For>

@@ -63,7 +63,7 @@ export default function Baloons(props) {
     * On localizationCompleted
     */
     createEffect(() => {
-        if (game.localizationCompleted()) {
+        if (props.enabled) {
             if (props.stored) {
                 loadAllModels();
             }
@@ -216,7 +216,7 @@ export default function Baloons(props) {
 
     function spawnModelOnTap() {
 
-        if (!game.localizationCompleted() || !game.loader.loaded()) return;
+        if (!props.enabled || !game.loader.loaded()) return;
 
         const newModel = game.loader.clone();
 

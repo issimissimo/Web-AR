@@ -45,10 +45,9 @@ export default function Localization(props) {
             props.setReferenceMatrix(fakeHitMatrix);
         }
         else {
-            if (props.planeFound) {
-                props.setReferenceMatrix(Reticle.getHitMatrix());
-            }
+            props.setReferenceMatrix(Reticle.getHitMatrix());
         }
+        // context.handleBlurredCover({ visible: false });
     }
 
 
@@ -56,7 +55,7 @@ export default function Localization(props) {
     /*
     * STYLE
     */
-    const AAA = styled(Motion.div)`
+    const DoneContainer = styled(Motion.div)`
         width: 100%;
         height: 80vh;
         display: flex;
@@ -66,24 +65,6 @@ export default function Localization(props) {
     `
 
 
-
-    // return (
-    //     <div>
-    //         {props.planeFound ?
-    //             <div>
-    //                 FOUND!
-    //             </div>
-    //             :
-    //             <div>
-    //                 LOOK...
-    //             </div>
-    //         }
-
-    //         <button
-    //             onClick={handleOnDone}
-    //         >DONE</button>
-    //     </div>
-    // );
     return (
         <Centered>
             {
@@ -102,7 +83,9 @@ export default function Localization(props) {
 
                     :
 
-                    <AAA>
+                    <DoneContainer
+                        animate={{ opacity: [0, 1] }}
+                        transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}>
                         Inquadra il QR-Code
                         <Button
                             onClick={handleOnDone}
@@ -113,7 +96,7 @@ export default function Localization(props) {
                         >
                             Fatto!
                         </Button>
-                    </AAA>
+                    </DoneContainer>
 
             }
         </Centered>
