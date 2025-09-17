@@ -35,6 +35,8 @@ export default function Baloons(props) {
     */
     onMount(async () => {
 
+        console.log("**** BALOONS - ON MOUNT")
+
         await game.loader.load("models/baloon.glb");
 
         if (props.stored) {
@@ -59,6 +61,7 @@ export default function Baloons(props) {
     */
     createEffect(() => {
         if (props.enabled) {
+            console.log("BALOONS ENABLED!")
             setupScene();
         }
     })
@@ -73,7 +76,7 @@ export default function Baloons(props) {
 
         setTimeout(() => {
             if (props.stored) {
-                // loadAllModels();
+                loadAllModels();
             }
         },1000)
 

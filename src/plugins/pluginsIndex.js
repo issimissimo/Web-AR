@@ -71,7 +71,7 @@ export const PLUGINS_LIST = [
         icon: '/icons/360.svg',
         category: 'Giochi',
         allowed: 1,
-        localized: false,
+        localized: true,
         tags: [],
         requirements: {}
     },

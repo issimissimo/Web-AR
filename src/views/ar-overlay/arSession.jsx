@@ -127,6 +127,8 @@ export default function ArSession(props) {
         // console.log("---- Games running:", props.gamesRunning)
         // // console.log("---- Games imported:", gamesImported());
         // console.log("---- Game id selected:", selectedGameId());
+
+        console.log(">>>>>localizationState:", localizationState())
         // // console.log("---- Games initializing:", gamesInitializing());
     })
 
@@ -338,6 +340,7 @@ export default function ArSession(props) {
     * with the function "handleModuleLoaded")
     */
     async function loadModule(moduleId, moduleName, storedOnDatabase, selectOnEnd = false) {
+        console.log("LOADING:", moduleName)
         const raw = await import(`../../plugins/${moduleName}.jsx`);
         const newModule = {
             id: moduleId,
