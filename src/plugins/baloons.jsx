@@ -3,12 +3,22 @@ import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4 } from 'three';
 import Reticle from '@js/reticle';
+import { LoadPositionalAudio } from '@tools/three/audioTools';
 
 
 const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080];
 
 
 export default function Baloons(props) {
+
+    let popAudio;
+    // const spawnedBalloons = [];
+    // class SpawnedBalloon {
+    //     constructor(model, revealSound, explodeSound = null){
+
+    //     }
+    // }
+
 
     /*
     * Put here derived functions from Game
@@ -38,6 +48,8 @@ export default function Baloons(props) {
         console.log("**** BALOONS - ON MOUNT")
 
         await game.loader.load("models/baloon.glb");
+
+        // popAudio = await new LoadPositionalAudio("sounds/pop.ogg", SceneManager.listener);
 
         if (props.stored) {
             // Load the game data from RealtimeDB
@@ -242,6 +254,8 @@ export default function Baloons(props) {
                 });
 
                 game.addToScene(newModel);
+                
+
             }
 
             currentIndex = endIndex;

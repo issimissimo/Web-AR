@@ -152,8 +152,9 @@ const Reticle = {
             return false;
         }
 
-        if (_reticleMesh) _scene.remove(_reticleMesh);
         _initialized = false;
+        if (_reticleMesh) _scene.remove(_reticleMesh);
+        
 
         // main
         _renderer = SceneManager.renderer;

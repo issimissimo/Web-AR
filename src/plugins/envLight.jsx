@@ -58,6 +58,14 @@ export default function EnvLight(props) {
     });
 
 
+    onCleanup(() => {
+        if (SceneManager.initialized()) {
+            SceneManager.scene.environment = null;
+            SceneManager.scene.add(SceneManager.light);
+        }
+    })
+
+
     createEffect(() => {
         if (game.gameData()) {
             setupScene();

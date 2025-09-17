@@ -81,7 +81,7 @@ export class LoadPositionalAudio {
                     sound.setLoop(this.loop);
                     sound.setRefDistance(this.refDistance);
                     sound.setMaxDistance(this.maxDistance);
-                    sound.setVolume(this.volume);   
+                    sound.setVolume(this.volume);
 
                     if (this.autoPlay) {
                         sound.play();
@@ -93,6 +93,36 @@ export class LoadPositionalAudio {
 
                     resolve(sound);
                 },
+                function (progress) {
+                    // console.log('Caricamento audio:', (progress.loaded / progress.total * 100) + '%');
+                },
+                function (error) {
+                    reject(new Error(`Errore nel caricamento del file audio: ${error}`));
+                }
+            );
+        });
+    }
+}
+
+
+export class LoadAudioBuffer {
+    constructor() {
+        this.filePath = filePath;
+        this.buffer = null;
+        return this._init();
+    }
+
+    async _init() {
+        this.buffer = await this._loadAudioBuffer();
+        return this.buffer;
+    }
+
+    _loadAudioBuffer() {
+        return new Promise((resolve, reject) => {
+            const audioLoader = new AudioLoader();
+            audioLoader.load(
+                this.filePath,
+                (buffer) => resolve(buffer),
                 function (progress) {
                     // console.log('Caricamento audio:', (progress.loaded / progress.total * 100) + '%');
                 },

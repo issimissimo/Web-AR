@@ -35,11 +35,8 @@ export default function Localization(props) {
 
     const handleCloseInstructions = () => {
         setShowInstructions(false);
-
         Reticle.setVisible(true);
-        // game.handleBlurredCover({ visible: false });
         // game.forceUpdateDomElements();
-
         context.handleBlurredCover({ showHole: true });
     }
 
