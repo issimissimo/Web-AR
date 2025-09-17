@@ -27,17 +27,17 @@ export default function testRobot(props) {
     const [spawned, setSpawned] = createSignal(false);
 
     let loadedModel,
-        // spawned = false,
         shadows,
         audioRobot,
-        clippingReveal,
-        audioReveal
+        clippingReveal
+        // audioReveal
 
 
     const handleCloseInstructions = () => {
         setShowInstructions(() => false);
-        game.blurBackground(false);
         Reticle.setVisible(true);
+        // game.blurBackground(false);
+        game.handleBlurredCover({ visible: false });
         game.forceUpdateDomElements();
     }
 
@@ -139,7 +139,8 @@ export default function testRobot(props) {
 
 
         // blur background for instructions
-        game.blurBackground(true);
+        // game.blurBackground(true);
+        game.handleBlurredCover({ visible: true });
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 

@@ -42,7 +42,10 @@ export default function ArSession(props) {
     const [modules, setModules] = createSignal([]);
     const [gamesInitialized, setGamesInitialized] = createSignal(false);
     const [selectedGameId, setSelectedGameId] = createSignal(null);
+
+    // Blurred cover
     const [blurVisible, setBlurVisible] = createSignal(false);
+    const [blurShowHole, setBlurShowHole] = createSignal(false);
 
     let _tapEnabled = true;
     let _gamesInitialized = 0;
@@ -52,7 +55,8 @@ export default function ArSession(props) {
     onMount(() => {
 
         // Let's start immediately darkening the background...
-        setBlurVisible(true);
+        // setBlurVisible(true);
+        handleBlurredCover({ visible: true });
 
         // ...and Starting the Reticle, to detect the space around us.
         // We start the Reticle here, and not in the games, because
@@ -70,7 +74,7 @@ export default function ArSession(props) {
 
         // When reopening the ARSession it seem to stay "true"... 
         // let's force (not clear why I have to do that)
-        setInitDetectionCompleted(false); 
+        setInitDetectionCompleted(false);
 
         console.log("initDetectionCompleted:", initDetectionCompleted())
 
@@ -78,7 +82,11 @@ export default function ArSession(props) {
         // to black, so to see something...
         const body = document.getElementsByTagName("body")[0];
         if (config.debugOnDesktop) {
-            body.style.backgroundColor = "black"
+            body.style.backgroundColor = "black";
+
+            // Skip init detection
+            setInitDetectionCompleted(true);
+            console.warn("We are DEBUGGING on desktop and Init detection is skipped!");
         }
         // If not, we must set it to transparent for compatibility on iOS
         else {
@@ -351,12 +359,15 @@ export default function ArSession(props) {
         setBlurVisible(() => inventoryVisible);
     }
 
-    const handleBlurBackground = (value) => {
-        setBlurVisible(() => value);
+    // const handleBlurBackground = (value) => {
+    //     setBlurVisible(() => value);
+    // }
+
+
+    const handleBlurredCover = (state = {}) => {
+        setBlurVisible(() => state.visible ?? blurVisible());
+        setBlurShowHole(() => state.showHole ?? blurShowHole());
     }
-
-
-
 
 
 
@@ -392,12 +403,16 @@ export default function ArSession(props) {
             markerId: props.marker.id,
             referenceMatrix: referenceMatrix(),
             localizationCompleted: () => localizationState() === LOCALIZATION_STATE.COMPLETED,
-            blurBackground: (value) => handleBlurBackground(value),
+            // blurBackground: (value) => handleBlurBackground(value),
+            handleBlurredCover: (state) => handleBlurredCover(state),
             forceUpdateDomElements: updateClickableDomElements
         }}>
             <Main id="arSession">
 
-                <BlurredCover direction={blurVisible() ? "in" : "out"} />
+                <BlurredCover
+                    visible={blurVisible()}
+                    showHole={blurShowHole()}
+                />
 
                 {/* HEADER */}
                 <Header
@@ -433,14 +448,20 @@ export default function ArSession(props) {
                                 !initDetectionCompleted() ?
 
                                     <InitialDetection />
+
                                     :
+
                                     localizationState() === LOCALIZATION_STATE.REQUIRED ?
+
                                         <Localization
                                             planeFound={props.planeFound}
                                             setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
                                         />
+
                                         :
+
                                         props.appMode === AppMode.SAVE &&
+
                                         <Inventory
                                             marker={props.marker}
                                             addNewModule={(id, name) => loadModule(id, name, false, true)}
@@ -449,8 +470,6 @@ export default function ArSession(props) {
                                             onToggleUi={(showed) => handleSetBlurVisible(showed)}
                                         />
                             )}
-
-
                         </>
                 }
             </Main>

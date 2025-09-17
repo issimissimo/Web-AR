@@ -21,6 +21,7 @@ export default function Localization(props) {
         // Reticle.set({
         //     fileName: 'models/gizmo.glb'
         // });
+        console.log("***Localitazion mounted***")
     });
 
 

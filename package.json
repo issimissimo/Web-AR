@@ -1,8 +1,8 @@
 {
-  "name": "launch-examples-threejs",
+  "name": "ar-web",
   "private": false,
   "license": "MIT",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,8 +12,8 @@
     "subdir-build": "vite build --base=/threejs/"
   },
   "devDependencies": {
-    "cloudflared": "^0.4.0",
-    "concurrently": "^9.1.2",
+    "cloudflared": "^0.7.1",
+    "concurrently": "^9.2.1",
     "solid-js": "^1.9.7",
     "vite": "^4.3.9",
     "vite-plugin-solid": "^2.11.6"

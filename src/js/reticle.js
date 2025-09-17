@@ -166,9 +166,6 @@ const Reticle = {
         _options.texturePath = options.texturePath || null;
 
 
-        console.log("MESH_TYPE:", _meshType)
-
-
         switch (_meshType) {
 
             case this.MESH_TYPE.RINGS:
@@ -195,53 +192,6 @@ const Reticle = {
                 break;
 
         }
-
-        // if (options.fileName) {
-        //     console.log("loading GLTF");
-        //     const loader = new GLTFLoader();
-
-        //     const draco = new DRACOLoader();
-        //     draco.setDecoderConfig({ type: "js" });
-        //     draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
-        //     loader.setDRACOLoader(draco);
-
-        //     loader.load(
-        //         options.fileName,
-        //         (gltf) => {
-        //             try {
-        //                 const r = gltf.scene;
-        //                 const ref = r.children[0];
-        //                 _planeMesh = ref.clone();
-        //                 _setReticleProperties();
-        //                 completeSetup();
-        //             } catch (error) {
-        //                 console.error('Error processing GLTF:', error);
-        //                 reject(error);
-        //             }
-        //         },
-        //         (xhr) => {
-        //             // console.log((xhr.loaded / xhr.total * 100) + '% loaded of reticle');
-        //         },
-        //         (error) => {
-        //             console.error('An error happened loading GLTF:', error);
-        //             reject(error);
-        //         }
-        //     );
-
-        // }
-
-
-        // else {
-        //     const ringGeometry = new RingGeometry(_options.innerRadius, _options.radius, _options.segments).rotateX(-Math.PI / 2);
-        //     const material = new MeshBasicMaterial({ color: _options.color || 0xffffff });
-        //     _planeMesh = new Mesh(ringGeometry, material);
-        //     _setReticleProperties();
-        //     completeSetup();
-        // }
-
-
-
-
     },
 
     _completeSetup() {
@@ -320,15 +270,6 @@ const Reticle = {
                 const hitTestResults = frame.getHitTestResults(_hitTestSource);
                 if (hitTestResults.length) {
 
-
-
-
-
-
-                    // _isHitting = true;
-
-                    // if (_planeMesh._shouldDisplay) _planeMesh.visible = true;
-
                     const hit = hitTestResults[0];
                     const pose = hit.getPose(referenceSpace);
                     const rawMatrix = pose.transform.matrix;
@@ -342,22 +283,8 @@ const Reticle = {
                     _reticleMesh.quaternion.copy(quat);
                     _reticleMesh.updateMatrix(); ////// NON QUI!!!!!!!!
 
-                    _surfTypeDetected = _getReticleSurface();
-
-
-                    // // Check if is the right surface...
-                    // if (_detectionMode !== 0) {
-                    //     if (_surfType !== _surfTypeNames[_detectionMode]) {
-
-                    //         // Not the surface we are looking for!
-                    //         console.log("Not the surface we are looking for!")
-                    //         _isHitting = false;
-                    //         _reticleMesh.visible = false;
-                    //         return false;
-                    //     }
-                    // }
-
                     // Check if is the right surface...
+                    _surfTypeDetected = _getReticleSurface();
                     if (_surfTypeMode !== this.SURF_TYPE_MODE.ALL) {
                         if (_surfTypeDetected !== _surfTypeMode) {
 
