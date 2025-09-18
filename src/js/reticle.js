@@ -454,8 +454,8 @@ const Reticle = {
     // so it's NOT updated and doesn't detect surfaces
     setEnabled(value) {
         _enabled = value;
-        _reticleMesh._shouldDisplay = value;
-        _circleMesh._shouldDisplay = value;
+        // _reticleMesh._shouldDisplay = value;
+        // _circleMesh._shouldDisplay = value;
     },
 
     enabled() {

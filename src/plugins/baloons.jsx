@@ -16,6 +16,8 @@ export default function Baloons(props) {
     */
     const defaultGameData = [];
 
+    let tempDiffMatrix;
+
 
     let popAudio;
     //  const spawnedBalloons = [];
@@ -149,8 +151,8 @@ export default function Baloons(props) {
     * LOOP
     */
     function loop() {
-        if (game.loader.loaded())
-            game.loader.animate();
+        // if (game.loader.loaded())
+        //     game.loader.animate();
     }
 
 
@@ -211,14 +213,14 @@ export default function Baloons(props) {
         <>
             {
                 props.enabled && (
-                    {/* (() => {
+                    (() => {
                         switch (game.appMode) {
-                            case game.AppMode.SAVE:
+                            case "save":
                                 return <AuthorUI />;
-                            case game.AppMode.LOAD:
+                            case "load":
                                 return <UserUI />;
                         }
-                    })() */}
+                    })()
                 )
             }
         </>
@@ -276,11 +278,11 @@ export default function Baloons(props) {
                 newModel.matrixAutoUpdate = false;
 
                 // position
-                const offsetMatrix = new Matrix4();
-                offsetMatrix.fromArray(assetData.diffMatrix.elements);
+                const diffMatrix = new Matrix4();
+                diffMatrix.fromArray(assetData.diffMatrix.elements);
 
                 const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
-                    (props.referenceMatrix, offsetMatrix);
+                    (props.referenceMatrix, diffMatrix);
                 newModel.matrix.copy(globalMatrix);
 
                 // color
@@ -311,6 +313,30 @@ export default function Baloons(props) {
         loadNextBatch();
     }
 
+
+    function testReload() {
+        setTimeout(() => {
+            game.removePreviousFromScene();
+            console.log("rimosso...")
+        }, 3000)
+
+
+        setTimeout(() => {
+
+            const newModel = game.loader.clone();
+            newModel.matrixAutoUpdate = false;
+
+            
+            console.log(tempDiffMatrix)
+            
+            const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
+                (props.referenceMatrix, tempDiffMatrix);
+            newModel.matrix.copy(globalMatrix);
+
+            game.addToScene(newModel);
+
+        }, 6000)
+    }
 
 
 
@@ -364,7 +390,7 @@ export default function Baloons(props) {
         const newModel_diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, newModel);
         console.log("DIFF MATRIX:", newModel_diffMatrix)
 
-
+        
 
         const newData = {
             color: colorIndex,
@@ -372,6 +398,12 @@ export default function Baloons(props) {
         }
 
         game.setGameData((prev) => [...prev, newData])
+
+
+
+        // TEST
+        tempDiffMatrix = newModel_diffMatrix;
+        testReload();
 
     }
 
