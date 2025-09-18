@@ -3,7 +3,7 @@ import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4, Vector3, Quaternion } from 'three';
 import Reticle from '@js/reticle';
-import { LoadPositionalAudio } from '@tools/three/audioTools';
+import { LoadPositionalAudio, LoadAudioBuffer } from '@tools/three/audioTools';
 
 
 const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080];
@@ -19,7 +19,7 @@ export default function Baloons(props) {
     let tempDiffMatrix;
 
 
-    let popAudio;
+    let popAudioBuffer;
     //  const spawnedBalloons = [];
     // class SpawnedBalloon {
     //     constructor(model, revealSound, explodeSound = null){
@@ -65,7 +65,7 @@ export default function Baloons(props) {
 
         await game.loader.load("models/baloon.glb");
 
-        // popAudio = await new LoadPositionalAudio("sounds/pop.ogg", SceneManager.listener);
+        popAudioBuffer = await new LoadPositionalAudio("sounds/pop.ogg", SceneManager.listener);
 
         // Setup data
         // if (props.stored) await game.loadGameData();
@@ -227,39 +227,6 @@ export default function Baloons(props) {
     );
 
 
-
-    /*
-    * FUNCTIONS
-    */
-    //#region [functions]
-
-    // function loadAllModels() {
-    //     game.gameData().forEach(assetData => {
-
-    //         const newModel = game.loader.clone({ randomizeTime: true });
-    //         newModel.matrixAutoUpdate = false;
-
-    //         // position
-    //         const offsetMatrix = new Matrix4();
-    //         offsetMatrix.fromArray(assetData.diffMatrix.elements);
-
-    //         const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
-    //             (game.referenceMatrix, offsetMatrix);
-    //         newModel.matrix.copy(globalMatrix);
-
-    //         // color
-    //         const colorIndex = assetData.color;
-    //         newModel.traverse((child) => {
-    //             if (child.isMesh && child.material && child.material.name === "baloon") {
-    //                 const newModelColor = balloonColors[colorIndex];
-    //                 child.material = child.material.clone(); // clone per non cambiare il materiale originale
-    //                 child.material.color = new Color(newModelColor);
-    //             }
-    //         });
-
-    //         game.addToScene(newModel);
-    //     });
-    // }
 
     function loadAllModels() {
         const gameData = game.gameData();

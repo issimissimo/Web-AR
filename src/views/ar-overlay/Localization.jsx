@@ -7,25 +7,24 @@ import { Matrix4 } from "three"
 import { Centered } from "@components/smallElements"
 import Message from "@components/Message"
 import Button from "@components/Button"
-import { faCheck } from "@fortawesome/free-solid-svg-icons"
+import { faCheck, faQrcode } from "@fortawesome/free-solid-svg-icons"
 import { Context } from "@views/ar-overlay/arSession"
 
 export default function Localization(props) {
     const [showInstructions, setShowInstructions] = createSignal(true)
     const context = useContext(Context)
 
-    onMount(async () => {
-        console.log("**** LOCALIZATION - ON MOUNT")
-        // await Reticle.setup(Reticle.MESH_TYPE.PLANE,
-        //     {
-        //         size: 0.3,
-        //         texturePath: "images/reticle_v1.png",
-        //         color: 0xf472b6,
-        //     });
-        await Reticle.setup(Reticle.MESH_TYPE.CUSTOM, {
-            glbFilePath: "models/reticle_v1.glb",
+    onMount(() => {
+        Reticle.setup(Reticle.MESH_TYPE.PLANE, {
+            size: 0.3,
+            texturePath: "images/qr-code.webp",
+            color: 0xf472b6,
         })
-        Reticle.setVisible(false)
+
+        // await Reticle.setup(Reticle.MESH_TYPE.CUSTOM, {
+        //     glbFilePath: "models/reticle_v1.glb",
+        // })
+        // Reticle.setVisible(false)
     })
 
     const handleCloseInstructions = () => {
@@ -43,12 +42,10 @@ export default function Localization(props) {
             const fakeHitMatrix = new Matrix4()
             props.setReferenceMatrix(fakeHitMatrix)
         } else {
-
             // Set the reference Matrix!
-            const matrix = Reticle.getHitMatrix();
+            const matrix = Reticle.getHitMatrix()
             console.log(">>> NOW SET referenceMatrix:", matrix)
             props.setReferenceMatrix(matrix)
-            
         }
         context.handleBlurredCover({ visible: false })
     }
@@ -70,14 +67,16 @@ export default function Localization(props) {
             {showInstructions() ? (
                 <Message
                     style={{ height: "auto" }}
-                    svgIcon={"icons/phone.svg"}
+                    icon={faQrcode}
+                    // svgIcon={"icons/phone.svg"}
                     showReadMore={false}
                     showDoneButton={true}
                     onDone={handleCloseInstructions}
                 >
-                    Per permettermi di localizzarti nell'ambiente circostante
-                    dovrai inquadrare il QR-Code di riferimento.<br></br>
-                    Cerca di essere il più preciso possibile!
+                    Mettiti di fronte al QR-Code e inquadralo,
+                    per localizzarti nell'ambiente circostante<br></br>
+                    Cerca di essere il più preciso possibile!<br></br>
+                    Io non posso ancora sapere quando lo avrai al centro dello schermo
                 </Message>
             ) : (
                 <DoneContainer
@@ -92,6 +91,7 @@ export default function Localization(props) {
                     <Button
                         onClick={handleOnDone}
                         small={true}
+                        visible={config.debugOnDesktop ? true : props.planeFound}
                         active={config.debugOnDesktop ? true : props.planeFound}
                         icon={faCheck}
                         width={"65%"}

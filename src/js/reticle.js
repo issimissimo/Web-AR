@@ -6,7 +6,6 @@ import {
     Mesh,
     MeshBasicMaterial,
     RingGeometry,
-    DoubleSide
 } from 'three';
 import SceneManager from "./sceneManager";
 import ConcentricRings from "@tools/three/ConcentricRings";
@@ -192,13 +191,11 @@ const Reticle = {
                 console.log("SETTING UP PLANE RETICLE....")
                 const opacityTexture = await new LoadTexture(_options.texturePath);
                 decodeImageFormat(opacityTexture)
-                // const planeGeo = new PlaneGeometry(_options.size, _options.size).rotateX(Math.PI / 2);
-                const planeGeo = new PlaneGeometry(_options.size, _options.size);
+                const planeGeo = new PlaneGeometry(_options.size, _options.size).rotateX(-Math.PI / 2);
                 const planeMat = new MeshBasicMaterial({
                     color: _options.color,
-                    opacity: opacityTexture,
+                    alphaMap: opacityTexture,
                     transparent: true,
-                    side: DoubleSide
                 });
                 _reticleMesh = new Mesh(planeGeo, planeMat);
                 this._completeSetup();
@@ -227,9 +224,9 @@ const Reticle = {
         _circleMesh.position.z = -1;
         _scene.add(_camera);
 
-        // We don't want to set the Reticle visible right now
+        // We don't want to set the Reticle visible right now!
         // Let the user to set it later...
-        // this.setVisible(true);
+        this.setVisible(false);
 
         _initialized = true;
     },
@@ -242,7 +239,6 @@ const Reticle = {
         }
 
         const referenceSpace = _renderer.xr.getReferenceSpace();
-
 
         // Update camera from pose (used from CircleMesh)
         if (_workingMode === this.WORKING_MODE.TARGET) {
@@ -318,7 +314,7 @@ const Reticle = {
                     _isHitting = true;
 
                     if (_surfTypeDetected == 'wall' && !window.iOS) _alignZAxisWithUp();
-                    if (_reticleMesh._shouldDisplay) _reticleMesh.visible = true;
+                    _reticleMesh.visible = _reticleMesh._shouldDisplay;
                     if (callback) callback(_surfTypeDetected);
 
                 } else {

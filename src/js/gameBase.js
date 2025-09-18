@@ -42,7 +42,6 @@ export function useGame(gameName, gameId, config = {}) {
         try {
             const path = `${context.userId}/markers/${context.markerId}/games/${gameId}`;
             const data = await firebase.realtimeDb.loadData(path);
-            console.log("I dati caricati per", gameName, " sono:", data)
             setGameData(data);
         } catch (error) {
             console.error("Errore nel caricamento JSON:", error);
@@ -113,7 +112,6 @@ export function useGame(gameName, gameId, config = {}) {
         initialized,
         setInitialized,
         handleBlurredCover: context.handleBlurredCover,
-        // referenceMatrix: context.referenceMatrix,
         getObjOffsetMatrix,
         getGlobalMatrixFromOffsetMatrix,
         onTap,

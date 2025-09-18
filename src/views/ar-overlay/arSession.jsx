@@ -9,9 +9,9 @@ import InitialDetection from './InitialDetection';
 import Localization from './Localization';
 import Inventory from './Inventory';
 import Header from './Header';
+import BlurredCover from './BlurredCover';
 
 import Loader from '@components/Loader';
-import BlurredCover from '@components/BlurredCover';
 
 import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 import { AppMode } from '@/main';
@@ -69,8 +69,8 @@ export default function ArSession(props) {
                 color: 0xf472b6,
             });
 
-        // We don't want to show the Reticle now!
-        Reticle.setVisible(false);
+        // // We don't want to show the Reticle now!
+        // Reticle.setVisible(false);
 
         // When reopening the ARSession it seem to stay "true"... 
         // let's force (not clear why I have to do that)
@@ -412,7 +412,6 @@ export default function ArSession(props) {
             appMode: props.appMode,
             userId: props.userId,
             markerId: props.marker.id,
-            // referenceMatrix: referenceMatrix(),
             handleBlurredCover: (state) => handleBlurredCover(state),
             forceUpdateDomElements: updateClickableDomElements
         }}>
@@ -421,6 +420,7 @@ export default function ArSession(props) {
                 <BlurredCover
                     visible={blurVisible()}
                     showHole={blurShowHole()}
+                    stroke={props.planeFound ? 0xf472b6 : 0xffffff }
                 />
 
                 {/* HEADER */}
