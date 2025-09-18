@@ -128,8 +128,9 @@ export default function ArSession(props) {
         // // console.log("---- Games imported:", gamesImported());
         // console.log("---- Game id selected:", selectedGameId());
 
-        console.log(">>>>>localizationState:", localizationState())
+        // console.log(">>>>>localizationState:", localizationState())
         // // console.log("---- Games initializing:", gamesInitializing());
+        console.log("AAAAHHHH:", referenceMatrix())
     })
 
 
@@ -411,7 +412,7 @@ export default function ArSession(props) {
             appMode: props.appMode,
             userId: props.userId,
             markerId: props.marker.id,
-            referenceMatrix: referenceMatrix(),
+            // referenceMatrix: referenceMatrix(),
             handleBlurredCover: (state) => handleBlurredCover(state),
             forceUpdateDomElements: updateClickableDomElements
         }}>
@@ -445,6 +446,7 @@ export default function ArSession(props) {
                                             localizationState() !== LOCALIZATION_STATE.REQUIRED}
                                         selected={item.id === selectedGameId() && gamesInitialized() &&
                                             initDetectionCompleted() && localizationState() !== LOCALIZATION_STATE.REQUIRED}
+                                        referenceMatrix={referenceMatrix()}
                                     />;
                                 }}
                             </For>

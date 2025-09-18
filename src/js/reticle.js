@@ -102,10 +102,10 @@ function _setReticleProperties() {
 const _options = {};
 
 
-const MODE = {
-    PLANE: 'plane',
-    FREE: 'free'
-}
+// const MODE = {
+//     PLANE: 'plane',
+//     FREE: 'free'
+// }
 
 
 
@@ -227,10 +227,9 @@ const Reticle = {
         _circleMesh.position.z = -1;
         _scene.add(_camera);
 
-        // // At the end, we set the default mode
-        // this.setUsePlaneDetection(true); // TODO - non deve essere necessario perchè lo specifichiamo già nel setup
-
-        this.setVisible(true);
+        // We don't want to set the Reticle visible right now
+        // Let the user to set it later...
+        // this.setVisible(true);
 
         _initialized = true;
     },
@@ -419,7 +418,8 @@ const Reticle = {
             return;
         }
         if (_workingMode === this.WORKING_MODE.SURFACE) return _reticleMesh.matrix;
-        return _circleMesh.matrixWorld;
+        if (_workingMode === this.WORKING_MODE.TARGET) return _circleMesh.matrixWorld;
+        return null;
     },
 
     // If NOT visible,
@@ -433,7 +433,7 @@ const Reticle = {
                 _reticleMesh._shouldDisplay = true;
                 _circleMesh._shouldDisplay = false;
             }
-            else if (_workingMode === this.WORKING_MODE.TARGET) {
+            if (_workingMode === this.WORKING_MODE.TARGET) {
                 _reticleMesh._shouldDisplay = false;
                 _circleMesh._shouldDisplay = true;
             }

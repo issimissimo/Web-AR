@@ -1,5 +1,4 @@
-import { onMount, createSignal } from 'solid-js';
-import { styled } from 'solid-styled-components';
+import { onMount } from 'solid-js';
 import Message from '@components/Message';
 import { Centered } from '@components/smallElements';
 
@@ -8,23 +7,8 @@ export default function InitialDetection() {
     
 
     onMount(()=>{
-        console.log("**** INTIAL DETECTION - ON MOUNT")
+        // console.log("**** INTIAL DETECTION - ON MOUNT")
     })
-
-
-    /*
-   * STYLE
-   */
-    // const Container = styled(Container)`
-    //     width: 100%;
-    //     height: 100vh;
-    //     display: flex;
-    //     flex-direction: column;
-    //     align-items: center;
-    //     justify-content: center;
-    //     box-sizing: border-box;
-    //     padding: 2em;
-    // `
 
     return (
         <Centered>

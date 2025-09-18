@@ -1,7 +1,7 @@
 import { onMount, createEffect, createSignal } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
-import { MathUtils, Color, Matrix4 } from 'three';
+import { MathUtils, Color, Matrix4, Vector3, Quaternion } from 'three';
 import Reticle from '@js/reticle';
 import { LoadPositionalAudio } from '@tools/three/audioTools';
 
@@ -11,8 +11,14 @@ const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x80008
 
 export default function Baloons(props) {
 
+    /*
+    * Default DATA
+    */
+    const defaultGameData = [];
+
+
     let popAudio;
-    // const spawnedBalloons = [];
+    //  const spawnedBalloons = [];
     // class SpawnedBalloon {
     //     constructor(model, revealSound, explodeSound = null){
 
@@ -27,17 +33,24 @@ export default function Baloons(props) {
 
         onTap: () => {
 
+            if (!props.enabled) return false;
+
+            switch (game.appMode) {
+                case "save":
+                    spawnModelOnTap();
+                    break;
+
+                case "load":
+                    // Explode
+                    break;
+            }
+
         },
 
         renderLoop: () => loop()
 
     });
 
-
-    /*
-    * Default DATA
-    */
-    const defaultGameData = [];
 
 
     /*
@@ -46,18 +59,24 @@ export default function Baloons(props) {
     onMount(async () => {
 
         console.log("**** BALOONS - ON MOUNT")
+        console.log("game.appMode:", game.appMode)
 
         await game.loader.load("models/baloon.glb");
 
         // popAudio = await new LoadPositionalAudio("sounds/pop.ogg", SceneManager.listener);
 
-        if (props.stored) {
-            // Load the game data from RealtimeDB
-            await game.loadGameData();
-        }
-        else {
+        // Setup data
+        // if (props.stored) await game.loadGameData();
+
+        await game.loadGameData();
+
+        if (!game.gameData()) {
+
+            console.log("siccome non abbiamo caricato niente settiamo i dati di default")
             game.setGameData(defaultGameData);
         }
+
+
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
@@ -78,19 +97,38 @@ export default function Baloons(props) {
         }
     })
 
+    createEffect(() => {
+        console.log("CCCBHHHH:", props.referenceMatrix)
+    })
+
 
     /*
     * SETUP SCENE
     */
     function setupScene() {
 
-        Reticle.setEnabled(false);
+        // Reticle.setEnabled(false);
 
+        switch (game.appMode) {
+            case "save":
+                Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
+                Reticle.setVisible(true);
+                break;
+
+            case "load":
+                Reticle.setEnabled(false);
+                break;
+        }
+
+        // setTimeout(() => {
+        //     if (props.stored) {
+        //         loadAllModels();
+        //     }
+        // }, 1000)
         setTimeout(() => {
-            if (props.stored) {
+            if (game.gameData().length > 0)
                 loadAllModels();
-            }
-        },1000)
+        }, 1000)
 
 
 
@@ -172,15 +210,15 @@ export default function Baloons(props) {
     return (
         <>
             {
-                props.selected && (
-                    (() => {
+                props.enabled && (
+                    {/* (() => {
                         switch (game.appMode) {
                             case game.AppMode.SAVE:
                                 return <AuthorUI />;
                             case game.AppMode.LOAD:
                                 return <UserUI />;
                         }
-                    })()
+                    })() */}
                 )
             }
         </>
@@ -225,6 +263,8 @@ export default function Baloons(props) {
         const gameData = game.gameData();
         let currentIndex = 0;
 
+        console.log(">>> LOADED referenceMatrix:", props.referenceMatrix);
+
         function loadNextBatch() {
             const batchSize = 1; // Carica 1 modello per frame
             const endIndex = Math.min(currentIndex + batchSize, gameData.length);
@@ -240,7 +280,7 @@ export default function Baloons(props) {
                 offsetMatrix.fromArray(assetData.diffMatrix.elements);
 
                 const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
-                    (game.referenceMatrix, offsetMatrix);
+                    (props.referenceMatrix, offsetMatrix);
                 newModel.matrix.copy(globalMatrix);
 
                 // color
@@ -254,7 +294,7 @@ export default function Baloons(props) {
                 });
 
                 game.addToScene(newModel);
-                
+
 
             }
 
@@ -276,15 +316,32 @@ export default function Baloons(props) {
 
     function spawnModelOnTap() {
 
-        if (!props.enabled || !game.loader.loaded()) return;
+        console.log("SPAWN...")
+
+        // if (!props.enabled || !game.loader.loaded()) return;
+
+        const hitMatrix = Reticle.getHitMatrix();
+        console.log(hitMatrix);
+
+
 
         const newModel = game.loader.clone();
 
-        newModel.position.set(
-            MathUtils.randFloat(-1, 1),     // X: -1 a 1
-            MathUtils.randFloat(-1.5, 1.5), // Y: -1.5 a 1.5
-            MathUtils.randFloat(-3, -2)     // Z: -3 a -2
-        );
+        let pos = new Vector3();
+        let rot = new Quaternion();
+        let scale = new Vector3();
+
+        hitMatrix.decompose(pos, rot, scale);
+        console.log("pos:", pos);
+        newModel.position.copy(pos);
+
+
+        //  // TODO - usare hitMatrix per la posizione di newModel
+        // newModel.position.set(
+        //     MathUtils.randFloat(-1, 1),     // X: -1 a 1
+        //     MathUtils.randFloat(-1.5, 1.5), // Y: -1.5 a 1.5
+        //     MathUtils.randFloat(-3, -2)     // Z: -3 a -2
+        // );
 
         // Cerca il materiale "baloon" e cambia colore
         let colorIndex;
@@ -300,18 +357,18 @@ export default function Baloons(props) {
         // Aggiunge il modello alla scena
         game.addToScene(newModel);
 
-        const newModelMatrix = newModel.matrix;
-        console.log("NEW MATRIX:", newModelMatrix)
-        console.log("REF MATRIX:", game.referenceMatrix)
+        const newModel_matrix = newModel.matrix;
+        console.log("NEW MATRIX:", newModel_matrix)
+        console.log("REF MATRIX:", props.referenceMatrix)
 
-        const newModeldiffMatrix = game.getObjOffsetMatrix(game.referenceMatrix, newModel);
-        console.log("DIFF MATRIX:", newModeldiffMatrix)
+        const newModel_diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, newModel);
+        console.log("DIFF MATRIX:", newModel_diffMatrix)
 
 
 
         const newData = {
             color: colorIndex,
-            diffMatrix: newModeldiffMatrix
+            diffMatrix: newModel_diffMatrix
         }
 
         game.setGameData((prev) => [...prev, newData])
