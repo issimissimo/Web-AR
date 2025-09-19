@@ -48,6 +48,29 @@ export function useGame(gameName, gameId, config = {}) {
         }
     }
 
+
+    const saveGameData = async () => {
+        console.log("*******************************")
+        console.log("ADESSO SALVO:", gameData());
+
+        console.log(context.userId)
+        console.log(context.markerId)
+        console.log(gameId)
+
+        if (gameData()) {
+            try {
+                const path = `${context.userId}/markers/${context.markerId}/games/${gameId}`;
+                await firebase.realtimeDb.saveData(path, gameData());
+                console.log('Salvati dati in RealtimeDB con ID:', gameId)
+
+            } catch (error) {
+                console.log("Errore nel salvataggio JSON:", error);
+            }
+        }
+    }
+
+
+
     const addToScene = (asset) => {
 
         // add new property
@@ -121,6 +144,7 @@ export function useGame(gameName, gameId, config = {}) {
         onUndo,
         forceUpdateDomElements: context.forceUpdateDomElements,
         loadGameData,
+        saveGameData,
         addToScene,
         removePreviousFromScene,
         removeAllFromScene,

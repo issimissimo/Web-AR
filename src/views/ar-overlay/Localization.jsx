@@ -20,7 +20,6 @@ export default function Localization(props) {
             texturePath: "images/qr-code.webp",
             color: 0xf472b6,
         })
-        console.log("Localization OnMount")
         context.forceUpdateDomElements();
     })
 

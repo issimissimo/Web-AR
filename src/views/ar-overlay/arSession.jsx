@@ -159,7 +159,7 @@ export default function ArSession(props) {
             if (el.enabled) {
 
                 // load dynamically the module
-                await loadModule(el.id, el.name, true);
+                await loadModule(el.id, el.name);
             }
         }
         setLoading(() => false);
@@ -340,13 +340,12 @@ export default function ArSession(props) {
     * Each "gameRunning" will be added automatically as loaded
     * with the function "handleModuleLoaded")
     */
-    async function loadModule(moduleId, moduleName, storedOnDatabase, selectOnEnd = false) {
+    async function loadModule(moduleId, moduleName, selectOnEnd = false) {
         console.log("LOADING:", moduleName)
         const raw = await import(`../../plugins/${moduleName}.jsx`);
         const newModule = {
             id: moduleId,
             name: moduleName,
-            stored: storedOnDatabase,
             component: raw.default,
         }
         setModules((prev) => [...prev, newModule]);
@@ -442,7 +441,6 @@ export default function ArSession(props) {
                                     const Component = item.component;
                                     return <Component
                                         id={item.id}
-                                        stored={item.stored}
                                         enabled={gamesInitialized() && initDetectionCompleted() &&
                                             localizationState() !== LOCALIZATION_STATE.REQUIRED}
                                         selected={item.id === selectedGameId() && gamesInitialized() &&

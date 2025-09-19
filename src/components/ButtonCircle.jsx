@@ -54,7 +54,7 @@ const ButtonCircle = (props) => {
       border={props.border ?? true}
       class="glass"
       style={props.style}
-      animate={{ opacity: props.active || props.active === undefined ? 1 : 0.4 }}
+      animate={{ opacity: props.active || props.active === undefined ? 1 : 0.25 }}
       transition={{ duration: 0.25 }}
       initial={false}
     >

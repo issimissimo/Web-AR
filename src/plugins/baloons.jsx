@@ -4,10 +4,8 @@ import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4, Vector3, Quaternion } from 'three';
 import Reticle from '@js/reticle';
 import { LoadPositionalAudio, LoadAudioBuffer } from '@tools/three/audioTools';
-import {
-    RecreateMaterials,
-    setMaterialsShadows,
-} from "@tools/three/materialTools"
+import { RecreateMaterials } from "@tools/three/materialTools";
+import Toolbar from '@views/ar-overlay/Toolbar';
 
 
 
@@ -22,6 +20,8 @@ export default function Baloons(props) {
     const defaultGameData = [];
 
     let tempDiffMatrix;
+
+    const [currentGameDataLength, setCurrentGameDataLength] = createSignal(0)
 
 
     let popAudioBuffer;
@@ -75,16 +75,15 @@ export default function Baloons(props) {
 
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
 
+
         // Setup data
-        // if (props.stored) await game.loadGameData();
-
         await game.loadGameData();
-
+        console.log("DATA LOADED:", game.gameData())
         if (!game.gameData()) {
-
             console.log("siccome non abbiamo caricato niente settiamo i dati di default")
             game.setGameData(defaultGameData);
         }
+        setCurrentGameDataLength(game.gameData().length);
 
 
 
@@ -110,6 +109,23 @@ export default function Baloons(props) {
     createEffect(() => {
         console.log("Current reference matrix:", props.referenceMatrix)
     })
+
+
+    const handleUndo = () => {
+        //TODO -- undo
+        // super
+        game.onUndo();
+        // remove last from scene
+        game.removePreviousFromScene();
+        // remove last from data
+        game.gameData().pop();
+    };
+
+    const handleSave = async () => {
+        //TODO -- save gamedata
+        await game.saveGameData();
+        setCurrentGameDataLength(game.gameData().length);
+    };
 
 
     /*
@@ -169,25 +185,25 @@ export default function Baloons(props) {
     /*
     * STYLE
     */
-    const Container = styled('div')`
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        padding: 2em;
-        /* pointer-events: none; */
-    `
-    const Title = styled('h2')`
-        text-align: center;
-    `
+    // const Container = styled('div')`
+    //     position: absolute;
+    //     width: 100%;
+    //     height: 100%;
+    //     display: flex;
+    //     flex-direction: column;
+    //     align-items: center;
+    //     justify-content: center;
+    //     box-sizing: border-box;
+    //     padding: 2em;
+    //     /* pointer-events: none; */
+    // `
+    // const Title = styled('h2')`
+    //     text-align: center;
+    // `
 
-    const Description = styled('p')`
-        text-align: center;
-    `
+    // const Description = styled('p')`
+    //     text-align: center;
+    // `
 
 
     /*
@@ -198,11 +214,18 @@ export default function Baloons(props) {
 
     const AuthorUI = () => {
         return (
-            <Container>
-                <Title>{game.gameDetails.title}</Title>
-                <Description>{game.gameDetails.description}</Description>
-                <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
-            </Container>
+            // <Container>
+            //     <Title>{game.gameDetails.title}</Title>
+            //     <Description>{game.gameDetails.description}</Description>
+            //     <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+            // </Container>
+            <Toolbar
+                buttons={["undo", "save"]}
+                onUndo={handleUndo}
+                onSave={handleSave}
+                undoActive={game.gameData().length > 0 ? true : false}
+                saveActive={currentGameDataLength() !== game.gameData().length ? true : false}
+            />
         )
     }
 
@@ -259,6 +282,7 @@ export default function Baloons(props) {
                 const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
                     (props.referenceMatrix, diffMatrix);
                 newModel.matrix.copy(globalMatrix);
+                newModel = RecreateMaterials(newModel); // Important!!!
 
                 // color
                 const colorIndex = assetData.color;
@@ -319,22 +343,16 @@ export default function Baloons(props) {
 
         console.log("SPAWN...")
 
-        // if (!props.enabled || !game.loader.loaded()) return;
-
+        // get hitMatrix
         const hitMatrix = Reticle.getHitMatrix();
-        console.log(hitMatrix);
 
-
-
+        // clone model
         let newModel = game.loader.clone();
-        newModel = RecreateMaterials(newModel);
-
+        newModel = RecreateMaterials(newModel); // Important!!!
         let pos = new Vector3();
         let rot = new Quaternion();
         let scale = new Vector3();
-
         hitMatrix.decompose(pos, rot, scale);
-        console.log("pos:", pos);
         newModel.position.copy(pos);
 
 
@@ -345,7 +363,7 @@ export default function Baloons(props) {
         //     MathUtils.randFloat(-3, -2)     // Z: -3 a -2
         // );
 
-        // Cerca il materiale "baloon" e cambia colore
+        // Set model material color
         let colorIndex;
         newModel.traverse((child) => {
             if (child.isMesh && child.material && child.material.name === "balloon") {
@@ -356,31 +374,23 @@ export default function Baloons(props) {
             }
         });
 
-        // Aggiunge il modello alla scena
+        // Add model to scene
         game.addToScene(newModel);
 
-        const newModel_matrix = newModel.matrix;
-        console.log("NEW MATRIX:", newModel_matrix)
-        console.log("REF MATRIX:", props.referenceMatrix)
 
+
+        // const newModel_matrix = newModel.matrix;
+        // console.log("NEW MATRIX:", newModel_matrix)
+        // console.log("REF MATRIX:", props.referenceMatrix)
+
+        // Set gameData
         const newModel_diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, newModel);
         console.log("DIFF MATRIX:", newModel_diffMatrix)
-
-
-
         const newData = {
             color: colorIndex,
             diffMatrix: newModel_diffMatrix
         }
-
         game.setGameData((prev) => [...prev, newData])
-
-
-
-        // // TEST
-        // tempDiffMatrix = newModel_diffMatrix;
-        // testReload();
-
     }
 
 }
