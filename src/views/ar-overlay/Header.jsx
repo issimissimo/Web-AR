@@ -32,8 +32,7 @@ const Header = (props) => {
 
     return (
         <HeaderContainer>
-
-            <div style="">
+            <div>
                 {
                     <LeftButtonContainer >
                         <ButtonCircle
@@ -46,22 +45,6 @@ const Header = (props) => {
                 }
 
             </div>
-
-            {/* <div style="flex: 1;">
-                {
-                    showUser() &&
-                    <RightButtonContainer>
-                        <ButtonCircle
-                            onClick={props.onClickUser}
-                            border={false}
-                        >
-                            <Fa icon={faUser} size="1x" class="icon" />
-                        </ButtonCircle>
-                    </RightButtonContainer>
-                }
-
-            </div> */}
-
         </HeaderContainer>
     )
 }

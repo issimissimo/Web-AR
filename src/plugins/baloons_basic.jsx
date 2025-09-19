@@ -7,8 +7,6 @@ import { LoadPositionalAudio, LoadAudioBuffer } from '@tools/three/audioTools';
 import { RecreateMaterials } from "@tools/three/materialTools";
 import Toolbar from '@views/ar-overlay/Toolbar';
 import SceneManager from "@js/sceneManager"
-import { Container } from '@components/smallElements';
-import SvgIcon from '@components/SvgIcon';
 
 
 
@@ -16,33 +14,8 @@ const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x80008
 
 
 export default function Baloons(props) {
+
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
-
-    // GAME constant
-    const maxGameTime = 30000;
-    const [remainingDart, setRemainingDart] = createSignal(10);
-    const [explodedBalloons, setExplodedBalloons] = createSignal(0);
-    const [remainingTime, setRemainingTime] = createSignal(maxGameTime);
-    const [currentTime, setCurrentTime] = createSignal(maxGameTime);
-
-    
-    // decrease game time
-    createEffect(() => {
-        if (props.enabled && game.appMode === "load") {
-            const interval = setInterval(() => {
-                setCurrentTime((prev) => {
-                    if (prev > 0) {
-                        setRemainingTime(prev - 1000);
-                        return prev - 1000;
-                    }
-                    clearInterval(interval);
-                    return 0;
-                });
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    });
-
 
     /*
     * Default DATA
@@ -347,34 +320,9 @@ export default function Baloons(props) {
     }
 
 
-    const UserInfo = styled('div')`
-        display: flex;
-        /* width: 100%; */
-        box-sizing: border-box;
-        align-items: center;
-        gap: 2rem;
-        justify-content: center;
-      `;
-
-
     const UserUI = () => {
         return (
-            <Container>
-                <UserInfo>
-                    <UserInfo style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25}/>
-                        {remainingDart()}
-                    </UserInfo>
-                    <UserInfo style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40}/>
-                        {explodedBalloons()} / {game.gameData().length}
-                    </UserInfo>
-                    <UserInfo style={{ gap: '0.5rem' }}>
-                        <img src="time.png" />
-                        {remainingTime() / 1000}
-                    </UserInfo>
-                </UserInfo>
-            </Container>
+            <div></div>
         )
     }
 

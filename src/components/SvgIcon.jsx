@@ -50,10 +50,10 @@ export default function SvgIcon(props) {
   return (
     <Wrapper
       role="img"
-      aria-label={props.alt ?? "icona"}
+      aria-label={props.alt ?? "icon"}
       style={{
-        width: `${props.size ?? 24}px`,
-        height: `${props.size ?? 24}px`,
+        width: `${props.size ?? props.sizeX ?? 24}px`,
+        height: `${props.size ?? props.sizeY ?? 24}px`,
         color: props.color ?? "currentColor",
       }}
     >
