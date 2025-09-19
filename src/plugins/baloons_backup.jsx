@@ -1,4 +1,4 @@
-import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
+import { onMount, createEffect, createSignal } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4, Vector3, Quaternion } from 'three';
@@ -14,10 +14,6 @@ const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x80008
 
 export default function Baloons(props) {
 
-
-    const [currentGameDataLength, setCurrentGameDataLength] = createSignal(0)
-    const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
-
     /*
     * Default DATA
     */
@@ -25,6 +21,7 @@ export default function Baloons(props) {
 
     let tempDiffMatrix;
 
+    const [currentGameDataLength, setCurrentGameDataLength] = createSignal(0)
 
 
     let popAudioBuffer;
@@ -86,8 +83,7 @@ export default function Baloons(props) {
             console.log("siccome non abbiamo caricato niente settiamo i dati di default")
             game.setGameData(defaultGameData);
         }
-        // setCurrentGameDataLength(game.gameData().length);
-        setLastSavedGameData([...game.gameData()]);
+        setCurrentGameDataLength(game.gameData().length);
 
 
 
@@ -115,31 +111,20 @@ export default function Baloons(props) {
     })
 
 
-
-
-
-
-    const hasUnsavedChanges = createMemo(() =>
-        JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
-    );
-
-
-
     const handleUndo = () => {
+        //TODO -- undo
         // super
         game.onUndo();
         // remove last from scene
         game.removePreviousFromScene();
         // remove last from data
-        game.setGameData(game.gameData().slice(0, -1));
+        game.gameData().pop();
     };
 
-
     const handleSave = async () => {
-        // save data
+        //TODO -- save gamedata
         await game.saveGameData();
-        // reset
-        setLastSavedGameData([...game.gameData()]);
+        setCurrentGameDataLength(game.gameData().length);
     };
 
 
@@ -200,28 +185,77 @@ export default function Baloons(props) {
     /*
     * STYLE
     */
-    const Container = styled('div')`
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        padding: 2em;
-        /* pointer-events: none; */
-    `
-    const Title = styled('h2')`
-        text-align: center;
-    `
+    // const Container = styled('div')`
+    //     position: absolute;
+    //     width: 100%;
+    //     height: 100%;
+    //     display: flex;
+    //     flex-direction: column;
+    //     align-items: center;
+    //     justify-content: center;
+    //     box-sizing: border-box;
+    //     padding: 2em;
+    //     /* pointer-events: none; */
+    // `
+    // const Title = styled('h2')`
+    //     text-align: center;
+    // `
 
-    const Description = styled('p')`
-        text-align: center;
-    `
+    // const Description = styled('p')`
+    //     text-align: center;
+    // `
+
+
+    /*
+    * RENDER
+    */
+    //#region [render]
+
+
+    const AuthorUI = () => {
+        return (
+            // <Container>
+            //     <Title>{game.gameDetails.title}</Title>
+            //     <Description>{game.gameDetails.description}</Description>
+            //     <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+            // </Container>
+            <Toolbar
+                buttons={["undo", "save"]}
+                onUndo={handleUndo}
+                onSave={handleSave}
+                undoActive={game.gameData().length > 0 ? true : false}
+                saveActive={currentGameDataLength() !== game.gameData().length ? true : false}
+            />
+        )
+    }
+
+
+    const UserUI = () => {
+        return (
+            <div></div>
+        )
+    }
 
 
 
+
+
+    return (
+        <>
+            {
+                props.enabled && (
+                    (() => {
+                        switch (game.appMode) {
+                            case "save":
+                                return <AuthorUI />;
+                            case "load":
+                                return <UserUI />;
+                        }
+                    })()
+                )
+            }
+        </>
+    );
 
 
 
@@ -358,60 +392,5 @@ export default function Baloons(props) {
         }
         game.setGameData((prev) => [...prev, newData])
     }
-
-
-
-
-    /*
-    * RENDER
-    */
-    //#region [render]
-
-
-    const AuthorUI = () => {
-        return (
-            <>
-
-
-                <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
-
-                <Toolbar
-                    buttons={["undo", "save"]}
-                    onUndo={handleUndo}
-                    onSave={handleSave}
-                    undoActive={game.gameData().length > 0}
-                    saveActive={hasUnsavedChanges()}
-                />
-            </>
-        )
-    }
-
-
-    const UserUI = () => {
-        return (
-            <div></div>
-        )
-    }
-
-
-
-
-
-    return (
-        <>
-            {
-                props.enabled && (
-                    (() => {
-                        switch (game.appMode) {
-                            case "save":
-                                return <AuthorUI />;
-                            case "load":
-                                return <UserUI />;
-                        }
-                    })()
-                )
-            }
-        </>
-    );
 
 }
