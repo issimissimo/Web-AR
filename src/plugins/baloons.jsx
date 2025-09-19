@@ -1,11 +1,12 @@
 import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
-import { MathUtils, Color, Matrix4, Vector3, Quaternion } from 'three';
+import { MathUtils, Color, Matrix4, Vector3, Quaternion, PositionalAudio } from 'three';
 import Reticle from '@js/reticle';
 import { LoadPositionalAudio, LoadAudioBuffer } from '@tools/three/audioTools';
 import { RecreateMaterials } from "@tools/three/materialTools";
 import Toolbar from '@views/ar-overlay/Toolbar';
+import SceneManager from "@js/sceneManager"
 
 
 
@@ -207,16 +208,25 @@ export default function Baloons(props) {
                     }
                 });
 
+                // audio
+                const audio = new PositionalAudio(SceneManager.listener);
+                audio.setBuffer(popAudioBuffer);
+                newModel.add(audio);
+
                 game.addToScene(newModel);
 
-
+                console.log("PLAY AUDIO")
+                audio.play();
             }
 
             currentIndex = endIndex;
 
             // Se ci sono ancora modelli da caricare, continua nel prossimo frame
             if (currentIndex < gameData.length) {
-                requestAnimationFrame(loadNextBatch);
+                // requestAnimationFrame(loadNextBatch);
+                setTimeout(() => {
+                    loadNextBatch()
+                }, 200)
             } else {
                 console.log("Tutti i modelli caricati!");
             }
@@ -259,8 +269,15 @@ export default function Baloons(props) {
             }
         });
 
+        // audio
+        const audio = new PositionalAudio(SceneManager.listener);
+        audio.setBuffer(popAudioBuffer);
+        newModel.add(audio);
+
         // Add model to scene
         game.addToScene(newModel);
+
+        audio.play();
 
 
 
@@ -290,10 +307,7 @@ export default function Baloons(props) {
     const AuthorUI = () => {
         return (
             <>
-
-
-                <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
-
+                {/* <button onClick={() => spawnModelOnTap()}>SPAWN!</button> */}
                 <Toolbar
                     buttons={["undo", "save"]}
                     onUndo={handleUndo}
