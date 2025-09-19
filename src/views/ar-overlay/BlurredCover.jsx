@@ -27,8 +27,6 @@ export default function BlurredCover(props) {
         // Here we receive props changes!
         setVisible(props.visible);
         setShowHole(props.showHole);
-
-        
     });
 
 
@@ -42,8 +40,8 @@ export default function BlurredCover(props) {
 
     // lato del foro: 40% della larghezza viewport, con maxSize opzionale
     const holeSide = createMemo(() => {
-        const max = props.maxSize ?? 300;
-        return Math.min(vw() * 0.4, max);
+        const max = props.maxSize ?? 600;
+        return Math.min(vw() * 0.5, max);
     });
 
     // centro in pixel (numeri, NON percentuali)
@@ -128,10 +126,16 @@ export default function BlurredCover(props) {
                     height={holeSide()}
                     rx={radius()}
                     fill="none"
-                    stroke={props.stroke ?? "#ffffff"}
-                    stroke-width={props.strokeWidth ?? 3}
+                    // stroke={props.stroke ?? "#ffffff"}
+                    // stroke={props.planeFound ? "#f472b6" : "#ffffff"}
+                    // stroke-width={props.strokeWidth ?? 3}
                     initial={{ scale: 0.001 }}
-                    animate={{ scale: showHole() && visible() ? 1 : 0.001 }}
+                    // animate={{ scale: showHole() && visible() ? 1 : 0.001 }}
+                    animate={{
+                        scale: showHole() && visible() ? 1 : 0.001,
+                        stroke: props.planeFound ? "#f472b6" : "#ffffff",
+                        strokeWidth: props.planeFound ? 4 : 1
+                    }}
                     transition={{ duration: dur(), easing: "ease-in-out" }}
                     style={{
                         transformOrigin: "center",

@@ -130,7 +130,7 @@ export default function ArSession(props) {
 
         // console.log(">>>>>localizationState:", localizationState())
         // // console.log("---- Games initializing:", gamesInitializing());
-        console.log("AAAAHHHH:", referenceMatrix())
+        // console.log("AAAAHHHH:", referenceMatrix())
     })
 
 
@@ -420,7 +420,8 @@ export default function ArSession(props) {
                 <BlurredCover
                     visible={blurVisible()}
                     showHole={blurShowHole()}
-                    stroke={props.planeFound ? 0xf472b6 : 0xffffff }
+                    // stroke={props.planeFound ? "#f472b6" : "#ffffff" }
+                    planeFound={props.planeFound}
                 />
 
                 {/* HEADER */}

@@ -16,22 +16,19 @@ export default function Localization(props) {
 
     onMount(() => {
         Reticle.setup(Reticle.MESH_TYPE.PLANE, {
-            size: 0.3,
+            size: 0.2,
             texturePath: "images/qr-code.webp",
             color: 0xf472b6,
         })
-
-        // await Reticle.setup(Reticle.MESH_TYPE.CUSTOM, {
-        //     glbFilePath: "models/reticle_v1.glb",
-        // })
-        // Reticle.setVisible(false)
+        console.log("Localization OnMount")
+        context.forceUpdateDomElements();
     })
 
     const handleCloseInstructions = () => {
         setShowInstructions(false)
         Reticle.setVisible(true)
-        // game.forceUpdateDomElements();
-        context.handleBlurredCover({ showHole: true })
+        context.handleBlurredCover({ showHole: true });
+        context.forceUpdateDomElements();
     }
 
     const handleOnDone = () => {
@@ -42,9 +39,10 @@ export default function Localization(props) {
             const fakeHitMatrix = new Matrix4()
             props.setReferenceMatrix(fakeHitMatrix)
         } else {
-            // Set the reference Matrix!
+            //
+            // Here we set the reference Matrix!
+            //
             const matrix = Reticle.getHitMatrix()
-            console.log(">>> NOW SET referenceMatrix:", matrix)
             props.setReferenceMatrix(matrix)
         }
         context.handleBlurredCover({ visible: false })
@@ -55,11 +53,35 @@ export default function Localization(props) {
      */
     const DoneContainer = styled(Motion.div)`
         width: 100%;
-        height: 80vh;
+        height: 50vh;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-around;
+        justify-content: space-between;
+        margin-top: -35px;
+
+        
+    `
+
+    const DoneCentralButton = styled("button")`
+        width: 150px;
+        height: 150px;
+        outline: none;
+        border: none;
+        -webkit-tap-highlight-color: transparent;
+        background: transparent;
+        &:focus {
+            outline: none;
+        }
+        /* &:active {
+            background: ${(props) =>
+            props.grey
+                ? "var(--color-grey-dark)"
+                : "var(--color-primary-dark)"};
+            color: var(--color-background);
+            border-color: ${(props) =>
+            props.grey ? "var(--color-grey)" : "var(--color-primary)"};
+        } */
     `
 
     return (
@@ -73,10 +95,11 @@ export default function Localization(props) {
                     showDoneButton={true}
                     onDone={handleCloseInstructions}
                 >
-                    Mettiti di fronte al QR-Code e inquadralo,
-                    per localizzarti nell'ambiente circostante<br></br>
+                    Mettiti di fronte al QR-Code e inquadralo, per localizzarti
+                    nell'ambiente circostante<br></br>
                     Cerca di essere il più preciso possibile!<br></br>
-                    Io non posso ancora sapere quando lo avrai al centro dello schermo
+                    Io non posso ancora sapere quando lo avrai al centro dello
+                    schermo
                 </Message>
             ) : (
                 <DoneContainer
@@ -87,11 +110,16 @@ export default function Localization(props) {
                         delay: 0,
                     }}
                 >
-                    Inquadra il QR-Code
+                    Allinea il QR-Code
+                    <DoneCentralButton
+                        onClick={handleOnDone}
+                    />
                     <Button
                         onClick={handleOnDone}
                         small={true}
-                        visible={config.debugOnDesktop ? true : props.planeFound}
+                        visible={
+                            config.debugOnDesktop ? true : props.planeFound
+                        }
                         active={config.debugOnDesktop ? true : props.planeFound}
                         icon={faCheck}
                         width={"65%"}

@@ -11,7 +11,6 @@ import SceneManager from "./sceneManager";
 import ConcentricRings from "@tools/three/ConcentricRings";
 import { GlbLoader } from "@tools/three/modelTools";
 import { LoadTexture } from "@tools/three/textureTools";
-import decodeImageFormat from '@tools/three/decodeImageFormat';
 
 
 let _renderer = null;
@@ -21,7 +20,6 @@ let _circleMesh = null;
 
 let _reticleMesh = null;
 const _glbLoader = new GlbLoader();
-const _loadTexture = null;
 
 
 // Elementi di stato
@@ -99,13 +97,6 @@ function _setReticleProperties() {
 
 
 const _options = {};
-
-
-// const MODE = {
-//     PLANE: 'plane',
-//     FREE: 'free'
-// }
-
 
 
 
@@ -190,7 +181,6 @@ const Reticle = {
             case this.MESH_TYPE.PLANE:
                 console.log("SETTING UP PLANE RETICLE....")
                 const opacityTexture = await new LoadTexture(_options.texturePath);
-                decodeImageFormat(opacityTexture)
                 const planeGeo = new PlaneGeometry(_options.size, _options.size).rotateX(-Math.PI / 2);
                 const planeMat = new MeshBasicMaterial({
                     color: _options.color,

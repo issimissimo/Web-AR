@@ -104,7 +104,7 @@ export class LoadPositionalAudio {
 }
 
 export class LoadAudioBuffer {
-  constructor() {
+  constructor(filePath) {
     this.filePath = filePath;
     this.buffer = null;
     return this._init();

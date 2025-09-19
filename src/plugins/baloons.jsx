@@ -4,6 +4,11 @@ import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4, Vector3, Quaternion } from 'three';
 import Reticle from '@js/reticle';
 import { LoadPositionalAudio, LoadAudioBuffer } from '@tools/three/audioTools';
+import {
+    RecreateMaterials,
+    setMaterialsShadows,
+} from "@tools/three/materialTools"
+
 
 
 const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080];
@@ -35,16 +40,19 @@ export default function Baloons(props) {
 
         onTap: () => {
 
-            if (!props.enabled) return false;
+            if (props.enabled) {
 
-            switch (game.appMode) {
-                case "save":
-                    spawnModelOnTap();
-                    break;
+                console.log("TAPPPP....")
 
-                case "load":
-                    // Explode
-                    break;
+                switch (game.appMode) {
+                    case "save":
+                        spawnModelOnTap();
+                        break;
+
+                    case "load":
+                        // Explode
+                        break;
+                }
             }
 
         },
@@ -63,9 +71,9 @@ export default function Baloons(props) {
         console.log("**** BALOONS - ON MOUNT")
         console.log("game.appMode:", game.appMode)
 
-        await game.loader.load("models/baloon.glb");
+        await game.loader.load("models/balloon_compressed.glb");
 
-        popAudioBuffer = await new LoadPositionalAudio("sounds/pop.ogg", SceneManager.listener);
+        popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
 
         // Setup data
         // if (props.stored) await game.loadGameData();
@@ -100,7 +108,7 @@ export default function Baloons(props) {
     })
 
     createEffect(() => {
-        console.log("CCCBHHHH:", props.referenceMatrix)
+        console.log("Current reference matrix:", props.referenceMatrix)
     })
 
 
@@ -241,7 +249,7 @@ export default function Baloons(props) {
             for (let i = currentIndex; i < endIndex; i++) {
                 const assetData = gameData[i];
 
-                const newModel = game.loader.clone({ randomizeTime: true });
+                let newModel = game.loader.clone({ randomizeTime: true });
                 newModel.matrixAutoUpdate = false;
 
                 // position
@@ -255,7 +263,7 @@ export default function Baloons(props) {
                 // color
                 const colorIndex = assetData.color;
                 newModel.traverse((child) => {
-                    if (child.isMesh && child.material && child.material.name === "baloon") {
+                    if (child.isMesh && child.material && child.material.name === "balloon") {
                         const newModelColor = balloonColors[colorIndex];
                         child.material = child.material.clone();
                         child.material.color = new Color(newModelColor);
@@ -281,29 +289,29 @@ export default function Baloons(props) {
     }
 
 
-    function testReload() {
-        setTimeout(() => {
-            game.removePreviousFromScene();
-            console.log("rimosso...")
-        }, 3000)
+    // function testReload() {
+    //     setTimeout(() => {
+    //         game.removePreviousFromScene();
+    //         console.log("rimosso...")
+    //     }, 3000)
 
 
-        setTimeout(() => {
+    //     setTimeout(() => {
 
-            const newModel = game.loader.clone();
-            newModel.matrixAutoUpdate = false;
+    //         const newModel = game.loader.clone();
+    //         newModel.matrixAutoUpdate = false;
 
-            
-            console.log(tempDiffMatrix)
-            
-            const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
-                (props.referenceMatrix, tempDiffMatrix);
-            newModel.matrix.copy(globalMatrix);
 
-            game.addToScene(newModel);
+    //         console.log(tempDiffMatrix)
 
-        }, 6000)
-    }
+    //         const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
+    //             (props.referenceMatrix, tempDiffMatrix);
+    //         newModel.matrix.copy(globalMatrix);
+
+    //         game.addToScene(newModel);
+
+    //     }, 6000)
+    // }
 
 
 
@@ -318,7 +326,8 @@ export default function Baloons(props) {
 
 
 
-        const newModel = game.loader.clone();
+        let newModel = game.loader.clone();
+        newModel = RecreateMaterials(newModel);
 
         let pos = new Vector3();
         let rot = new Quaternion();
@@ -339,7 +348,7 @@ export default function Baloons(props) {
         // Cerca il materiale "baloon" e cambia colore
         let colorIndex;
         newModel.traverse((child) => {
-            if (child.isMesh && child.material && child.material.name === "baloon") {
+            if (child.isMesh && child.material && child.material.name === "balloon") {
                 colorIndex = Math.floor(Math.random() * balloonColors.length);
                 const newModelColor = balloonColors[colorIndex];
                 child.material = child.material.clone(); // clone per non cambiare il materiale originale
@@ -357,7 +366,7 @@ export default function Baloons(props) {
         const newModel_diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, newModel);
         console.log("DIFF MATRIX:", newModel_diffMatrix)
 
-        
+
 
         const newData = {
             color: colorIndex,
@@ -368,9 +377,9 @@ export default function Baloons(props) {
 
 
 
-        // TEST
-        tempDiffMatrix = newModel_diffMatrix;
-        testReload();
+        // // TEST
+        // tempDiffMatrix = newModel_diffMatrix;
+        // testReload();
 
     }
 
