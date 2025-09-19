@@ -6,8 +6,6 @@ import Reticle from "@js/reticle"
 import SceneManager from "@js/sceneManager"
 
 import Message from "@components/Message"
-import ButtonCircle from "@components/ButtonCircle"
-import SvgIcon from "@components/SvgIcon"
 
 import { Vector3, Euler } from "three"
 import { LoadTexture } from "@tools/three/textureTools"
@@ -18,6 +16,7 @@ import {
 } from "@tools/three/materialTools"
 import ContactShadowsXR from "@tools/three/ContactShadowsXR"
 import ClippingReveal from "@tools/three/ClippingReveal"
+import Toolbar from "@views/ar-overlay/Toolbar"
 
 export default function testRobot(props) {
     const [showInstructions, setShowInstructions] = createSignal(true)
@@ -121,7 +120,6 @@ export default function testRobot(props) {
         // audioReveal = await new LoadPositionalAudio("sounds/reveal.ogg", SceneManager.listener);
 
         // blur background for instructions
-        // game.blurBackground(true);
         game.handleBlurredCover({ visible: true })
 
         /*
@@ -133,7 +131,6 @@ export default function testRobot(props) {
     createEffect(async () => {
         if (props.enabled) {
             console.log("***** testRobot is enabled *****")
-            // Reticle.setDetectionMode(1); // only floor
             Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
         }
     })
@@ -151,33 +148,6 @@ export default function testRobot(props) {
         box-sizing: border-box;
         padding: 2em;
     `
-
-    const ContainerToolbar = styled("div")`
-        position: absolute;
-        right: 1.5em;
-        top: 20%;
-        height: 50vh;
-        display: flex;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    `
-
-    const Toolbar = () => {
-        return (
-            <ContainerToolbar>
-                <ButtonCircle
-                    data-interactive
-                    active={spawned()}
-                    visible={true}
-                    border={false}
-                    onClick={handleUndo}
-                >
-                    <SvgIcon src={"icons/undo.svg"} size={18} />
-                </ButtonCircle>
-            </ContainerToolbar>
-        )
-    }
 
     /*
      * RENDER (Will be shown ONLY after initialization completed)
@@ -200,7 +170,11 @@ export default function testRobot(props) {
                         </Message>
                     </Container>
                 ) : (
-                    <Toolbar />
+                    <Toolbar
+                        buttons={["undo"]}
+                        onUndo={handleUndo}
+                        undoActive={spawned()}
+                    />
                 ))}
         </>
     )
@@ -208,9 +182,6 @@ export default function testRobot(props) {
     //#region [functions]
 
     function spawnModel(matrix) {
-        // spawnedModel = game.loader.clone();
-        // spawnedModel = game.loader.model;
-
         const position = new Vector3()
         position.setFromMatrixPosition(matrix)
 

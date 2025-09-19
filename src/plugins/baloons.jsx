@@ -9,22 +9,17 @@ import Toolbar from '@views/ar-overlay/Toolbar';
 
 
 
-const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080];
+const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080, 0x000000];
 
 
 export default function Baloons(props) {
 
-
-    const [currentGameDataLength, setCurrentGameDataLength] = createSignal(0)
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
 
     /*
     * Default DATA
     */
     const defaultGameData = [];
-
-    let tempDiffMatrix;
-
 
 
     let popAudioBuffer;
@@ -70,26 +65,18 @@ export default function Baloons(props) {
     * On mount
     */
     onMount(async () => {
-
-        console.log("**** BALOONS - ON MOUNT")
-        console.log("game.appMode:", game.appMode)
-
-        await game.loader.load("models/balloon_compressed.glb");
-
+        // load model
+        await game.loader.load("models/balloon.glb");
+        // load audio
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
-
-
         // Setup data
         await game.loadGameData();
-        console.log("DATA LOADED:", game.gameData())
         if (!game.gameData()) {
             console.log("siccome non abbiamo caricato niente settiamo i dati di default")
             game.setGameData(defaultGameData);
         }
-        // setCurrentGameDataLength(game.gameData().length);
+        // reset
         setLastSavedGameData([...game.gameData()]);
-
-
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
@@ -147,9 +134,6 @@ export default function Baloons(props) {
     * SETUP SCENE
     */
     function setupScene() {
-
-        // Reticle.setEnabled(false);
-
         switch (game.appMode) {
             case "save":
                 Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
@@ -160,29 +144,11 @@ export default function Baloons(props) {
                 Reticle.setEnabled(false);
                 break;
         }
-
-        // setTimeout(() => {
-        //     if (props.stored) {
-        //         loadAllModels();
-        //     }
-        // }, 1000)
+        // wait a little before to spawn loaded models
         setTimeout(() => {
             if (game.gameData().length > 0)
                 loadAllModels();
-        }, 1000)
-
-
-
-        //     const model = game.loader.model;
-        //     model.position.z = -3;
-        //     game.addToScene(model);
-
-
-
-        //     game.setGameData(defaultGameData);
-
-        //     // /// test per spawn
-        //     // spawnModel();
+        }, 250)
     }
 
 
@@ -190,8 +156,8 @@ export default function Baloons(props) {
     * LOOP
     */
     function loop() {
-        // if (game.loader.loaded())
-        //     game.loader.animate();
+        if (game.loader.loaded())
+            game.loader.animate();
     }
 
 
@@ -200,36 +166,15 @@ export default function Baloons(props) {
     /*
     * STYLE
     */
-    const Container = styled('div')`
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        padding: 2em;
-        /* pointer-events: none; */
-    `
-    const Title = styled('h2')`
-        text-align: center;
-    `
-
-    const Description = styled('p')`
-        text-align: center;
-    `
 
 
 
-
-
-
+    /*
+    * Spawn loaded models
+    */
     function loadAllModels() {
         const gameData = game.gameData();
         let currentIndex = 0;
-
-        console.log(">>> LOADED referenceMatrix:", props.referenceMatrix);
 
         function loadNextBatch() {
             const batchSize = 1; // Carica 1 modello per frame
@@ -239,16 +184,18 @@ export default function Baloons(props) {
                 const assetData = gameData[i];
 
                 let newModel = game.loader.clone({ randomizeTime: true });
+                newModel = RecreateMaterials(newModel); // Important!!!
                 newModel.matrixAutoUpdate = false;
 
                 // position
                 const diffMatrix = new Matrix4();
                 diffMatrix.fromArray(assetData.diffMatrix.elements);
-
                 const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
                     (props.referenceMatrix, diffMatrix);
                 newModel.matrix.copy(globalMatrix);
-                newModel = RecreateMaterials(newModel); // Important!!!
+
+                // rotation
+                newModel.rotation.y = Math.random() * Math.PI * 2;
 
                 // color
                 const colorIndex = assetData.color;
@@ -279,32 +226,9 @@ export default function Baloons(props) {
     }
 
 
-    // function testReload() {
-    //     setTimeout(() => {
-    //         game.removePreviousFromScene();
-    //         console.log("rimosso...")
-    //     }, 3000)
-
-
-    //     setTimeout(() => {
-
-    //         const newModel = game.loader.clone();
-    //         newModel.matrixAutoUpdate = false;
-
-
-    //         console.log(tempDiffMatrix)
-
-    //         const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
-    //             (props.referenceMatrix, tempDiffMatrix);
-    //         newModel.matrix.copy(globalMatrix);
-
-    //         game.addToScene(newModel);
-
-    //     }, 6000)
-    // }
-
-
-
+    /*
+    * Spawn on TAP
+    */
     function spawnModelOnTap() {
 
         console.log("SPAWN...")
@@ -313,7 +237,7 @@ export default function Baloons(props) {
         const hitMatrix = Reticle.getHitMatrix();
 
         // clone model
-        let newModel = game.loader.clone();
+        let newModel = game.loader.clone({ randomizeTime: true });
         newModel = RecreateMaterials(newModel); // Important!!!
         let pos = new Vector3();
         let rot = new Quaternion();
@@ -321,15 +245,10 @@ export default function Baloons(props) {
         hitMatrix.decompose(pos, rot, scale);
         newModel.position.copy(pos);
 
+        // rotation
+        newModel.rotation.y = Math.random() * Math.PI * 2;
 
-        //  // TODO - usare hitMatrix per la posizione di newModel
-        // newModel.position.set(
-        //     MathUtils.randFloat(-1, 1),     // X: -1 a 1
-        //     MathUtils.randFloat(-1.5, 1.5), // Y: -1.5 a 1.5
-        //     MathUtils.randFloat(-3, -2)     // Z: -3 a -2
-        // );
-
-        // Set model material color
+        // color
         let colorIndex;
         newModel.traverse((child) => {
             if (child.isMesh && child.material && child.material.name === "balloon") {
@@ -351,7 +270,7 @@ export default function Baloons(props) {
 
         // Set gameData
         const newModel_diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, newModel);
-        console.log("DIFF MATRIX:", newModel_diffMatrix)
+        // console.log("DIFF MATRIX:", newModel_diffMatrix)
         const newData = {
             color: colorIndex,
             diffMatrix: newModel_diffMatrix

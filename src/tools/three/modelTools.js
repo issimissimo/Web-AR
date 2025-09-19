@@ -1,6 +1,7 @@
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { AnimationMixer, Clock } from 'three';
+import { RecreateMaterials } from "./materialTools";
 
 export class GlbLoader {
     constructor() {

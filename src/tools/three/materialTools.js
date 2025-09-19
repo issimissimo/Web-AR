@@ -27,6 +27,8 @@ export function RecreateMaterials(
 
                 aoMap: options.aoMap,
                 aoMapIntensity: options.aoMapIntensity,
+                lightMap: options.lightMap,
+                lightMapIntensity: options.lightMapIntensity,
                 color: child.material.color,
                 metalness: child.material.metalness,
                 roughness: child.material.roughness,
