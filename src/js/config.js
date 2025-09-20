@@ -3,9 +3,13 @@
 // * USE "appConfig.json" INSTEAD
 // **************************************
 
+// default values (don't modify!)
 let appConfig = {
-  production: false,
-  debugOnDesktop: false
+  production: true,
+  debugOnDesktop: false,
+  debugLoadMode: false,
+  debugUserId: null,
+  debugMarkerId: null
 };
 
 
@@ -25,5 +29,14 @@ export const config = {
   },
   get debugOnDesktop() {
     return appConfig.debugOnDesktop;
+  },
+  get debugLoadMode() {
+    return appConfig.debugLoadMode;
+  },
+   get debugUserId() {
+    return appConfig.debugUserId;
+  },
+   get debugMarkerId() {
+    return appConfig.debugMarkerId;
   },
 };

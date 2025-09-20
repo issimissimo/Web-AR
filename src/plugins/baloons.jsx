@@ -25,6 +25,7 @@ let isPlaying = true;
 // GAME parameters
 const ARROW_HEIGHT = 0.1;
 const ARROW_SPEED = 0.04;
+const ARROW_OFFSET = new THREE.Vector3(0, -0.2, -0.3);
 const GRAVITY = 0.008;
 const GROUND_Y = -1.5;
 const BALLOON_COUNT = 8;
@@ -228,12 +229,12 @@ export default function Baloons(props) {
                     updateArrow();
 
 
-                    // ✅ NUOVO: Aggiorna posizione freccia se non sta volando
-                    if (!isArrowFlying && arrow) {
-                        const offset = new THREE.Vector3(0, -0.2, -0.3);
-                        arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
-                        arrow.rotation.copy(SceneManager.camera.rotation);
-                    }
+                    // // ✅ NUOVO: Aggiorna posizione freccia se non sta volando
+                    // if (!isArrowFlying && arrow) {
+                    //     const offset = new THREE.Vector3(0, -0.2, -0.3);
+                    //     arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
+                    //     arrow.rotation.copy(SceneManager.camera.rotation);
+                    // }
 
                 }
             }
@@ -413,8 +414,8 @@ export default function Baloons(props) {
 
 
         // Posizione relativa alla camera
-        const offset = new THREE.Vector3(0, -0.2, -0.3); // Sotto e davanti alla camera
-        arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
+        // const offset = new THREE.Vector3(0, -0.2, -0.3); // Sotto e davanti alla camera
+        arrow.position.copy(SceneManager.camera.position).add(ARROW_OFFSET.applyQuaternion(SceneManager.camera.quaternion));
 
         console.log(SceneManager.camera.position)
         console.log(arrow.position)
@@ -439,6 +440,13 @@ export default function Baloons(props) {
 
     function launchArrow() {
         if (isArrowFlying || arrowsLeft <= 0) return;
+
+
+
+        arrow.position.copy(camera.position).add(ARROW_OFFSET.applyQuaternion(camera.quaternion));
+        arrow.rotation.copy(camera.rotation);
+
+
 
         arrowsLeft--;
         // document.getElementById('arrows').textContent = arrowsLeft;

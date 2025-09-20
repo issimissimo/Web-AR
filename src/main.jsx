@@ -94,7 +94,7 @@ export default function Main() {
                     const hasQueryParams = urlParams.has('userId') && urlParams.has('markerId');
 
                     // Access as anonymous
-                    if (hasQueryParams) {
+                    if (hasQueryParams || config.debugLoadMode) {
                         setCurrentAppMode(() => AppMode.LOAD);
                         accessAnonymous(urlParams);
 
@@ -144,8 +144,8 @@ export default function Main() {
             await firebase.auth.loginAnonymous();
         }
 
-        setUserId(() => params.get('userId'));
-        const markerId = params.get('markerId');
+        setUserId(() => config.debugLoadMode ? config.debugUserId : params.get('userId'));
+        const markerId = config.debugLoadMode ? config.debugMarkerId : params.get('markerId');
         const data = await firebase.firestore.fetchMarker(userId(), markerId);
 
         setupMarker({ id: markerId, data: data }, () => goToAnonymous());
