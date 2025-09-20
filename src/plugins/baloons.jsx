@@ -3,7 +3,7 @@ import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { MathUtils, Color, Matrix4, Vector3, Quaternion, PositionalAudio, Euler } from 'three';
 import Reticle from '@js/reticle';
-import { LoadAudioBuffer } from '@tools/three/audioTools';
+import { LoadAudioBuffer, LoadAudio } from '@tools/three/audioTools';
 import { RecreateMaterials, findMaterialByName } from "@tools/three/materialTools";
 import Toolbar from '@views/ar-overlay/Toolbar';
 import SceneManager from "@js/sceneManager"
@@ -38,6 +38,9 @@ let balloons = [];
 let arrow = null;
 let isArrowFlying = false;
 let score = 0;
+let maxGameTime = 30000;
+const dartBonus = 5;
+let interval;
 // let arrowsLeft = 10;
 // let isPlaying = true;
 
@@ -45,8 +48,10 @@ let score = 0;
 export default function Baloons(props) {
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
 
-    let maxGameTime = 30000;
-    const dartBonus = 5;
+    // let maxGameTime = 30000;
+    // const dartBonus = 5;
+    // let timeout;
+
 
 
 
@@ -58,10 +63,10 @@ export default function Baloons(props) {
     const [currentTime, setCurrentTime] = createSignal(maxGameTime);
     const [playerState, setPlayerState] = createSignal(PLAYER_STATE.NONE);
 
-    // decrease game time
+    // decrease timeout
     createEffect(() => {
         if (props.enabled && game.appMode === "load") {
-            const interval = setInterval(() => {
+            interval = setInterval(() => {
                 setCurrentTime((prev) => {
                     if (prev > 0) {
                         setRemainingTime(prev - 1000);
@@ -72,8 +77,16 @@ export default function Baloons(props) {
                 });
             }, 1000);
             return () => clearInterval(interval);
+
         }
     });
+
+    // stop timeout if is winner or looser
+    createEffect(() => {
+        if (playerState() == PLAYER_STATE.WINNER || playerState() == PLAYER_STATE.LOOSER) {
+            clearInterval(interval);
+        }
+    })
 
 
     /*
@@ -84,6 +97,7 @@ export default function Baloons(props) {
 
     let popAudioBuffer;
     let balloonExplosionAudioBuffer;
+    let whooshAudio;
 
 
     /*
@@ -127,6 +141,9 @@ export default function Baloons(props) {
         // load audio
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
         balloonExplosionAudioBuffer = await new LoadAudioBuffer("sounds/balloon-explosion.ogg");
+        whooshAudio = await new LoadAudio('sounds/whoosh.ogg', SceneManager.listener, {
+            volume: 0.1
+        });
 
         // Setup data
         await game.loadGameData();
@@ -419,7 +436,7 @@ export default function Baloons(props) {
         // console.log("*********START************")
 
         if (playerState() !== PLAYER_STATE.RUNNING) {
-            console.log("ADESSO DEVO SDMETTERLA!!!")
+            // console.log("ADESSO DEVO SDMETTERLA!!!")
             return;
         }
 
@@ -457,6 +474,8 @@ export default function Baloons(props) {
         if (isArrowFlying || arrowsLeft() <= 0) return;
 
         console.log("launchArrow")
+
+        whooshAudio.play();
 
         // ✅ PRIMA ottieni i valori mondiali
         const worldPosition = new THREE.Vector3();

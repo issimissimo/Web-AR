@@ -50,23 +50,15 @@ export function useGame(gameName, gameId, config = {}) {
 
 
     const saveGameData = async () => {
-        console.log("*******************************")
-        console.log("ADESSO SALVO:", gameData());
+        try {
+            const path = `${context.userId}/markers/${context.markerId}/games/${gameId}`;
+            await firebase.realtimeDb.saveData(path, gameData());
+            console.log('Salvati dati in RealtimeDB con ID:', gameId)
 
-        console.log(context.userId)
-        console.log(context.markerId)
-        console.log(gameId)
-
-        if (gameData()) {
-            try {
-                const path = `${context.userId}/markers/${context.markerId}/games/${gameId}`;
-                await firebase.realtimeDb.saveData(path, gameData());
-                console.log('Salvati dati in RealtimeDB con ID:', gameId)
-
-            } catch (error) {
-                console.log("Errore nel salvataggio JSON:", error);
-            }
+        } catch (error) {
+            console.log("Errore nel salvataggio JSON:", error);
         }
+
     }
 
 
