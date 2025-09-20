@@ -474,12 +474,14 @@ export default function Baloons(props) {
             if (arrowBox.intersectsBox(balloonBox)) {
 
                 // Collisione! Rimuovi il palloncino
-
-                // const color = balloon.material.color;
-                console.log(balloon)
                 const mat = findMaterialByName(balloon, "balloon")
                 const color = mat.color;
-                console.log(mat)
+
+                // play audio explosion
+                const audio = new PositionalAudio(SceneManager.listener);
+                audio.setBuffer(balloonExplosionAudioBuffer);
+                balloon.add(audio);
+                audio.play();
 
                 SceneManager.scene.remove(balloon);
                 balloons.splice(i, 1);
