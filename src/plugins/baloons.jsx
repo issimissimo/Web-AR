@@ -93,7 +93,7 @@ export default function Baloons(props) {
                         break;
 
                     case "load":
-                        // Explode
+                        launchArrow();
                         break;
                 }
             }
@@ -222,8 +222,19 @@ export default function Baloons(props) {
             game.loader.animate();
 
             if (game.appMode == "load") {
+
                 if (isPlaying) {
+
                     updateArrow();
+
+
+                    // ✅ NUOVO: Aggiorna posizione freccia se non sta volando
+                    if (!isArrowFlying && arrow) {
+                        const offset = new THREE.Vector3(0, -0.2, -0.3);
+                        arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
+                        arrow.rotation.copy(SceneManager.camera.rotation);
+                    }
+
                 }
             }
 
@@ -388,7 +399,7 @@ export default function Baloons(props) {
     //#region [Game Logics]
 
     function createArrow() {
-        // console.log("GAME >>>>>>>>> createArrow")
+        console.log("*********START************")
         if (arrow) {
             SceneManager.scene.remove(arrow);
         }
@@ -398,7 +409,21 @@ export default function Baloons(props) {
         const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
 
         arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-        arrow.position.set(0, -0.2, -0.3);
+        // arrow.position.set(0, -0.2, -0.3);
+
+
+        // Posizione relativa alla camera
+        const offset = new THREE.Vector3(0, -0.2, -0.3); // Sotto e davanti alla camera
+        arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
+
+        console.log(SceneManager.camera.position)
+        console.log(arrow.position)
+
+
+
+        // Rotazione come la camera
+        arrow.rotation.copy(SceneManager.camera.rotation);
+
 
         SceneManager.scene.add(arrow);
 
@@ -409,6 +434,7 @@ export default function Baloons(props) {
         };
 
         isArrowFlying = false;
+        console.log("*********END*************")
     }
 
     function launchArrow() {
@@ -417,8 +443,29 @@ export default function Baloons(props) {
         arrowsLeft--;
         // document.getElementById('arrows').textContent = arrowsLeft;
 
-        // Imposta la velocità iniziale della freccia
-        arrow.userData.velocity.set(0, 0.15, -ARROW_SPEED);
+
+
+
+        // // Imposta la velocità iniziale della freccia
+        // arrow.userData.velocity.set(0, 0.15, -ARROW_SPEED);
+
+
+        // Calcola direzione basata sulla rotazione della camera
+        const direction = new THREE.Vector3(0, 0, -1); // Direzione forward
+        direction.applyQuaternion(SceneManager.camera.quaternion);   // Ruota secondo la camera
+
+        // Velocità nella direzione della camera
+        const horizontalSpeed = ARROW_SPEED;
+        const verticalBoost = ARROW_HEIGHT; // L'altezza che hai impostato prima
+
+        arrow.userData.velocity.set(
+            direction.x * horizontalSpeed,
+            direction.y * horizontalSpeed + verticalBoost, // Componente Y + boost verticale
+            direction.z * horizontalSpeed
+        );
+
+
+
         arrow.userData.isFlying = true;
         isArrowFlying = true;
     }

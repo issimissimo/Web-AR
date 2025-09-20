@@ -23,9 +23,10 @@ export class GlbLoader {
         this.gltf = await this.loader.loadAsync(fileUrl);
         this.model = this.gltf.scene;
 
-        // we need to recreate materials!
+        // we need to recreate materials
+        // because often the model have physical materials, double side, etc
+        // and in AR it get worse!!!
         this.model = RecreateMaterials(this.model);
-
 
         this._setupAnimations(this.model, randomizeTime);
         this._loaded = true;
