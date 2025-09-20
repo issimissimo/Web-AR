@@ -213,7 +213,7 @@ export default function Baloons(props) {
         }, 250)
     }
 
-
+    //#region [LOOP]
     /*
     * LOOP
     */
@@ -402,49 +402,55 @@ export default function Baloons(props) {
     function createArrow() {
         console.log("*********START************")
         if (arrow) {
-            SceneManager.scene.remove(arrow);
+            // Se era attaccata alla camera, rimuovila da lì
+            if (arrow.parent === SceneManager.camera) {
+                SceneManager.camera.remove(arrow);
+            } else {
+                SceneManager.scene.remove(arrow);
+            }
         }
 
-        // Crea un piccolo cubo come placeholder della freccia
         const arrowGeometry = new THREE.BoxGeometry(0.05, 0.05, 0.2);
         const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
-
         arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-        // arrow.position.set(0, -0.2, -0.3);
 
+        // ✅ POSIZIONE RELATIVA alla camera (coordinate locali)
+        arrow.position.set(0, -0.2, -0.3); // Offset dalla camera
+        arrow.rotation.set(0, 0, 0);   // Rotazione relativa alla camera
 
-        // Posizione relativa alla camera
-        // const offset = new THREE.Vector3(0, -0.2, -0.3); // Sotto e davanti alla camera
-        arrow.position.copy(SceneManager.camera.position).add(ARROW_OFFSET.applyQuaternion(SceneManager.camera.quaternion));
+        // ✅ ATTACCA alla camera!
+        SceneManager.camera.add(arrow);
 
-        console.log(SceneManager.camera.position)
-        console.log(arrow.position)
-
-
-
-        // Rotazione come la camera
-        arrow.rotation.copy(SceneManager.camera.rotation);
-
-
-        SceneManager.scene.add(arrow);
-
-        // Reset delle proprietà di volo
         arrow.userData = {
             velocity: new THREE.Vector3(0, 0, 0),
             isFlying: false
         };
 
         isArrowFlying = false;
-        console.log("*********END*************")
     }
 
     function launchArrow() {
         if (isArrowFlying || arrowsLeft <= 0) return;
 
+        // ✅ PRIMA ottieni i valori mondiali
+        const worldPosition = new THREE.Vector3();
+        const worldQuaternion = new THREE.Quaternion();
+
+        arrow.getWorldPosition(worldPosition);
+        arrow.getWorldQuaternion(worldQuaternion);  // ← PRIMA ottieni il quaternion!
+
+        // ✅ POI calcola la direzione con il quaternion CORRETTO
+        const direction = new THREE.Vector3(0, 0, -1);
+        direction.applyQuaternion(worldQuaternion);  // ← ORA ha i valori giusti!
 
 
-        arrow.position.copy(camera.position).add(ARROW_OFFSET.applyQuaternion(camera.quaternion));
-        arrow.rotation.copy(camera.rotation);
+        // ✅ DOPO stacca dalla camera
+        SceneManager.camera.remove(arrow);
+        SceneManager.scene.add(arrow);
+
+        // ✅ Imposta posizione e rotazione
+        arrow.position.copy(worldPosition);
+        arrow.quaternion.copy(worldQuaternion);  // ← Usa direttamente il quaternion!
 
 
 
@@ -452,19 +458,9 @@ export default function Baloons(props) {
         // document.getElementById('arrows').textContent = arrowsLeft;
 
 
-
-
-        // // Imposta la velocità iniziale della freccia
-        // arrow.userData.velocity.set(0, 0.15, -ARROW_SPEED);
-
-
-        // Calcola direzione basata sulla rotazione della camera
-        const direction = new THREE.Vector3(0, 0, -1); // Direzione forward
-        direction.applyQuaternion(SceneManager.camera.quaternion);   // Ruota secondo la camera
-
         // Velocità nella direzione della camera
         const horizontalSpeed = ARROW_SPEED;
-        const verticalBoost = ARROW_HEIGHT; // L'altezza che hai impostato prima
+        const verticalBoost = ARROW_HEIGHT;
 
         arrow.userData.velocity.set(
             direction.x * horizontalSpeed,
@@ -478,17 +474,6 @@ export default function Baloons(props) {
         isArrowFlying = true;
     }
 
-    function launchArrow() {
-        if (isArrowFlying || arrowsLeft <= 0) return;
-
-        arrowsLeft--;
-        // document.getElementById('arrows').textContent = arrowsLeft;
-
-        // Imposta la velocità iniziale della freccia
-        arrow.userData.velocity.set(0, ARROW_HEIGHT, -ARROW_SPEED);
-        arrow.userData.isFlying = true;
-        isArrowFlying = true;
-    }
 
     function updateArrow() {
         if (!isArrowFlying || !arrow.userData.isFlying) return;
@@ -500,7 +485,7 @@ export default function Baloons(props) {
         arrow.position.add(arrow.userData.velocity);
 
         // Ruota leggermente la freccia per seguire la traiettoria
-        arrow.rotation.x = Math.atan2(-arrow.userData.velocity.y, -arrow.userData.velocity.z);
+        arrow.rotation.x += 0.01;
 
         // Controlla le collisioni con i palloncini
         checkCollisions();
