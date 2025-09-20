@@ -122,3 +122,33 @@ export function setMaterialsShadows(model, value) {
         child.castShadow = value
     })
 }
+
+export function findMaterialByName(object, materialName) {
+    // Controlla se l'oggetto corrente ha un materiale
+    if (object.material) {
+        // Se è un singolo materiale
+        if (object.material.name === materialName) {
+            return object.material;
+        }
+        
+        // Se è un array di materiali (per geometrie multi-materiale)
+        if (Array.isArray(object.material)) {
+            for (let material of object.material) {
+                if (material.name === materialName) {
+                    return material;
+                }
+            }
+        }
+    }
+    
+    // Ricerca ricorsiva nei children
+    for (let child of object.children) {
+        const foundMaterial = findMaterialByName(child, materialName);
+        if (foundMaterial) {
+            return foundMaterial;
+        }
+    }
+    
+    // Non trovato
+    return null;
+}
