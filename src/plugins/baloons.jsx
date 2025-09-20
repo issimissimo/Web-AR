@@ -337,7 +337,7 @@ export default function Baloons(props) {
 
                 // Init GAME!!!
                 if (game.appMode == "load") {
-                    arrowsLeft = balloons.length;
+                    // arrowsLeft = balloons.length;
                     // Crea freccia iniziale
                     createArrow();
                 }
