@@ -22,11 +22,6 @@ export class GlbLoader {
         const randomizeTime = options.randomizeTime ?? false;
         this.gltf = await this.loader.loadAsync(fileUrl);
         this.model = this.gltf.scene;
-
-        // we need to recreate materials!
-        this.model = RecreateMaterials(this.model);
-
-
         this._setupAnimations(this.model, randomizeTime);
         this._loaded = true;
         return this.model;
@@ -35,13 +30,7 @@ export class GlbLoader {
     clone(options = {}) {
         const randomizeTime = options.randomizeTime ?? false;
         const newModel = this.model.clone(true);
-
-        if (options.position) newModel.position.copy(options.position);
-        if (options.rotation) newModel.rotation.copy(options.rotation);
-        if (options.scale) newModel.scale.copy(options.scale);
-
         this._setupAnimations(newModel, randomizeTime);
-
         return newModel;
     }
 
@@ -67,7 +56,7 @@ export class GlbLoader {
             // Forza un update con deltaTime = 0 per applicare il frame corrente
             this.mixers.forEach(mixer => mixer.update(0));
         }
-
+        
         this.clock = new Clock();
     }
 

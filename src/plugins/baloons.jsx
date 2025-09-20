@@ -1,9 +1,9 @@
 import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
-import { MathUtils, Color, Matrix4, Vector3, Quaternion, PositionalAudio } from 'three';
+import { MathUtils, Color, Matrix4, Vector3, Quaternion, PositionalAudio, Euler } from 'three';
 import Reticle from '@js/reticle';
-import { LoadPositionalAudio, LoadAudioBuffer } from '@tools/three/audioTools';
+import { LoadAudioBuffer } from '@tools/three/audioTools';
 import { RecreateMaterials } from "@tools/three/materialTools";
 import Toolbar from '@views/ar-overlay/Toolbar';
 import SceneManager from "@js/sceneManager"
@@ -19,13 +19,14 @@ export default function Baloons(props) {
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
 
     // GAME constant
-    const maxGameTime = 30000;
-    const [remainingDart, setRemainingDart] = createSignal(10);
+    let maxGameTime = 30000;
+    const dartBonus = 5;
+    const [remainingDart, setRemainingDart] = createSignal(0);
     const [explodedBalloons, setExplodedBalloons] = createSignal(0);
     const [remainingTime, setRemainingTime] = createSignal(maxGameTime);
     const [currentTime, setCurrentTime] = createSignal(maxGameTime);
 
-    
+
     // decrease game time
     createEffect(() => {
         if (props.enabled && game.appMode === "load") {
@@ -93,16 +94,23 @@ export default function Baloons(props) {
     * On mount
     */
     onMount(async () => {
+
         // load model
         await game.loader.load("models/balloon.glb");
+
         // load audio
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
+
         // Setup data
         await game.loadGameData();
         if (!game.gameData()) {
             console.log("siccome non abbiamo caricato niente settiamo i dati di default")
             game.setGameData(defaultGameData);
         }
+
+        // setup game
+        setRemainingDart(game.gameData().length + dartBonus);
+
         // reset
         setLastSavedGameData([...game.gameData()]);
 
@@ -212,7 +220,7 @@ export default function Baloons(props) {
                 const assetData = gameData[i];
 
                 let newModel = game.loader.clone({ randomizeTime: true });
-                newModel = RecreateMaterials(newModel); // Important!!!
+                // newModel = RecreateMaterials(newModel); // Important!!!
                 newModel.matrixAutoUpdate = false;
 
                 // position
@@ -271,21 +279,30 @@ export default function Baloons(props) {
         console.log("SPAWN...")
 
         // get hitMatrix
-        const hitMatrix = Reticle.getHitMatrix();
+        // const hitMatrix = Reticle.getHitMatrix();
 
-        // clone model
-        let newModel = game.loader.clone({ randomizeTime: true });
-        newModel = RecreateMaterials(newModel); // Important!!!
-        let pos = new Vector3();
-        let rot = new Quaternion();
-        let scale = new Vector3();
-        hitMatrix.decompose(pos, rot, scale);
-        newModel.position.copy(pos);
+        // // clone model
+        // let newModel = game.loader.clone({ randomizeTime: true });
+        // newModel = RecreateMaterials(newModel); // Important!!!
+        // let pos = new Vector3();
+        // let rot = new Quaternion();
+        // let scale = new Vector3();
+        // hitMatrix.decompose(pos, rot, scale);
+        // newModel.position.copy(pos);
 
-        // rotation
-        newModel.rotation.y = Math.random() * Math.PI * 2;
+        // // rotation
+        // newModel.rotation.y = Math.random() * Math.PI * 2;
 
-        // color
+       
+
+        // clone model on hitMatrix with random Y rotation
+        const newModel = game.loader.clone({
+            position: new Vector3().setFromMatrixPosition(Reticle.getHitMatrix()),
+            rotation: new Euler(0, Math.random() * Math.PI * 2, 0),
+            randomizeTime: true
+        });
+
+        // random color
         let colorIndex;
         newModel.traverse((child) => {
             if (child.isMesh && child.material && child.material.name === "balloon") {
@@ -296,31 +313,36 @@ export default function Baloons(props) {
             }
         });
 
-        // audio
+        // add model to scene
+        game.addToScene(newModel);
+
+        // pop sound
         const audio = new PositionalAudio(SceneManager.listener);
         audio.setBuffer(popAudioBuffer);
         newModel.add(audio);
-
-        // Add model to scene
-        game.addToScene(newModel);
-
         audio.play();
 
-
-
-        // const newModel_matrix = newModel.matrix;
-        // console.log("NEW MATRIX:", newModel_matrix)
-        // console.log("REF MATRIX:", props.referenceMatrix)
-
         // Set gameData
-        const newModel_diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, newModel);
-        // console.log("DIFF MATRIX:", newModel_diffMatrix)
+        const diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, newModel);
         const newData = {
             color: colorIndex,
-            diffMatrix: newModel_diffMatrix
-        }
-        game.setGameData((prev) => [...prev, newData])
+            diffMatrix: diffMatrix
+        };
+        game.setGameData((prev) => [...prev, newData]);
     }
+
+
+
+    //#region [Game Logics]
+
+
+
+
+
+
+
+
+
 
 
 
@@ -328,7 +350,7 @@ export default function Baloons(props) {
     /*
     * RENDER
     */
-    //#region [render]
+    //#region [Author UI]
 
 
     const AuthorUI = () => {
@@ -347,6 +369,8 @@ export default function Baloons(props) {
     }
 
 
+    //#region [User UI]
+
     const UserInfo = styled('div')`
         display: flex;
         /* width: 100%; */
@@ -362,15 +386,15 @@ export default function Baloons(props) {
             <Container>
                 <UserInfo>
                     <UserInfo style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25}/>
+                        <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
                         {remainingDart()}
                     </UserInfo>
                     <UserInfo style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40}/>
+                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40} />
                         {explodedBalloons()} / {game.gameData().length}
                     </UserInfo>
                     <UserInfo style={{ gap: '0.5rem' }}>
-                        <img src="time.png" />
+                        <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={25} />
                         {remainingTime() / 1000}
                     </UserInfo>
                 </UserInfo>
@@ -381,6 +405,7 @@ export default function Baloons(props) {
 
 
 
+    //#region [RETURN]
 
     return (
         <>
