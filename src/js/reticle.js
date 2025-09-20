@@ -232,23 +232,12 @@ const Reticle = {
 
         // Update camera from pose (used from CircleMesh)
         if (_workingMode === this.WORKING_MODE.TARGET) {
-
-            _reticleMesh.visible = false;
-            _circleMesh.visible = _circleMesh._shouldDisplay;
-
-            // const framePose = frame.getViewerPose(referenceSpace);
-            // if (framePose) {
-            //     const position = framePose.transform.position;
-            //     const rotation = framePose.transform.orientation;
-            //     _camera.position.set(position.x, position.y, position.z);
-            //     _camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
-            //     _camera.updateMatrixWorld();
-            // }
-
             _camera.position.copy(SceneManager.camera.position);
             _camera.quaternion.copy(SceneManager.camera.quaternion);
+            
+            _reticleMesh.visible = false;
+            _circleMesh.visible = _circleMesh._shouldDisplay;
         }
-
 
         // Check for hit source (used from PlaneMesh)
         else if (_workingMode === this.WORKING_MODE.SURFACE) {

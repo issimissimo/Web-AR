@@ -50,7 +50,7 @@ const Button = (props) => {
   return (
     <StyledButton
       onClick={handleOnClick}
-      active={props.active ?? true}
+      active={props.active ?? 1}
       visible={props.visible ?? true}
       grey={props.grey}
       border={props.border ?? true}
@@ -58,7 +58,7 @@ const Button = (props) => {
       class={props.class}
       style={props.style}
       width={props.width}
-      animate={{ opacity: props.active ? 1 : 0.4 }}
+      animate={{ opacity: (props.active ?? 1) ? 1 : 0.4 }}
       transition={{ duration: 0.25 }}
     >
       {props.children}

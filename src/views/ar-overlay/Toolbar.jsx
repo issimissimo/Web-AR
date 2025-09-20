@@ -1,12 +1,13 @@
 import { onMount, onCleanup, useContext } from "solid-js"
 import { styled } from "solid-styled-components"
+import { Motion } from 'solid-motionone';
 import ButtonCircle from "@components/ButtonCircle"
 import SvgIcon from "@components/SvgIcon"
 import Fa from "solid-fa"
 import { faSave } from "@fortawesome/free-solid-svg-icons"
 import { Context } from "@views/ar-overlay/arSession"
 
-const ContainerToolbar = styled("div")`
+const ContainerToolbar = styled(Motion.div)`
     position: absolute;
     right: 1.5em;
     top: 20%;
@@ -15,13 +16,13 @@ const ContainerToolbar = styled("div")`
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    pointer-events: ${props => props.visible ? 'auto' : 'none'};
 `
 
 const Toolbar = (props) => {
     const context = useContext(Context)
 
     onMount(() => {
-        console.log(props.buttons)
         context.forceUpdateDomElements()
     })
 
@@ -30,7 +31,11 @@ const Toolbar = (props) => {
     })
 
     return (
-        <ContainerToolbar>
+        <ContainerToolbar
+            visible={props.visible ?? true}
+            animate={{ opacity: (props.visible ?? 1) ? 1 : 0 }}
+            transition={{ duration: 0.25 }}
+        >
             {/* UNDO button */}
             <ButtonCircle
                 data-interactive

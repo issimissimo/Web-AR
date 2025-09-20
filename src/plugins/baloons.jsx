@@ -15,12 +15,7 @@ import { config } from '@js/config';
 
 
 const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080, 0x000000];
-let balloons = [];
-let arrow = null;
-let isArrowFlying = false;
-let score = 0;
-let arrowsLeft = 10;
-let isPlaying = true;
+
 
 // GAME parameters
 const ARROW_HEIGHT = 0.1;
@@ -29,6 +24,22 @@ const ARROW_OFFSET = new THREE.Vector3(0, -0.2, -0.3);
 const GRAVITY = 0.008;
 const GROUND_Y = -1.5;
 const BALLOON_COUNT = 8;
+const ARROW_BONUS = 2;
+
+const PLAYER_STATE = {
+    NONE: 'none',
+    RUNNING: 'running',
+    WINNER: 'winner',
+    LOOSER: 'looser'
+}
+
+// let playerState;
+let balloons = [];
+let arrow = null;
+let isArrowFlying = false;
+let score = 0;
+// let arrowsLeft = 10;
+// let isPlaying = true;
 
 
 export default function Baloons(props) {
@@ -37,11 +48,15 @@ export default function Baloons(props) {
     let maxGameTime = 30000;
     const dartBonus = 5;
 
+
+
     // GAME variables
     const [remainingArrow, setRemainingArrow] = createSignal(0);
+    const [arrowsLeft, setArrowsLeft] = createSignal(10);
     const [explodedBalloons, setExplodedBalloons] = createSignal(0);
     const [remainingTime, setRemainingTime] = createSignal(maxGameTime);
     const [currentTime, setCurrentTime] = createSignal(maxGameTime);
+    const [playerState, setPlayerState] = createSignal(PLAYER_STATE.NONE);
 
     // decrease game time
     createEffect(() => {
@@ -69,12 +84,6 @@ export default function Baloons(props) {
 
     let popAudioBuffer;
     let balloonExplosionAudioBuffer;
-    //  const spawnedBalloons = [];
-    // class SpawnedBalloon {
-    //     constructor(model, revealSound, explodeSound = null){
-
-    //     }
-    // }
 
 
     /*
@@ -123,6 +132,7 @@ export default function Baloons(props) {
         await game.loadGameData();
         if (!game.gameData()) {
             console.log("siccome non abbiamo caricato niente settiamo i dati di default")
+            // load default data
             game.setGameData(defaultGameData);
         }
 
@@ -204,6 +214,7 @@ export default function Baloons(props) {
                 else {
                     Reticle.setEnabled(false);
                 }
+                setPlayerState(PLAYER_STATE.RUNNING)
                 break;
         }
         // wait a little before to spawn loaded models
@@ -224,9 +235,13 @@ export default function Baloons(props) {
 
             if (game.appMode == "load") {
 
-                if (isPlaying) {
+                if (playerState() === PLAYER_STATE.RUNNING) {
 
                     updateArrow();
+
+
+
+                    if (currentTime() <= 0) endGameLooser();
 
 
                     // // ✅ NUOVO: Aggiorna posizione freccia se non sta volando
@@ -338,7 +353,8 @@ export default function Baloons(props) {
 
                 // Init GAME!!!
                 if (game.appMode == "load") {
-                    // arrowsLeft = balloons.length;
+                    // arrowsLeft = balloons.length + ARROW_BONUS;
+                    setArrowsLeft(balloons.length + ARROW_BONUS);
                     // Crea freccia iniziale
                     createArrow();
                 }
@@ -400,7 +416,14 @@ export default function Baloons(props) {
     //#region [Game Logics]
 
     function createArrow() {
-        console.log("*********START************")
+        // console.log("*********START************")
+
+        if (playerState() !== PLAYER_STATE.RUNNING) {
+            console.log("ADESSO DEVO SDMETTERLA!!!")
+            return;
+        }
+
+
         if (arrow) {
             // Se era attaccata alla camera, rimuovila da lì
             if (arrow.parent === SceneManager.camera) {
@@ -415,7 +438,8 @@ export default function Baloons(props) {
         arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
 
         // ✅ POSIZIONE RELATIVA alla camera (coordinate locali)
-        arrow.position.set(0, -0.2, -0.3); // Offset dalla camera
+        // arrow.position.set(0, -0.2, -0.3); // Offset dalla camera
+        arrow.position.copy(ARROW_OFFSET); // Offset dalla camera
         arrow.rotation.set(0, 0, 0);   // Rotazione relativa alla camera
 
         // ✅ ATTACCA alla camera!
@@ -430,7 +454,9 @@ export default function Baloons(props) {
     }
 
     function launchArrow() {
-        if (isArrowFlying || arrowsLeft <= 0) return;
+        if (isArrowFlying || arrowsLeft() <= 0) return;
+
+        console.log("launchArrow")
 
         // ✅ PRIMA ottieni i valori mondiali
         const worldPosition = new THREE.Vector3();
@@ -454,7 +480,8 @@ export default function Baloons(props) {
 
 
 
-        arrowsLeft--;
+        // arrowsLeft--;
+        setArrowsLeft(prev => prev - 1);
         // document.getElementById('arrows').textContent = arrowsLeft;
 
 
@@ -493,11 +520,11 @@ export default function Baloons(props) {
         // Rimuovi la freccia se va troppo in basso o troppo lontano
         if (arrow.position.y < GROUND_Y || arrow.position.z < -15) {
             setTimeout(() => {
-                console.log("arrowLeft:", arrowsLeft)
-                if (arrowsLeft > 0) {
+                // console.log("arrowLeft:", arrowsLeft())
+                if (arrowsLeft() > 0) {
                     createArrow();
                 } else {
-                    endGame();
+                    endGameLooser();
                 }
             }, 500);
         }
@@ -515,6 +542,9 @@ export default function Baloons(props) {
 
             if (arrowBox.intersectsBox(balloonBox)) {
 
+
+                setExplodedBalloons(prev => prev + 1);
+
                 // Collisione! Rimuovi il palloncino
                 const mat = findMaterialByName(balloon, "balloon")
                 const color = mat.color;
@@ -528,12 +558,19 @@ export default function Baloons(props) {
                 SceneManager.scene.remove(balloon);
                 balloons.splice(i, 1);
 
-                // Aggiorna il punteggio
-                score++;
+                // // Aggiorna il punteggio
+                // score++;
                 // document.getElementById('score').textContent = score;
 
                 // Effetto di "pop" - piccola animazione
                 createPopEffect(balloon.position, color);
+
+
+                if (explodedBalloons() == game.gameData().length) {
+                    // console.log("HAI VINTO!")
+
+                    endGameWinner();
+                }
 
                 // // Se tutti i palloncini sono stati colpiti
                 // if (balloons.length === 0) {
@@ -594,11 +631,21 @@ export default function Baloons(props) {
     }
 
 
-    function endGame() {
+    function endGameWinner() {
         setTimeout(() => {
-            console.log(`Gioco finito! Hai colpito ${score} palloncini su ${BALLOON_COUNT}. Premi R per ricominciare.`);
-        }, 1000);
-        isPlaying = false;
+            setPlayerState(PLAYER_STATE.WINNER);
+            console.log("HAI VINTO!!!")
+        }, 500);
+
+    }
+
+
+    function endGameLooser() {
+        setTimeout(() => {
+            setPlayerState(PLAYER_STATE.LOOSER);
+            console.log("HAI PERSO!!!")
+        }, 500);
+
     }
 
 
@@ -660,12 +707,11 @@ export default function Baloons(props) {
     const UserUI = () => {
         return (
             <Container>
-                <button onClick={() => spawnModelOnTap()}>SPAWN</button>
                 <button onClick={() => launchArrow()}>ARROW</button>
                 <Info>
                     <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
-                        {remainingArrow()}
+                        {arrowsLeft()}
                     </Info>
                     <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40} />
@@ -701,5 +747,4 @@ export default function Baloons(props) {
             }
         </>
     );
-
 }
