@@ -144,7 +144,7 @@ const Reticle = {
 
         _initialized = false;
         if (_reticleMesh) _scene.remove(_reticleMesh);
-        
+
 
         // main
         _renderer = SceneManager.renderer;
@@ -236,14 +236,17 @@ const Reticle = {
             _reticleMesh.visible = false;
             _circleMesh.visible = _circleMesh._shouldDisplay;
 
-            const framePose = frame.getViewerPose(referenceSpace);
-            if (framePose) {
-                const position = framePose.transform.position;
-                const rotation = framePose.transform.orientation;
-                _camera.position.set(position.x, position.y, position.z);
-                _camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
-                _camera.updateMatrixWorld();
-            }
+            // const framePose = frame.getViewerPose(referenceSpace);
+            // if (framePose) {
+            //     const position = framePose.transform.position;
+            //     const rotation = framePose.transform.orientation;
+            //     _camera.position.set(position.x, position.y, position.z);
+            //     _camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+            //     _camera.updateMatrixWorld();
+            // }
+
+            _camera.position.copy(SceneManager.camera.position);
+            _camera.quaternion.copy(SceneManager.camera.quaternion);
         }
 
 

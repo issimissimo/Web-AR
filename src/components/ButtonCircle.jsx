@@ -13,6 +13,7 @@ const StyledButton = styled(Motion.button)`
   border: ${props => props.border ? "1px solid" : "none"};
   border-color: var(--color-white);
   pointer-events: ${props => props.active ? 'auto' : 'none'};
+  opacity: ${props => props.active ? 1 : 0.25};
   color: var(--color-white);
   box-shadow: none;
   outline: none;
@@ -54,9 +55,6 @@ const ButtonCircle = (props) => {
       border={props.border ?? true}
       class="glass"
       style={props.style}
-      animate={{ opacity: props.active || props.active === undefined ? 1 : 0.25 }}
-      transition={{ duration: 0.25 }}
-      initial={false}
     >
       {props.children}
       {props.icon && <Icon />}

@@ -379,6 +379,8 @@ export default function Baloons(props) {
             diffMatrix: diffMatrix
         };
         game.setGameData((prev) => [...prev, newData]);
+
+        console.log("UNDO VISIBLE:", game.gameData().length > 0)
     }
 
 
@@ -574,6 +576,19 @@ export default function Baloons(props) {
     /*
     * RENDER
     */
+
+
+    const Info = styled('div')`
+        display: flex;
+        /* width: 100%; */
+        box-sizing: border-box;
+        align-items: center;
+        gap: 2rem;
+        justify-content: center;
+      `;
+
+
+
     //#region [Author UI]
 
 
@@ -581,6 +596,12 @@ export default function Baloons(props) {
         return (
             <>
                 <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+                <Info>
+                    <Info style={{ gap: '0.5rem' }}>
+                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40} />
+                        {game.gameData().length}
+                    </Info>
+                </Info>
                 <Toolbar
                     buttons={["undo", "save"]}
                     onUndo={handleUndo}
@@ -595,35 +616,26 @@ export default function Baloons(props) {
 
     //#region [User UI]
 
-    const UserInfo = styled('div')`
-        display: flex;
-        /* width: 100%; */
-        box-sizing: border-box;
-        align-items: center;
-        gap: 2rem;
-        justify-content: center;
-      `;
-
 
     const UserUI = () => {
         return (
             <Container>
                 <button onClick={() => spawnModelOnTap()}>SPAWN</button>
                 <button onClick={() => launchArrow()}>ARROW</button>
-                <UserInfo>
-                    <UserInfo style={{ gap: '0.5rem' }}>
+                <Info>
+                    <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
                         {remainingArrow()}
-                    </UserInfo>
-                    <UserInfo style={{ gap: '0.5rem' }}>
+                    </Info>
+                    <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40} />
                         {explodedBalloons()} / {game.gameData().length}
-                    </UserInfo>
-                    <UserInfo style={{ gap: '0.5rem' }}>
+                    </Info>
+                    <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={25} />
                         {remainingTime() / 1000}
-                    </UserInfo>
-                </UserInfo>
+                    </Info>
+                </Info>
             </Container>
         )
     }
