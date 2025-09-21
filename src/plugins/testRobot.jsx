@@ -54,7 +54,8 @@ export default function testRobot(props) {
             if (
                 Reticle.visible() &&
                 Reticle.isHitting() &&
-                !showInstructions()
+                !showInstructions() &&
+                !spawned()
             ) {
                 // Tap sound
                 game.super.onTap()

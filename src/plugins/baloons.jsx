@@ -11,6 +11,9 @@ import { Container } from '@components/smallElements';
 import SvgIcon from '@components/SvgIcon';
 import * as THREE from 'three';
 import { config } from '@js/config';
+import { GlbLoader } from '@tools/three/modelTools';
+import { LoadTexture } from '@tools/three/textureTools';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 
 
 
@@ -18,12 +21,11 @@ const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x80008
 
 
 // GAME parameters
-const ARROW_HEIGHT = 0.1;
+const ARROW_HEIGHT = 0.07;
 const ARROW_SPEED = 0.04;
-const ARROW_OFFSET = new THREE.Vector3(0, -0.2, -0.3);
+const ARROW_OFFSET = new THREE.Vector3(0, -0.1, -0.3);
 const GRAVITY = 0.008;
 const GROUND_Y = -1.5;
-const BALLOON_COUNT = 8;
 const ARROW_BONUS = 2;
 
 const PLAYER_STATE = {
@@ -37,10 +39,10 @@ const PLAYER_STATE = {
 let balloons = [];
 let arrow = null;
 let isArrowFlying = false;
-let score = 0;
 let maxGameTime = 30000;
 const arrowsBonus = 5;
 let interval;
+let arrowModel = null;
 // let arrowsLeft = 10;
 // let isPlaying = true;
 
@@ -134,8 +136,22 @@ export default function Baloons(props) {
     */
     onMount(async () => {
 
-        // load model
+        // load balloon model
         await game.loader.load("models/demo/Balloons/balloon.glb");
+        const balloonAoTexture = await new LoadTexture("models/demo/Balloons/balloon_AO.webp", {
+            flipY: false
+        });
+
+        // load dart model
+        const arrowAoTexture = await new LoadTexture("models/demo/Balloons/dart_AO.webp", {
+            flipY: false
+        });
+        const glbLoader = new GlbLoader();
+        arrowModel = await glbLoader.load("models/demo/Balloons/dart.glb")
+        arrowModel = RecreateMaterials(arrowModel, {
+            aoMap: arrowAoTexture,
+            aoMapIntensity: 2,
+        });
 
         // load audio
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
@@ -155,6 +171,10 @@ export default function Baloons(props) {
         // // setup game
         // setRemainingArrow(game.gameData().length + arrowsBonus);
         // console.log("++++ NE RIMANGONO: ", remainingArrow());
+
+        loadEnv();
+
+
 
         // reset
         setLastSavedGameData([...game.gameData()]);
@@ -432,6 +452,18 @@ export default function Baloons(props) {
 
     //#region [Game Logics]
 
+    function loadEnv() {
+        const rgbeLoader = new RGBELoader();
+        const fileUrl = "images/hdr/empty_warehouse_1k.hdr";
+        rgbeLoader.load(fileUrl, (envMap) => {
+            envMap.mapping = THREE.EquirectangularReflectionMapping;
+            SceneManager.scene.environment = envMap;
+            SceneManager.scene.environmentIntensity = 1.2;
+        });
+    }
+
+
+
     function createArrow() {
         // console.log("*********START************")
 
@@ -450,14 +482,34 @@ export default function Baloons(props) {
             }
         }
 
-        const arrowGeometry = new THREE.BoxGeometry(0.05, 0.05, 0.2);
-        const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
-        arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+        // const arrowGeometry = new THREE.BoxGeometry(0.05, 0.05, 0.2);
+        // const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+        // arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+
+        // const arrowGeometry = new THREE.BoxGeometry(0.001, 0.001, 0.2);
+        // const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+        // arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+
+
+        arrow = arrowModel;
 
         // ✅ POSIZIONE RELATIVA alla camera (coordinate locali)
         // arrow.position.set(0, -0.2, -0.3); // Offset dalla camera
         arrow.position.copy(ARROW_OFFSET); // Offset dalla camera
         arrow.rotation.set(0, 0, 0);   // Rotazione relativa alla camera
+
+
+
+
+        // arrowModel.position.copy(ARROW_OFFSET); // Offset dalla camera
+        // arrowModel.rotation.set(0, 0, 0);   // Rotazione relativa alla camera
+        // SceneManager.camera.add(arrowModel);
+        // console.log("------ arrow ------ ")
+        // console.log(arrow)
+        // console.log(arrowModel)
+        // console.log("------ end ------ ")
+
+
 
         // ✅ ATTACCA alla camera!
         SceneManager.camera.add(arrow);

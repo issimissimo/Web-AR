@@ -27,17 +27,21 @@ export function RecreateMaterials(
                 transparent: child.material.transparent,
                 metalnessMap: child.material.metalnessMap,
 
-                aoMap: options.aoMap,
-                aoMapIntensity: options.aoMapIntensity,
-                lightMap: options.lightMap,
-                lightMapIntensity: options.lightMapIntensity,
+                aoMap: options.aoMap || null,
+                aoMapIntensity: options.aoMapIntensity || 1,
+                lightMap: options.lightMap || null,
+                lightMapIntensity: options.lightMapIntensity || 1,
                 color: child.material.color,
                 metalness: child.material.metalness,
                 roughness: child.material.roughness,
             })
             child.material = mat;
-            if (child.material.aoMap) child.material.aoMap.channel = options.aoMapChannel;
-            if (child.material.lightMap) child.material.lightMap.channel = options.lightMapChannel;
+            if (child.material.aoMap) {
+                child.material.aoMap.channel = options.aoMapChannel || 0;
+            }
+            if (child.material.lightMap) {
+                child.material.lightMap.channel = options.lightMapChannel || 0;
+            }
             child.material.needsUpdate = true
         }
     })
@@ -134,7 +138,7 @@ export function findMaterialByName(object, materialName) {
         if (object.material.name === materialName) {
             return object.material;
         }
-        
+
         // Se è un array di materiali (per geometrie multi-materiale)
         if (Array.isArray(object.material)) {
             for (let material of object.material) {
@@ -144,7 +148,7 @@ export function findMaterialByName(object, materialName) {
             }
         }
     }
-    
+
     // Ricerca ricorsiva nei children
     for (let child of object.children) {
         const foundMaterial = findMaterialByName(child, materialName);
@@ -152,7 +156,7 @@ export function findMaterialByName(object, materialName) {
             return foundMaterial;
         }
     }
-    
+
     // Non trovato
     return null;
 }
