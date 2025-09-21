@@ -52,15 +52,18 @@ export default function SvgIcon(props) {
       role="img"
       aria-label={props.alt ?? "icon"}
       style={{
-        width: `${props.size ?? props.sizeX ?? 24}px`,
-        height: `${props.size ?? props.sizeY ?? 24}px`,
+        ...(props.size || props.sizeX ? { width: `${props.size ?? props.sizeX}px` } : {}),
+        ...(props.size || props.sizeY ? { height: `${props.size ?? props.sizeY}px` } : {}),
         color: props.color ?? "currentColor",
       }}
     >
       {/* Quando la resource è pronta, innerHTML riceve UNA stringa, non una Promise */}
-      <div style={{
-        transform: props.translateY ? `translateY(${props.translateY}em)` : undefined,
-      }} innerHTML={processed()} />
+      <div
+        style={{
+          transform: props.translateY ? `translateY(${props.translateY}em)` : undefined,
+        }}
+        innerHTML={processed()}
+      />
     </Wrapper>
   );
 }

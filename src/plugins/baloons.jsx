@@ -39,7 +39,7 @@ let arrow = null;
 let isArrowFlying = false;
 let score = 0;
 let maxGameTime = 30000;
-const dartBonus = 5;
+const arrowsBonus = 5;
 let interval;
 // let arrowsLeft = 10;
 // let isPlaying = true;
@@ -56,7 +56,6 @@ export default function Baloons(props) {
 
 
     // GAME variables
-    const [remainingArrow, setRemainingArrow] = createSignal(0);
     const [arrowsLeft, setArrowsLeft] = createSignal(10);
     const [explodedBalloons, setExplodedBalloons] = createSignal(0);
     const [remainingTime, setRemainingTime] = createSignal(maxGameTime);
@@ -136,7 +135,7 @@ export default function Baloons(props) {
     onMount(async () => {
 
         // load model
-        await game.loader.load("models/balloon.glb");
+        await game.loader.load("models/demo/Balloons/balloon.glb");
 
         // load audio
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
@@ -153,8 +152,9 @@ export default function Baloons(props) {
             game.setGameData(defaultGameData);
         }
 
-        // setup game
-        setRemainingArrow(game.gameData().length + dartBonus);
+        // // setup game
+        // setRemainingArrow(game.gameData().length + arrowsBonus);
+        // console.log("++++ NE RIMANGONO: ", remainingArrow());
 
         // reset
         setLastSavedGameData([...game.gameData()]);
@@ -473,6 +473,9 @@ export default function Baloons(props) {
     function launchArrow() {
         if (isArrowFlying || arrowsLeft() <= 0) return;
 
+        if (playerState() !== PLAYER_STATE.RUNNING) return;
+
+
         console.log("launchArrow")
 
         whooshAudio.play();
@@ -701,10 +704,10 @@ export default function Baloons(props) {
     const AuthorUI = () => {
         return (
             <>
-                <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+                {/* <button onClick={() => spawnModelOnTap()}>SPAWN!</button> */}
                 <Info>
                     <Info style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40} />
+                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
                         {game.gameData().length}
                     </Info>
                 </Info>
@@ -733,11 +736,11 @@ export default function Baloons(props) {
                         {arrowsLeft()}
                     </Info>
                     <Info style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={40} />
+                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={25} />
                         {explodedBalloons()} / {game.gameData().length}
                     </Info>
                     <Info style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={25} />
+                        <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={20} />
                         {remainingTime() / 1000}
                     </Info>
                 </Info>

@@ -5,8 +5,10 @@ export function RecreateMaterials(
     options = {
         aoMap: null,
         aoMapIntensity: 1,
+        aoMapChannel: 0,
         lightMap: null,
         lightMapIntensity: 1,
+        lightMapChannel: 0
     }
 ) {
     model.traverse((child) => {
@@ -33,7 +35,9 @@ export function RecreateMaterials(
                 metalness: child.material.metalness,
                 roughness: child.material.roughness,
             })
-            child.material = mat
+            child.material = mat;
+            if (child.material.aoMap) child.material.aoMap.channel = options.aoMapChannel;
+            if (child.material.lightMap) child.material.lightMap.channel = options.lightMapChannel;
             child.material.needsUpdate = true
         }
     })
