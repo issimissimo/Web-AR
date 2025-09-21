@@ -11,7 +11,7 @@ import { Container } from '@components/smallElements';
 import SvgIcon from '@components/SvgIcon';
 import * as THREE from 'three';
 import { config } from '@js/config';
-import { GlbLoader, LoadGLB } from '@tools/three/modelTools';
+import { LoadGLB } from '@tools/three/modelTools';
 import { LoadTexture } from '@tools/three/textureTools';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 
@@ -43,6 +43,7 @@ let maxGameTime = 30000;
 const arrowsBonus = 5;
 let interval;
 let arrowModel = null;
+let balloonModel = null;
 // let arrowsLeft = 10;
 // let isPlaying = true;
 
@@ -137,19 +138,20 @@ export default function Baloons(props) {
     onMount(async () => {
 
         // load balloon model
-        await game.loader.load("models/demo/Balloons/balloon.glb");
         const balloonAoTexture = await new LoadTexture("models/demo/Balloons/balloon_AO.webp", {
             flipY: false
         });
+        balloonModel = await new LoadGLB("models/demo/Balloons/balloon.glb", {
+            aoMap: balloonAoTexture
+        });
+
+        //TODO- questa non la vogliamo più usare!
+        await game.loader.load("models/demo/Balloons/balloon.glb");
 
         // load dart model
         const arrowAoTexture = await new LoadTexture("models/demo/Balloons/dart_AO.webp", {
             flipY: false
         });
-        // const glbLoader = new GlbLoader();
-        // arrowModel = await glbLoader.load("models/demo/Balloons/dart.glb", {
-        //     aoMap: arrowAoTexture,
-        // })
         arrowModel = await new LoadGLB("models/demo/Balloons/dart.glb", {
             aoMap: arrowAoTexture
         });
@@ -174,7 +176,7 @@ export default function Baloons(props) {
         // setRemainingArrow(game.gameData().length + arrowsBonus);
         // console.log("++++ NE RIMANGONO: ", remainingArrow());
 
-        loadEnv();
+        // loadEnv();
 
 
 
