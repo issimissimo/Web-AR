@@ -11,7 +11,7 @@ import { Container } from '@components/smallElements';
 import SvgIcon from '@components/SvgIcon';
 import * as THREE from 'three';
 import { config } from '@js/config';
-import { LoadGLB } from '@tools/three/modelTools';
+import { GlbLoader, LoadGLB } from '@tools/three/modelTools';
 import { LoadTexture } from '@tools/three/textureTools';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 
@@ -44,6 +44,7 @@ const arrowsBonus = 5;
 let interval;
 let arrowModel = null;
 let balloonModel = null;
+let balloonLoader = new GlbLoader();
 // let arrowsLeft = 10;
 // let isPlaying = true;
 
@@ -141,12 +142,15 @@ export default function Baloons(props) {
         const balloonAoTexture = await new LoadTexture("models/demo/Balloons/balloon_AO.webp", {
             flipY: false
         });
-        balloonModel = await new LoadGLB("models/demo/Balloons/balloon.glb", {
-            aoMap: balloonAoTexture
+        await balloonLoader.load("models/demo/Balloons/balloon.glb", {
+            aoMap: balloonAoTexture,
+            aoMapChannel: 1
         });
+        
 
         //TODO- questa non la vogliamo più usare!
         await game.loader.load("models/demo/Balloons/balloon.glb");
+
 
         // load dart model
         const arrowAoTexture = await new LoadTexture("models/demo/Balloons/dart_AO.webp", {
@@ -155,7 +159,7 @@ export default function Baloons(props) {
         arrowModel = await new LoadGLB("models/demo/Balloons/dart.glb", {
             aoMap: arrowAoTexture
         });
-        
+
 
         // load audio
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
@@ -274,6 +278,8 @@ export default function Baloons(props) {
 
             game.loader.animate();
 
+            balloonLoader.animate();
+
             if (game.appMode == "load") {
 
                 if (playerState() === PLAYER_STATE.RUNNING) {
@@ -325,7 +331,17 @@ export default function Baloons(props) {
             for (let i = currentIndex; i < endIndex; i++) {
                 const assetData = gameData[i];
 
-                let newModel = game.loader.clone({ randomizeTime: true });
+
+                // let newModel = game.loader.clone({ randomizeTime: true });
+                let newModel = balloonLoader.clone({ randomizeTime: true });
+
+
+                // console.log(">>>>>>>>>", balloonModel)
+                // const CLONETEST = balloonModel.createClone({ aaaaa: true });
+                // console.log(">>>>>>>>>>>>>>>>>>>", CLONETEST)
+
+
+
                 // newModel = RecreateMaterials(newModel); // Important!!!
                 newModel.matrixAutoUpdate = false;
 

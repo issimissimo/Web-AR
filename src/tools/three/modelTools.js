@@ -28,7 +28,9 @@ export class GlbLoader {
         // and in AR it get worse!!!
         this.model = RecreateMaterials(this.model, {
             aoMap: options.aoMap || null,
+            aoMapChannel: options.aoMapChannel || 0,
             lightMap: options.lightMap || null,
+            lightMapChannel: options.lightMapChannel || 0,
         });
 
         this._setupAnimations(this.model, randomizeTime);
@@ -121,11 +123,11 @@ export class LoadGLB {
     }
 
     async _init() {
-        this.model = await this.loadModel();
+        this.model = await this._loadModel();
         return this.model;
     }
 
-    async loadModel() {
+    async _loadModel() {
         const randomizeTime = this.options.randomizeTime ?? false;
         this.gltf = await this.loader.loadAsync(this.fileUrl);
 
@@ -144,7 +146,8 @@ export class LoadGLB {
         return model;
     }
 
-    clone(options = {}) {
+    createClone(options = {}) {
+        console.log("STO CLONANDO!!!!!")
         const randomizeTime = options.randomizeTime ?? false;
         const newModel = this.model.clone(true);
 
@@ -152,7 +155,8 @@ export class LoadGLB {
         if (options.rotation) newModel.rotation.copy(options.rotation);
         if (options.scale) newModel.scale.copy(options.scale);
 
-        this._setupAnimations(newModel, randomizeTime);
+        // this._setupAnimations(newModel, randomizeTime);
+        this._setupAnimations(newModel);
 
         return newModel;
     }
