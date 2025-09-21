@@ -11,7 +11,7 @@ import { Container } from '@components/smallElements';
 import SvgIcon from '@components/SvgIcon';
 import * as THREE from 'three';
 import { config } from '@js/config';
-import { GlbLoader } from '@tools/three/modelTools';
+import { GlbLoader, LoadGLB } from '@tools/three/modelTools';
 import { LoadTexture } from '@tools/three/textureTools';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 
@@ -146,12 +146,14 @@ export default function Baloons(props) {
         const arrowAoTexture = await new LoadTexture("models/demo/Balloons/dart_AO.webp", {
             flipY: false
         });
-        const glbLoader = new GlbLoader();
-        arrowModel = await glbLoader.load("models/demo/Balloons/dart.glb")
-        arrowModel = RecreateMaterials(arrowModel, {
-            aoMap: arrowAoTexture,
-            aoMapIntensity: 2,
+        // const glbLoader = new GlbLoader();
+        // arrowModel = await glbLoader.load("models/demo/Balloons/dart.glb", {
+        //     aoMap: arrowAoTexture,
+        // })
+        arrowModel = await new LoadGLB("models/demo/Balloons/dart.glb", {
+            aoMap: arrowAoTexture
         });
+        
 
         // load audio
         popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg");
