@@ -43,11 +43,12 @@ let maxGameTime = 30000;
 const arrowsBonus = 5;
 let interval;
 let arrowModel = null;
-let balloonModel = null;
-let balloonLoader = new GlbLoader();
+// let balloonModel = null;
+// let balloonLoader = new GlbLoader();
 // let arrowsLeft = 10;
 // let isPlaying = true;
 
+let arrowGlb;
 let balloonGlb;
 
 
@@ -144,10 +145,10 @@ export default function Baloons(props) {
         const balloonAoTexture = await new LoadTexture("models/demo/Balloons/balloon_AO.webp", {
             flipY: false
         });
-        await balloonLoader.load("models/demo/Balloons/balloon.glb", {
-            aoMap: balloonAoTexture,
-            aoMapChannel: 1
-        });
+        // await balloonLoader.load("models/demo/Balloons/balloon.glb", {
+        //     aoMap: balloonAoTexture,
+        //     aoMapChannel: 1
+        // });
 
 
 
@@ -159,18 +160,26 @@ export default function Baloons(props) {
 
 
 
-        //TODO- questa non la vogliamo più usare! -- NON E' VERO!!...
-        await game.loader.load("models/demo/Balloons/balloon.glb");
+        // //TODO- questa non la vogliamo più usare! -- NON E' VERO!!...
+        // await game.loader.load("models/demo/Balloons/balloon.glb");
+
+
 
 
         // load dart model
         const arrowAoTexture = await new LoadTexture("models/demo/Balloons/dart_AO.webp", {
             flipY: false
         });
-        //todo- USARE "GLBlOADER ANZICHè' lOADgLB"
-        arrowModel = await new LoadGLB("models/demo/Balloons/dart.glb", {
+        
+        // arrowModel = await new LoadGLB("models/demo/Balloons/dart.glb", {
+        //     aoMap: arrowAoTexture
+        // });
+
+        arrowGlb = await new GLBFile("models/demo/Balloons/dart.glb", {
             aoMap: arrowAoTexture
         });
+        arrowModel = arrowGlb.model;
+
 
 
         // load audio
@@ -286,11 +295,40 @@ export default function Baloons(props) {
     * LOOP
     */
     function loop() {
-        if (game.loader.loaded()) {
+        // if (game.loader.loaded()) {
 
-            game.loader.animate();
+        //     game.loader.animate();
 
-            balloonLoader.animate();
+        //     balloonLoader.animate();
+
+        //     if (game.appMode == "load") {
+
+        //         if (playerState() === PLAYER_STATE.RUNNING) {
+
+        //             updateArrow();
+
+
+
+        //             if (currentTime() <= 0) endGameLooser();
+
+
+        //             // // ✅ NUOVO: Aggiorna posizione freccia se non sta volando
+        //             // if (!isArrowFlying && arrow) {
+        //             //     const offset = new THREE.Vector3(0, -0.2, -0.3);
+        //             //     arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
+        //             //     arrow.rotation.copy(SceneManager.camera.rotation);
+        //             // }
+
+        //         }
+        //     }
+        // }
+        if (props.enabled) {
+
+            // game.loader.animate();
+
+            // balloonLoader.animate();
+
+            balloonGlb.animate();
 
             if (game.appMode == "load") {
 
@@ -312,10 +350,6 @@ export default function Baloons(props) {
 
                 }
             }
-
-
-
-
         }
 
     }
@@ -345,7 +379,7 @@ export default function Baloons(props) {
 
 
                 // let newModel = game.loader.clone({ randomizeTime: true });
-                let newModel = balloonLoader.clone({ randomizeTime: true });
+                let newModel = balloonGlb.clone({ randomizeTime: true });
 
 
                 // console.log(">>>>>>>>>", balloonModel)
@@ -444,7 +478,7 @@ export default function Baloons(props) {
         console.log("SPAWN...", p)
 
         // clone model on hitMatrix with random Y rotation
-        const newModel = game.loader.clone({
+        const newModel = balloonGlb.clone({
             position: new Vector3().setFromMatrixPosition(Reticle.getHitMatrix()),
             rotation: new Euler(0, Math.random() * Math.PI * 2, 0),
             randomizeTime: true
@@ -788,7 +822,7 @@ export default function Baloons(props) {
     const AuthorUI = () => {
         return (
             <>
-                {/* <button onClick={() => spawnModelOnTap()}>SPAWN!</button> */}
+                <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
                 <Info>
                     <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
@@ -813,7 +847,7 @@ export default function Baloons(props) {
     const UserUI = () => {
         return (
             <Container>
-                {/* <button onClick={() => launchArrow()}>ARROW</button> */}
+                <button onClick={() => launchArrow()}>ARROW</button>
 
                 {(() => {
                     switch (playerState()) {
