@@ -45,6 +45,8 @@ let _reticleDirection = new Vector3();
 
 let _initialized = false;
 
+let _backup = {};
+
 
 function _addPlaneForReticleSurface() {
     _geomLookAt = new PlaneGeometry(0.1, 0.1);
@@ -237,7 +239,7 @@ const Reticle = {
         if (_workingMode === this.WORKING_MODE.TARGET) {
             _camera.position.copy(SceneManager.camera.position);
             _camera.quaternion.copy(SceneManager.camera.quaternion);
-            
+
             _reticleMesh.visible = false;
             _circleMesh.visible = _circleMesh._shouldDisplay;
         }
@@ -451,7 +453,26 @@ const Reticle = {
         _workingMode = workingMode;
     },
 
+    // backup current setup
+    backup() {
+        const currentSetup = {
+            workingMode: _workingMode,
+            surfType: _surfTypeMode,
+            meshType: _meshType,
+            enabled: _enabled,
+            visible: _reticleMesh._shouldDisplay || _circleMesh._shouldDisplay ? true : false
+        };
+        _backup = currentSetup;
+    },
 
+    // restore last setup
+    restore() {
+        this.setWorkingMode(_backup.workingMode);
+        this.setSurfType(_backup.surfType);
+        this.setEnabled(_backup.enabled);
+        this.setVisible(_backup.visible);
+        this.setup(_backup.meshType);
+    }
 }
 
 export default Reticle;   

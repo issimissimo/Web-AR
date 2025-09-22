@@ -7,6 +7,8 @@ import Toolbar from '@views/ar-overlay/Toolbar';
 import { config } from '@js/config';
 import * as THREE from "three";
 import SceneManager from '@js/sceneManager';
+import HorizontalSlider from '@views/ar-overlay/HorizontalSlider';
+import ColorPicker from '@views/ar-overlay/ColorPicker';
 
 
 const defaultGameData = [];
@@ -42,7 +44,10 @@ export default function pointLights(props) {
     });
 
 
+    const [intensity, setIntensity] = createSignal(5);
+    const [color, setColor] = createSignal('#ff0000');
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
+
 
     const hasUnsavedChanges = createMemo(() =>
         JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
@@ -126,7 +131,15 @@ export default function pointLights(props) {
                 console.log("defaultLight tornata!")
             }
         }
-    })
+    });
+
+
+    // createEffect(() => {
+    //     console.log(intensity())
+    // })
+    // createEffect(() => {
+    //     console.log(color())
+    // })
 
 
     const handleSave = async () => {
@@ -140,8 +153,8 @@ export default function pointLights(props) {
     // spawn light on TAP
     function spawnModelOnTap() {
         const lightPosition = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix());
-        const lightColor = 16711680;
-        const lightIntensity = 20;
+        const lightColor = color();
+        const lightIntensity = intensity();
 
         createLight(lightPosition, lightColor, lightIntensity);
 
@@ -230,13 +243,17 @@ export default function pointLights(props) {
             <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
             {
                 props.enabled && (
-                    <Toolbar
-                        buttons={["undo", "save"]}
-                        onUndo={handleUndo}
-                        onSave={handleSave}
-                        undoActive={game.gameData().length > 0}
-                        saveActive={hasUnsavedChanges()}
-                    />
+                    <>
+                        <ColorPicker color={color} setColor={setColor} />
+                        <HorizontalSlider value={intensity} setValue={setIntensity} />
+                        <Toolbar
+                            buttons={["undo", "save"]}
+                            onUndo={handleUndo}
+                            onSave={handleSave}
+                            undoActive={game.gameData().length > 0}
+                            saveActive={hasUnsavedChanges()}
+                        />
+                    </>
                 )
             }
         </>
