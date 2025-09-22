@@ -44,6 +44,7 @@ export default function pointLights(props) {
     });
 
 
+    const [currentLight, setCurrentLight] = createSignal(null);
     const [intensity, setIntensity] = createSignal(5);
     const [color, setColor] = createSignal('#ff0000');
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
@@ -134,13 +135,15 @@ export default function pointLights(props) {
     });
 
 
-    // createEffect(() => {
-    //     console.log(intensity())
-    // })
-    // createEffect(() => {
-    //     console.log(color())
-    // })
+    createEffect(() => {
+        if (currentLight()) {
+            console.log(intensity());
+            console.log(color());
+            currentLight().intensity = intensity();
+            currentLight().color = new THREE.Color(color());
+        }
 
+    })
 
     const handleSave = async () => {
         // save data
@@ -156,7 +159,9 @@ export default function pointLights(props) {
         const lightColor = color();
         const lightIntensity = intensity();
 
-        createLight(lightPosition, lightColor, lightIntensity);
+        const _light = createLight(lightPosition, lightColor, lightIntensity);
+        setCurrentLight(_light);
+        console.log("currentLight:", currentLight())
 
         // get the difference from positions
         const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
@@ -204,6 +209,8 @@ export default function pointLights(props) {
         const pointLightHelper = new THREE.PointLightHelper(newLight, 0.1);
         pointLightHelper.name = "helper";
         game.addToScene(pointLightHelper);
+
+        return newLight;
     }
 
 
@@ -241,11 +248,31 @@ export default function pointLights(props) {
 
         <>
             <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+            {/* <button onClick={() => {
+                if (currentLight()) {
+
+                    console.log("PRIMA:", currentLight())
+                    // console.log("newcolor:", color())
+
+                    const newColor = new THREE.Color(color());
+                    console.log("newcolor:", newColor)
+
+                    currentLight().color = newColor;
+                    // console.log("DOPO:", currentLight())
+                }
+            }}>SET COLOR</button> */}
+
             {
                 props.enabled && (
                     <>
-                        <ColorPicker color={color} setColor={setColor} />
-                        <HorizontalSlider value={intensity} setValue={setIntensity} />
+                        {currentLight() && (
+                            <>
+                                <ColorPicker color={color} setColor={setColor} />
+                                <HorizontalSlider value={intensity} setValue={setIntensity} />
+                                <button onClick={() => console.log("DONE")}>DONE</button>
+                            </>
+                        )}
+
                         <Toolbar
                             buttons={["undo", "save"]}
                             onUndo={handleUndo}
