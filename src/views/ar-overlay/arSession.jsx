@@ -139,10 +139,10 @@ export default function ArSession(props) {
         }
     })
 
-     createEffect(() => {
+    createEffect(() => {
         console.log("---- Games running:", props.gamesRunning)
         // // console.log("---- Games imported:", gamesImported());
-        
+
     })
 
 
@@ -166,15 +166,16 @@ export default function ArSession(props) {
     * Load all the games (as bundles) of the marker.
     * In this way we keep the main bundle as small as possible!
     */
-    async function loadAllModules() {
+    function loadAllModules() {
         for (const el of props.marker.games) {
             if (el.enabled) {
 
                 // load dynamically the module
-                await loadModule(el.id, el.name);
+                // await loadModule(el.id, el.name);
+                loadModule(el.id, el.name);
             }
         }
-        setLoading(() => false);
+        // setLoading(() => false);
     }
 
 
@@ -231,14 +232,75 @@ export default function ArSession(props) {
 
         _gamesInitialized++;
 
-        // When all games have finished to load their assets...
-        if (_gamesInitialized === modules().length) {
+        checkAllGamesReady();
 
+        // // When all games have finished to load their assets...
+        // if (_gamesInitialized === modules().length) {
+
+        //     // Here before to proceed WE MUST WAIT for all props.gamesRunning
+        //     // are set too, because it can happen that are intialized BEFORE that are set!!!
+
+
+
+
+        //     console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+
+
+        //     console.log("all games initialized!")
+        //     setGamesInitialized(true);
+
+        //     // it should not be necessary here... :/
+        //     updateClickableDomElements();
+
+
+        //     console.log("props.gamesRunning", props.gamesRunning)
+
+
+        //     // If just one of the game need localization,
+        //     // we need to show the Localization component
+        //     // as soon as all the games initialized
+
+        //     for (let i = 0; i < props.gamesRunning.length; i++) {
+
+
+
+        //         const _game = props.gamesRunning[i];
+
+        //         const gameSpecs = PLUGINS_LIST.find(g => g.fileName === _game.name);
+        //         if (gameSpecs.localized && localizationState() !== LOCALIZATION_STATE.COMPLETED) {
+
+        //             console.log("============= ", _game.name, "RICHIEDE LOCALIZZAZIONE!!")
+
+        //             // Hide all the meshes of all the games
+        //             setGamesVisible(false);
+        //             // Show the Localization view
+        //             setLocalizationState(() => LOCALIZATION_STATE.REQUIRED);
+
+        //             break;
+        //         }
+        //         else{
+        //             console.log("============= ", _game.name, "NON RICHIEDE LOCALIZZAZIONE...")
+        //         }
+        //     }
+
+        //     console.log("OOOOOOOOOOOOOOOOOOOOOO --------------   OOOOOOOOOOOOOOOOOO")
+        // }
+    }
+
+
+    const checkAllGamesReady = () => {
+
+        // When all games have finished to load their assets
+        // AND all props.gamesRunning are set
+        // (I need to check props.gamesRunning too because if initialization
+        // is too quick often the game it's not yet set in props.gamesRunning...!)
+        if (_gamesInitialized === modules().length &&
+            props.gamesRunning.length === modules().length) {
 
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
 
-            console.log("all games initialized!")
+            console.log("all games initialized and set!")
             setGamesInitialized(true);
 
             // it should not be necessary here... :/
@@ -254,7 +316,7 @@ export default function ArSession(props) {
 
             for (let i = 0; i < props.gamesRunning.length; i++) {
 
-                
+
 
                 const _game = props.gamesRunning[i];
 
@@ -262,7 +324,7 @@ export default function ArSession(props) {
                 if (gameSpecs.localized && localizationState() !== LOCALIZATION_STATE.COMPLETED) {
 
                     console.log("============= ", _game.name, "RICHIEDE LOCALIZZAZIONE!!")
-                    
+
                     // Hide all the meshes of all the games
                     setGamesVisible(false);
                     // Show the Localization view
@@ -270,7 +332,7 @@ export default function ArSession(props) {
 
                     break;
                 }
-                else{
+                else {
                     console.log("============= ", _game.name, "NON RICHIEDE LOCALIZZAZIONE...")
                 }
             }
