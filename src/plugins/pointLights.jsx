@@ -55,12 +55,16 @@ export default function pointLights(props) {
     */
     onMount(async () => {
 
-        // Setup data
+        // load data
         await game.loadGameData();
+
+        // set default data if no data are saved
         if (!game.gameData()) {
-            console.log("siccome non abbiamo caricato niente settiamo i dati di default")
-            // load default data
             game.setGameData(defaultGameData);
+        }
+        // or setup the lights from data
+        else {
+            loadLights();
         }
 
         // reset
@@ -86,38 +90,68 @@ export default function pointLights(props) {
     };
 
 
+    // setup Reticle as soon as this game is enabled
     createEffect(() => {
         if (props.enabled) {
             console.log("POINTLIGHTS ENABLED:", props.enabled)
 
-            // remove or add default light
-            const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
-            if (game.gameData().length > 0) {
-                if (defaultLight) {
-                    SceneManager.scene.remove(SceneManager.light);
-                    console.log("defaultLight rimossa!")
-                }
+
+            if (game.appMode === "save" || config.debugOnDesktop) {
+                Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
+                Reticle.setEnabled(true);
+                Reticle.setVisible(true);
             }
             else {
-                if (!defaultLight) {
-                    SceneManager.scene.add(SceneManager.light);
-                    console.log("defaultLight tornata!")
-                }
+                Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
             }
 
+            // // remove or add default light
+            // const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
+            // if (game.gameData().length > 0) {
+            //     if (defaultLight) {
+            //         SceneManager.scene.remove(SceneManager.light);
+            //         console.log("defaultLight rimossa!")
+            //     }
+            // }
+            // else {
+            //     if (!defaultLight) {
+            //         SceneManager.scene.add(SceneManager.light);
+            //         console.log("defaultLight tornata!")
+            //     }
+            // }
 
 
 
-            // I reeally should NOT do this... wtf... ????
-            // ...don't know why it's called 
-            if (enabled) return;
-            enabled = true;
 
-            setupScene();
-            console.log(SceneManager.scene)
-            console.log(SceneManager.light)
+            // // I reeally should NOT do this... wtf... ????
+            // // ...don't know why it's called 
+            // if (enabled) return;
+            // enabled = true;
+
+            // setupScene();
         }
     });
+
+
+    // remove or add default light when data change
+    createEffect(() => {
+
+        if (!game.gameData()) return;
+
+        const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
+        if (game.gameData().length > 0) {
+            if (defaultLight) {
+                SceneManager.scene.remove(SceneManager.light);
+                console.log("defaultLight rimossa!")
+            }
+        }
+        else {
+            if (!defaultLight) {
+                SceneManager.scene.add(SceneManager.light);
+                console.log("defaultLight tornata!")
+            }
+        }
+    })
 
 
     const handleSave = async () => {
@@ -128,29 +162,27 @@ export default function pointLights(props) {
     };
 
 
-    /*
-    * SETUP SCENE
-    */
-    function setupScene() {
-        console.log("***** pointLights - setup")
+    // /*
+    // * SETUP SCENE
+    // */
+    // function setupScene() {
+    //     console.log("***** pointLights - setup")
 
-        if (game.appMode === "save" || config.debugOnDesktop) {
-            Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
-            Reticle.setEnabled(true);
-            Reticle.setVisible(true);
-        }
-        else {
-            Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
-        }
+    //     if (game.appMode === "save" || config.debugOnDesktop) {
+    //         Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
+    //         Reticle.setEnabled(true);
+    //         Reticle.setVisible(true);
+    //     }
+    //     else {
+    //         Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
+    //     }
 
-        // just to be sure...
-        game.removeAllFromScene();
 
-        if (game.gameData().length > 0) {
-            loadLights();
-        }
+    //     // if (game.gameData().length > 0) {
+    //     //     loadLights();
+    //     // }
 
-    }
+    // }
 
 
     // /*

@@ -49,6 +49,7 @@ export default function ArSession(props) {
     const [blurShowHole, setBlurShowHole] = createSignal(false);
 
     let _tapEnabled = true;
+    let _modulesToLoad = 0;
     let _gamesInitialized = 0;
 
 
@@ -100,6 +101,7 @@ export default function ArSession(props) {
             firebase.firestore.updateMarkerViews(props.userId, props.marker.id);
         }
 
+        //TODO - questo lo spostiamo quando sono tutti pronti
         // On TAP on screen
         // event listener
         SceneManager.controller.addEventListener("select", () => {
@@ -116,33 +118,34 @@ export default function ArSession(props) {
 
         // Load games of this marker
         if (props.marker.games.length > 0) {
+            // _modulesToLoad = props.marker.games.length;
             loadAllModules();
         }
         else {
-            setLoading(() => false);
+            //TODO - here we must move on...
+            // setLoading(() => false);
+
+            // Bypass all the check for initialization
+            // and props.runningGames count
+            console.log("=== ArSession: no games in this marker, let's set gamesInitialized = true")
+            setGamesInitialized(true);
         }
     });
 
 
     createEffect(() => {
-        // console.log("---- Games running:", props.gamesRunning)
-        // // console.log("---- Games imported:", gamesImported());
-        // console.log("---- Game id selected:", selectedGameId());
-
-        // console.log(">>>>>localizationState:", localizationState())
-        // // console.log("---- Games initializing:", gamesInitializing());
-        // console.log("AAAAHHHH:", referenceMatrix())
         if (gamesInitialized() && initDetectionCompleted() &&
             localizationState() !== LOCALIZATION_STATE.REQUIRED) {
-            console.log("------------ ADESSO SONO ENABLED!")
+            console.log("=== ArSession: all requirements to set gamesEnabled = true")
             setGamesEnabled(true);
         }
     })
 
     createEffect(() => {
-        console.log("---- Games running:", props.gamesRunning)
-        // // console.log("---- Games imported:", gamesImported());
-
+        if (props.gamesRunning.length > 0) {
+            console.log("=== ArSession: Games running changed:", props.gamesRunning)
+            checkAllGamesReady();
+        }
     })
 
 
@@ -153,13 +156,14 @@ export default function ArSession(props) {
     */
     createEffect(() => {
         if (props.planeFound) {
-            setInitDetectionCompleted(() => true);
+            console.log("=== ArSession: plane is found, so we can set initDetectionCompleted = true")
+            setInitDetectionCompleted(true);
         }
     })
 
-    createEffect(() => {
-        console.log("UEEE GUARDA INIT DETECTION!!!...", initDetectionCompleted())
-    })
+    // createEffect(() => {
+    //     console.log("UEEE GUARDA INIT DETECTION!!!...", initDetectionCompleted())
+    // })
 
 
     /**
@@ -169,6 +173,8 @@ export default function ArSession(props) {
     function loadAllModules() {
         for (const el of props.marker.games) {
             if (el.enabled) {
+
+                _modulesToLoad ++;
 
                 // load dynamically the module
                 // await loadModule(el.id, el.name);
@@ -202,7 +208,7 @@ export default function ArSession(props) {
         // Show all the meshes of all the games
         setGamesVisible(true);
 
-        console.log("LOCALIZATION COMPLETED! Matrix:", referenceMatrix());
+        console.log("=== ArSession: LOCALIZATION COMPLETED! Matrix:", referenceMatrix())
         setLocalizationState(() => LOCALIZATION_STATE.COMPLETED);
     }
 
@@ -215,8 +221,8 @@ export default function ArSession(props) {
     * to display the UI of each module!)
     */
     const handleModuleLoaded = (el) => {
+        // add to props.gameRunning
         props.addGame(el);
-
         // update the DOM elements that can be clicked
         updateClickableDomElements();
     };
@@ -229,85 +235,33 @@ export default function ArSession(props) {
     * to hide the initializing component message
     */
     const handleGameInitialized = () => {
-
         _gamesInitialized++;
-
         checkAllGamesReady();
-
-        // // When all games have finished to load their assets...
-        // if (_gamesInitialized === modules().length) {
-
-        //     // Here before to proceed WE MUST WAIT for all props.gamesRunning
-        //     // are set too, because it can happen that are intialized BEFORE that are set!!!
-
-
-
-
-        //     console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-
-
-        //     console.log("all games initialized!")
-        //     setGamesInitialized(true);
-
-        //     // it should not be necessary here... :/
-        //     updateClickableDomElements();
-
-
-        //     console.log("props.gamesRunning", props.gamesRunning)
-
-
-        //     // If just one of the game need localization,
-        //     // we need to show the Localization component
-        //     // as soon as all the games initialized
-
-        //     for (let i = 0; i < props.gamesRunning.length; i++) {
-
-
-
-        //         const _game = props.gamesRunning[i];
-
-        //         const gameSpecs = PLUGINS_LIST.find(g => g.fileName === _game.name);
-        //         if (gameSpecs.localized && localizationState() !== LOCALIZATION_STATE.COMPLETED) {
-
-        //             console.log("============= ", _game.name, "RICHIEDE LOCALIZZAZIONE!!")
-
-        //             // Hide all the meshes of all the games
-        //             setGamesVisible(false);
-        //             // Show the Localization view
-        //             setLocalizationState(() => LOCALIZATION_STATE.REQUIRED);
-
-        //             break;
-        //         }
-        //         else{
-        //             console.log("============= ", _game.name, "NON RICHIEDE LOCALIZZAZIONE...")
-        //         }
-        //     }
-
-        //     console.log("OOOOOOOOOOOOOOOOOOOOOO --------------   OOOOOOOOOOOOOOOOOO")
-        // }
     }
 
 
     const checkAllGamesReady = () => {
 
+        
+        console.log("=== ArSession: checkAllGamesReady")
+        console.log("======= modules to load:", _modulesToLoad)
+        console.log("======= games initialized:", _gamesInitialized)
+        console.log("======= games running:", props.gamesRunning.length)
+
         // When all games have finished to load their assets
         // AND all props.gamesRunning are set
         // (I need to check props.gamesRunning too because if initialization
         // is too quick often the game it's not yet set in props.gamesRunning...!)
-        if (_gamesInitialized === modules().length &&
-            props.gamesRunning.length === modules().length) {
+        if (_gamesInitialized === _modulesToLoad &&
+            props.gamesRunning.length === _modulesToLoad) {
 
-            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+            
 
-
-            console.log("all games initialized and set!")
+            console.log("=== ArSession: all games initialized and set!!!")
             setGamesInitialized(true);
 
             // it should not be necessary here... :/
             updateClickableDomElements();
-
-
-            console.log("props.gamesRunning", props.gamesRunning)
 
 
             // If just one of the game need localization,
@@ -336,8 +290,7 @@ export default function ArSession(props) {
                     console.log("============= ", _game.name, "NON RICHIEDE LOCALIZZAZIONE...")
                 }
             }
-
-            console.log("OOOOOOOOOOOOOOOOOOOOOO --------------   OOOOOOOOOOOOOOOOOO")
+            
         }
     }
 
@@ -346,7 +299,7 @@ export default function ArSession(props) {
 
 
     /**
-    * This function is called when all games are initialized,
+    * This function is automatically called when all games are initialized,
     * but, since it's very unpredictable yo know the interactable DOM elements
     * on the page, it should be called also when something on the page change
     */
@@ -518,53 +471,51 @@ export default function ArSession(props) {
                 />
 
                 {
-                    loading() ? (<Loader />)
-                        :
-                        <>
-                            {!gamesInitialized() && <Loader text="Inizializzo" />}
+                    <>
+                        {!gamesInitialized() && <Loader text="Inizializzo" />}
 
 
-                            {/* GAMES */}
-                            <For each={modules()}>
-                                {item => {
-                                    const Component = item.component;
-                                    return <Component
-                                        id={item.id}
-                                        enabled={gamesEnabled()}
-                                        selected={gamesEnabled() && item.id === selectedGameId()}
-                                        referenceMatrix={referenceMatrix()}
-                                    />;
-                                }}
-                            </For>
+                        {/* GAMES */}
+                        <For each={modules()}>
+                            {item => {
+                                const Component = item.component;
+                                return <Component
+                                    id={item.id}
+                                    enabled={gamesEnabled()}
+                                    selected={gamesEnabled() && item.id === selectedGameId()}
+                                    referenceMatrix={referenceMatrix()}
+                                />;
+                            }}
+                        </For>
 
 
-                            {gamesInitialized() && (
+                        {gamesInitialized() && (
 
-                                !initDetectionCompleted() ?
+                            !initDetectionCompleted() ?
 
-                                    <InitialDetection />
+                                <InitialDetection />
+
+                                :
+
+                                localizationState() === LOCALIZATION_STATE.REQUIRED ?
+
+                                    <Localization
+                                        planeFound={props.planeFound}
+                                        setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
+                                    />
 
                                     :
 
-                                    localizationState() === LOCALIZATION_STATE.REQUIRED ?
+                                    props.appMode === AppMode.SAVE &&
 
-                                        <Localization
-                                            planeFound={props.planeFound}
-                                            setReferenceMatrix={(matrix) => handleLocalizationCompleted(matrix)}
-                                        />
-
-                                        :
-
-                                        props.appMode === AppMode.SAVE &&
-
-                                        <Inventory
-                                            marker={props.marker}
-                                            addNewModule={(id, name) => loadModule(id, name, false, true)}
-                                            saveEnabled={selectedGameId() !== null ? true : false}
-                                            saveGame={handleSaveSelectedGame}
-                                        />
-                            )}
-                        </>
+                                    <Inventory
+                                        marker={props.marker}
+                                        addNewModule={(id, name) => loadModule(id, name, false, true)}
+                                        saveEnabled={selectedGameId() !== null ? true : false}
+                                        saveGame={handleSaveSelectedGame}
+                                    />
+                        )}
+                    </>
                 }
             </Main>
         </Context.Provider>
