@@ -289,7 +289,7 @@ const Reticle = {
                         if (_surfTypeDetected !== _surfTypeMode) {
 
                             // Not the surface we are looking for!
-                            console.log("Not the surface we are looking for! - current _surfTypeMode:", _surfTypeMode)
+                            console.log("Not the surface we are looking for!")
                             _isHitting = false;
                             _reticleMesh.visible = false;
                             return false;
@@ -445,7 +445,6 @@ const Reticle = {
 
     setSurfType(surfType) {
         _surfTypeMode = surfType;
-        console.log("----->>>>>> NUOVO SURF TYPE:", _surfTypeMode)
     },
 
     setWorkingMode(workingMode) {

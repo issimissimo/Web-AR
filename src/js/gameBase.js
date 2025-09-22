@@ -16,7 +16,7 @@ export function useGame(gameName, gameId, config = {}) {
     const firebase = useFirebase();
     const context = useContext(Context);
     const gameDetails = PLUGINS_LIST.find(g => g.fileName === gameName);
-    const gameAssets = [];
+    let gameAssets = [];
     const [initialized, setInitialized] = createSignal(false);
     const [gameData, setGameData] = createSignal(null);
 

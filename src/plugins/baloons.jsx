@@ -229,12 +229,14 @@ export default function Baloons(props) {
         switch (game.appMode) {
             case "save":
                 Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
+                Reticle.setEnabled(true);
                 Reticle.setVisible(true);
                 break;
 
             case "load":
                 if (config.debugOnDesktop) {
                     Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
+                    Reticle.setEnabled(true);
                     Reticle.setVisible(true);
                 }
                 else {
@@ -362,7 +364,6 @@ export default function Baloons(props) {
     * Spawn on TAP
     */
     function spawnModelOnTap() {
-        if (!props.enabled) return;
         const p = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix())
         console.log("SPAWN...", p)
 
@@ -670,7 +671,7 @@ export default function Baloons(props) {
     const AuthorUI = () => {
         return (
             <>
-                <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+                {/* <button onClick={() => spawnModelOnTap()}>SPAWN!</button> */}
                 <Info>
                     <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
@@ -695,7 +696,7 @@ export default function Baloons(props) {
     const UserUI = () => {
         return (
             <Container>
-                <button onClick={() => launchArrow()}>ARROW</button>
+                {/* <button onClick={() => launchArrow()}>ARROW</button> */}
 
                 {(() => {
                     switch (playerState()) {

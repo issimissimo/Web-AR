@@ -31,6 +31,28 @@ export const PLUGINS_CATEGORIES = [
 */
 
 export const PLUGINS_LIST = [
+     {
+        fileName: "pointLights",
+        title: "Luci puntiformi",
+        description: "Inserisci luci puntiformi",
+        icon: '/icons/360.svg',
+        category: 'Luci',
+        allowed: 1,
+        localized: true,
+        tags: [],
+        requirements: {}
+    },
+    {
+        fileName: "studioLights",
+        title: "Setup preimpostati di luci",
+        description: "Inserisci un setup preimpostato di luci",
+        icon: '/icons/360.svg',
+        category: 'Luci',
+        allowed: 1,    
+        localized: false,
+        tags: [],
+        requirements: {}
+    },
     {
         fileName: "envLight",
         title: "Luce HDRI",

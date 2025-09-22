@@ -47,14 +47,15 @@ export default function basicRotCube(props) {
     let cube, shadows;
     function setupScene() {
 
-        console.log("SETUP!")
-        Reticle.setEnabled(false);
+        console.log("***** basicRotCube - setup")
+        // Reticle.setEnabled(false);
 
-        const cubeGeometry = new BoxGeometry(0.5, 0.5, 0.5);
+        // const cubeGeometry = new BoxGeometry(0.2, 0.2, 0.2);
+        const cubeGeometry = new THREE.SphereGeometry(0.2, 16, 16);
         const cubeMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
         cube = new Mesh(cubeGeometry, cubeMaterial);
         cube.position.set(0, -0.5, -1);
-        // game.addToScene(cube);
+        game.addToScene(cube);
 
 
         // const light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
@@ -62,13 +63,13 @@ export default function basicRotCube(props) {
         // game.addToScene(light);
 
 
-        shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
-            position: new Vector3(0, -1, -1),
-            resolution: 512,
-            blur: 2,
-            animate: true,
-            updateFrequency: 2,
-        });
+        // shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
+        //     position: new Vector3(0, -1, -1),
+        //     resolution: 512,
+        //     blur: 2,
+        //     animate: true,
+        //     updateFrequency: 2,
+        // });
 
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
