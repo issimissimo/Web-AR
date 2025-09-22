@@ -10,7 +10,6 @@ import SceneManager from '@js/sceneManager';
 
 
 const defaultGameData = [];
-let enabled = false;
 
 
 export default function pointLights(props) {
@@ -28,6 +27,7 @@ export default function pointLights(props) {
 
                 switch (game.appMode) {
                     case "save":
+                        game.super.onTap(); // sound
                         spawnModelOnTap();
                         break;
 
@@ -80,17 +80,16 @@ export default function pointLights(props) {
     const handleUndo = () => {
         // super
         game.onUndo();
-        // remove last 2 from scene
+        // remove last 2 from scene (light and helper)
         game.removePreviousFromScene();
         game.removePreviousFromScene();
         // remove last from data
         game.setGameData(game.gameData().slice(0, -1));
-
-        console.log("UNDO! ->>", game.gameData());
     };
 
 
-    // setup Reticle as soon as this game is enabled
+    // setup Reticle
+    // as soon as this game is enabled
     createEffect(() => {
         if (props.enabled) {
             console.log("POINTLIGHTS ENABLED:", props.enabled)
@@ -104,36 +103,12 @@ export default function pointLights(props) {
             else {
                 Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
             }
-
-            // // remove or add default light
-            // const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
-            // if (game.gameData().length > 0) {
-            //     if (defaultLight) {
-            //         SceneManager.scene.remove(SceneManager.light);
-            //         console.log("defaultLight rimossa!")
-            //     }
-            // }
-            // else {
-            //     if (!defaultLight) {
-            //         SceneManager.scene.add(SceneManager.light);
-            //         console.log("defaultLight tornata!")
-            //     }
-            // }
-
-
-
-
-            // // I reeally should NOT do this... wtf... ????
-            // // ...don't know why it's called 
-            // if (enabled) return;
-            // enabled = true;
-
-            // setupScene();
         }
     });
 
 
-    // remove or add default light when data change
+    // remove or add default light
+    // when data change
     createEffect(() => {
 
         if (!game.gameData()) return;
@@ -160,36 +135,6 @@ export default function pointLights(props) {
         // reset
         setLastSavedGameData([...game.gameData()]);
     };
-
-
-    // /*
-    // * SETUP SCENE
-    // */
-    // function setupScene() {
-    //     console.log("***** pointLights - setup")
-
-    //     if (game.appMode === "save" || config.debugOnDesktop) {
-    //         Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
-    //         Reticle.setEnabled(true);
-    //         Reticle.setVisible(true);
-    //     }
-    //     else {
-    //         Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
-    //     }
-
-
-    //     // if (game.gameData().length > 0) {
-    //     //     loadLights();
-    //     // }
-
-    // }
-
-
-    // /*
-    // * LOOP
-    // */
-    // function loop() {
-    // }
 
 
     // spawn light on TAP
