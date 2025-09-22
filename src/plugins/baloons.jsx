@@ -11,7 +11,7 @@ import { Container } from '@components/smallElements';
 import SvgIcon from '@components/SvgIcon';
 import * as THREE from 'three';
 import { config } from '@js/config';
-import { GlbLoader, LoadGLB } from '@tools/three/modelTools';
+import { GlbLoader, LoadGLB, GLBFile } from '@tools/three/modelTools';
 import { LoadTexture } from '@tools/three/textureTools';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 
@@ -47,6 +47,8 @@ let balloonModel = null;
 let balloonLoader = new GlbLoader();
 // let arrowsLeft = 10;
 // let isPlaying = true;
+
+let balloonGlb;
 
 
 export default function Baloons(props) {
@@ -146,9 +148,18 @@ export default function Baloons(props) {
             aoMap: balloonAoTexture,
             aoMapChannel: 1
         });
-        
 
-        //TODO- questa non la vogliamo più usare!
+
+
+        balloonGlb = await new GLBFile("models/demo/Balloons/balloon.glb", {
+            aoMap: balloonAoTexture,
+            aoMapChannel: 1
+        });
+        console.log(">>>>>>", balloonGlb)
+
+
+
+        //TODO- questa non la vogliamo più usare! -- NON E' VERO!!...
         await game.loader.load("models/demo/Balloons/balloon.glb");
 
 
@@ -156,6 +167,7 @@ export default function Baloons(props) {
         const arrowAoTexture = await new LoadTexture("models/demo/Balloons/dart_AO.webp", {
             flipY: false
         });
+        //todo- USARE "GLBlOADER ANZICHè' lOADgLB"
         arrowModel = await new LoadGLB("models/demo/Balloons/dart.glb", {
             aoMap: arrowAoTexture
         });
@@ -427,6 +439,7 @@ export default function Baloons(props) {
     * Spawn on TAP
     */
     function spawnModelOnTap() {
+        if (!props.enabled) return;
         const p = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix())
         console.log("SPAWN...", p)
 
@@ -488,7 +501,6 @@ export default function Baloons(props) {
         // console.log("*********START************")
 
         if (playerState() !== PLAYER_STATE.RUNNING) {
-            // console.log("ADESSO DEVO SDMETTERLA!!!")
             return;
         }
 
@@ -801,21 +813,33 @@ export default function Baloons(props) {
     const UserUI = () => {
         return (
             <Container>
-                <button onClick={() => launchArrow()}>ARROW</button>
-                <Info>
-                    <Info style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
-                        {arrowsLeft()}
-                    </Info>
-                    <Info style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={25} />
-                        {explodedBalloons()} / {game.gameData().length}
-                    </Info>
-                    <Info style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={20} />
-                        {remainingTime() / 1000}
-                    </Info>
-                </Info>
+                {/* <button onClick={() => launchArrow()}>ARROW</button> */}
+
+                {(() => {
+                    switch (playerState()) {
+                        case PLAYER_STATE.WINNER:
+                            return <div>HAI VINTO!</div>;
+                        case PLAYER_STATE.LOOSER:
+                            return <div>HAI PERSO!</div>;
+                        default:
+                            return (
+                                <Info>
+                                    <Info style={{ gap: '0.5rem' }}>
+                                        <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
+                                        {arrowsLeft()}
+                                    </Info>
+                                    <Info style={{ gap: '0.5rem' }}>
+                                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={25} />
+                                        {explodedBalloons()} / {game.gameData().length}
+                                    </Info>
+                                    <Info style={{ gap: '0.5rem' }}>
+                                        <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={20} />
+                                        {remainingTime() / 1000}
+                                    </Info>
+                                </Info>
+                            );
+                    }
+                })()}
             </Container>
         )
     }

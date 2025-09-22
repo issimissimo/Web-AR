@@ -41,6 +41,7 @@ export default function ArSession(props) {
     const [loading, setLoading] = createSignal(true);
     const [modules, setModules] = createSignal([]);
     const [gamesInitialized, setGamesInitialized] = createSignal(false);
+    const [gamesEnabled, setGamesEnabled] = createSignal(false);
     const [selectedGameId, setSelectedGameId] = createSignal(null);
 
     // Blurred cover
@@ -131,6 +132,8 @@ export default function ArSession(props) {
         // console.log(">>>>>localizationState:", localizationState())
         // // console.log("---- Games initializing:", gamesInitializing());
         // console.log("AAAAHHHH:", referenceMatrix())
+        if (gamesInitialized() && initDetectionCompleted() &&
+            localizationState() !== LOCALIZATION_STATE.REQUIRED) setGamesEnabled(true);
     })
 
 
@@ -419,7 +422,6 @@ export default function ArSession(props) {
                 <BlurredCover
                     visible={blurVisible()}
                     showHole={blurShowHole()}
-                    // stroke={props.planeFound ? "#f472b6" : "#ffffff" }
                     planeFound={props.planeFound}
                 />
 
@@ -441,10 +443,8 @@ export default function ArSession(props) {
                                     const Component = item.component;
                                     return <Component
                                         id={item.id}
-                                        enabled={gamesInitialized() && initDetectionCompleted() &&
-                                            localizationState() !== LOCALIZATION_STATE.REQUIRED}
-                                        selected={item.id === selectedGameId() && gamesInitialized() &&
-                                            initDetectionCompleted() && localizationState() !== LOCALIZATION_STATE.REQUIRED}
+                                        enabled={gamesEnabled()}
+                                        selected={gamesEnabled() && item.id === selectedGameId()}
                                         referenceMatrix={referenceMatrix()}
                                     />;
                                 }}
