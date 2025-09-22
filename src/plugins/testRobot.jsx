@@ -8,10 +8,10 @@ import SceneManager from "@js/sceneManager"
 import Message from "@components/Message"
 
 import { Vector3, Euler } from "three"
+import { GLBFile } from '@tools/three/modelTools';
 import { LoadTexture } from "@tools/three/textureTools"
 import { LoadPositionalAudio } from "@tools/three/audioTools"
 import {
-    RecreateMaterials,
     setMaterialsShadows,
 } from "@tools/three/materialTools"
 import ContactShadowsXR from "@tools/three/ContactShadowsXR"
@@ -23,7 +23,8 @@ export default function testRobot(props) {
     const [spawned, setSpawned] = createSignal(false)
 
     let loadedModel, shadows, audioRobot, clippingReveal
-    // audioReveal
+    let robotGlb;
+    
 
     const handleCloseInstructions = () => {
         setShowInstructions(() => false)
@@ -41,7 +42,9 @@ export default function testRobot(props) {
         if (audioRobot) audioRobot.stop()
         if (clippingReveal) clippingReveal.dispose()
         Reticle.setEnabled(true)
-        game.loader.resetAnimations()
+        
+        robotGlb.resetAnimations();
+
         game.removePreviousFromScene()
         setSpawned(false)
     }
@@ -69,8 +72,10 @@ export default function testRobot(props) {
         },
 
         renderLoop: () => {
-            if (game.loader.loaded() && spawned()) {
-                game.loader.animate()
+            if (props.enabled && spawned()) {
+
+                robotGlb.animate();
+
                 if (shadows) shadows.update()
                 if (clippingReveal) clippingReveal.update()
             }
@@ -101,13 +106,13 @@ export default function testRobot(props) {
             }
         )
 
-        loadedModel = await game.loader.load(
-            "models/demo/Comau_RACER3/Comau_RACER3.glb"
-        )
-        loadedModel = RecreateMaterials(loadedModel, {
+        robotGlb = await new GLBFile("models/demo/Comau_RACER3/Comau_RACER3.glb", {
             aoMap: aoTexture,
             aoMapIntensity: 1.4,
-        })
+        });
+
+        loadedModel = robotGlb.model;
+
 
         audioRobot = await new LoadPositionalAudio(
             "models/demo/Comau_RACER3/Comau_RACER3.ogg",
@@ -117,8 +122,6 @@ export default function testRobot(props) {
                 loop: true,
             }
         )
-
-        // audioReveal = await new LoadPositionalAudio("sounds/reveal.ogg", SceneManager.listener);
 
         // blur background for instructions
         game.handleBlurredCover({ visible: true })

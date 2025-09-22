@@ -9,7 +9,8 @@ import {
 } from 'three';
 import SceneManager from "./sceneManager";
 import ConcentricRings from "@tools/three/ConcentricRings";
-import { GlbLoader } from "@tools/three/modelTools";
+// import { GlbLoader } from "@tools/three/modelTools";
+import { GLBFile } from '@tools/three/modelTools';
 import { LoadTexture } from "@tools/three/textureTools";
 
 
@@ -19,7 +20,7 @@ let _camera = null;
 let _circleMesh = null;
 
 let _reticleMesh = null;
-const _glbLoader = new GlbLoader();
+// const _glbLoader = new GlbLoader();
 
 
 // Elementi di stato
@@ -194,7 +195,9 @@ const Reticle = {
 
             case this.MESH_TYPE.CUSTOM:
                 console.log("SETTING UP CUSTOM RETICLE....")
-                _reticleMesh = await _glbLoader.load(_options.glbFilePath);
+                // _reticleMesh = await _glbLoader.load(_options.glbFilePath);
+                const glb = await new GLBFile(_options.glbFilePath);
+                _reticleMesh = glb.model;
                 this._completeSetup();
                 break;
 
@@ -286,7 +289,7 @@ const Reticle = {
                         if (_surfTypeDetected !== _surfTypeMode) {
 
                             // Not the surface we are looking for!
-                            console.log("Not the surface we are looking for!")
+                            console.log("Not the surface we are looking for! - current _surfTypeMode:", _surfTypeMode)
                             _isHitting = false;
                             _reticleMesh.visible = false;
                             return false;
@@ -442,6 +445,7 @@ const Reticle = {
 
     setSurfType(surfType) {
         _surfTypeMode = surfType;
+        console.log("----->>>>>> NUOVO SURF TYPE:", _surfTypeMode)
     },
 
     setWorkingMode(workingMode) {

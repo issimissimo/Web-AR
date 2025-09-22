@@ -4,7 +4,7 @@ import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 import { AppMode } from '@/main';
 import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
-import { GlbLoader } from '@tools/three/modelTools';
+// import { GlbLoader } from '@tools/three/modelTools';
 import { getObjOffsetMatrix, getGlobalMatrixFromOffsetMatrix } from '@tools/three/maths';
 import { LoadAudio } from '@tools/three/audioTools';
 
@@ -20,7 +20,7 @@ export function useGame(gameName, gameId, config = {}) {
     const [initialized, setInitialized] = createSignal(false);
     const [gameData, setGameData] = createSignal(null);
 
-    const loader = new GlbLoader();
+    // const loader = new GlbLoader();
     let audioTap;
     let audioUndo;
 
@@ -144,7 +144,7 @@ export function useGame(gameName, gameId, config = {}) {
         gameDetails,
         gameData,
         setGameData,
-        loader
+        // loader
     }
 
     return {

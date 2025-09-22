@@ -15,6 +15,7 @@ export default function Localization(props) {
     const context = useContext(Context)
 
     onMount(() => {
+        Reticle.setSurfType(Reticle.SURF_TYPE_MODE.ALL)
         Reticle.setup(Reticle.MESH_TYPE.PLANE, {
             size: 0.2,
             texturePath: "images/qr-code.webp",

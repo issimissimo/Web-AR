@@ -1,17 +1,17 @@
 import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
-import { MathUtils, Color, Matrix4, Vector3, Quaternion, PositionalAudio, Euler } from 'three';
+import { Color, Matrix4, Vector3, PositionalAudio, Euler } from 'three';
 import Reticle from '@js/reticle';
 import { LoadAudioBuffer, LoadAudio } from '@tools/three/audioTools';
-import { RecreateMaterials, findMaterialByName } from "@tools/three/materialTools";
+import { findMaterialByName } from "@tools/three/materialTools";
 import Toolbar from '@views/ar-overlay/Toolbar';
 import SceneManager from "@js/sceneManager"
 import { Container } from '@components/smallElements';
 import SvgIcon from '@components/SvgIcon';
 import * as THREE from 'three';
 import { config } from '@js/config';
-import { GlbLoader, LoadGLB, GLBFile } from '@tools/three/modelTools';
+import { GLBFile } from '@tools/three/modelTools';
 import { LoadTexture } from '@tools/three/textureTools';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 
@@ -40,13 +40,8 @@ let balloons = [];
 let arrow = null;
 let isArrowFlying = false;
 let maxGameTime = 30000;
-const arrowsBonus = 5;
 let interval;
 let arrowModel = null;
-// let balloonModel = null;
-// let balloonLoader = new GlbLoader();
-// let arrowsLeft = 10;
-// let isPlaying = true;
 
 let arrowGlb;
 let balloonGlb;
@@ -54,13 +49,6 @@ let balloonGlb;
 
 export default function Baloons(props) {
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
-
-    // let maxGameTime = 30000;
-    // const dartBonus = 5;
-    // let timeout;
-
-
-
 
     // GAME variables
     const [arrowsLeft, setArrowsLeft] = createSignal(10);
@@ -145,41 +133,20 @@ export default function Baloons(props) {
         const balloonAoTexture = await new LoadTexture("models/demo/Balloons/balloon_AO.webp", {
             flipY: false
         });
-        // await balloonLoader.load("models/demo/Balloons/balloon.glb", {
-        //     aoMap: balloonAoTexture,
-        //     aoMapChannel: 1
-        // });
-
-
-
         balloonGlb = await new GLBFile("models/demo/Balloons/balloon.glb", {
             aoMap: balloonAoTexture,
             aoMapChannel: 1
         });
-        console.log(">>>>>>", balloonGlb)
-
-
-
-        // //TODO- questa non la vogliamo più usare! -- NON E' VERO!!...
-        // await game.loader.load("models/demo/Balloons/balloon.glb");
-
-
 
 
         // load dart model
         const arrowAoTexture = await new LoadTexture("models/demo/Balloons/dart_AO.webp", {
             flipY: false
         });
-        
-        // arrowModel = await new LoadGLB("models/demo/Balloons/dart.glb", {
-        //     aoMap: arrowAoTexture
-        // });
-
         arrowGlb = await new GLBFile("models/demo/Balloons/dart.glb", {
             aoMap: arrowAoTexture
         });
         arrowModel = arrowGlb.model;
-
 
 
         // load audio
@@ -196,13 +163,6 @@ export default function Baloons(props) {
             // load default data
             game.setGameData(defaultGameData);
         }
-
-        // // setup game
-        // setRemainingArrow(game.gameData().length + arrowsBonus);
-        // console.log("++++ NE RIMANGONO: ", remainingArrow());
-
-        // loadEnv();
-
 
 
         // reset
@@ -295,38 +255,7 @@ export default function Baloons(props) {
     * LOOP
     */
     function loop() {
-        // if (game.loader.loaded()) {
-
-        //     game.loader.animate();
-
-        //     balloonLoader.animate();
-
-        //     if (game.appMode == "load") {
-
-        //         if (playerState() === PLAYER_STATE.RUNNING) {
-
-        //             updateArrow();
-
-
-
-        //             if (currentTime() <= 0) endGameLooser();
-
-
-        //             // // ✅ NUOVO: Aggiorna posizione freccia se non sta volando
-        //             // if (!isArrowFlying && arrow) {
-        //             //     const offset = new THREE.Vector3(0, -0.2, -0.3);
-        //             //     arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
-        //             //     arrow.rotation.copy(SceneManager.camera.rotation);
-        //             // }
-
-        //         }
-        //     }
-        // }
         if (props.enabled) {
-
-            // game.loader.animate();
-
-            // balloonLoader.animate();
 
             balloonGlb.animate();
 
@@ -336,18 +265,8 @@ export default function Baloons(props) {
 
                     updateArrow();
 
-
-
+                    // end
                     if (currentTime() <= 0) endGameLooser();
-
-
-                    // // ✅ NUOVO: Aggiorna posizione freccia se non sta volando
-                    // if (!isArrowFlying && arrow) {
-                    //     const offset = new THREE.Vector3(0, -0.2, -0.3);
-                    //     arrow.position.copy(SceneManager.camera.position).add(offset.applyQuaternion(SceneManager.camera.quaternion));
-                    //     arrow.rotation.copy(SceneManager.camera.rotation);
-                    // }
-
                 }
             }
         }
@@ -378,17 +297,7 @@ export default function Baloons(props) {
                 const assetData = gameData[i];
 
 
-                // let newModel = game.loader.clone({ randomizeTime: true });
                 let newModel = balloonGlb.clone({ randomizeTime: true });
-
-
-                // console.log(">>>>>>>>>", balloonModel)
-                // const CLONETEST = balloonModel.createClone({ aaaaa: true });
-                // console.log(">>>>>>>>>>>>>>>>>>>", CLONETEST)
-
-
-
-                // newModel = RecreateMaterials(newModel); // Important!!!
                 newModel.matrixAutoUpdate = false;
 
                 // position
@@ -417,29 +326,9 @@ export default function Baloons(props) {
                 newModel.add(audio);
 
 
-
-
-
                 game.addToScene(newModel);
                 balloons.push(newModel);
 
-
-                // const balloonGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-                // const balloonMaterial = new THREE.MeshLambertMaterial();
-                // const balloon = new THREE.Mesh(balloonGeometry, balloonMaterial);
-                // // Posiziona i palloncini in modo sparso
-                // balloon.position.x = 0;
-                // balloon.position.y = 0;
-                // balloon.position.z = -1;
-                // SceneManager.scene.add(balloon);
-                // balloons.push(balloon);
-
-
-
-
-
-
-                console.log("PLAY AUDIO")
                 audio.play();
             }
 
@@ -548,34 +437,10 @@ export default function Baloons(props) {
             }
         }
 
-        // const arrowGeometry = new THREE.BoxGeometry(0.05, 0.05, 0.2);
-        // const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
-        // arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-
-        // const arrowGeometry = new THREE.BoxGeometry(0.001, 0.001, 0.2);
-        // const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
-        // arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-
-
         arrow = arrowModel;
 
-        // ✅ POSIZIONE RELATIVA alla camera (coordinate locali)
-        // arrow.position.set(0, -0.2, -0.3); // Offset dalla camera
         arrow.position.copy(ARROW_OFFSET); // Offset dalla camera
         arrow.rotation.set(0, 0, 0);   // Rotazione relativa alla camera
-
-
-
-
-        // arrowModel.position.copy(ARROW_OFFSET); // Offset dalla camera
-        // arrowModel.rotation.set(0, 0, 0);   // Rotazione relativa alla camera
-        // SceneManager.camera.add(arrowModel);
-        // console.log("------ arrow ------ ")
-        // console.log(arrow)
-        // console.log(arrowModel)
-        // console.log("------ end ------ ")
-
-
 
         // ✅ ATTACCA alla camera!
         SceneManager.camera.add(arrow);
@@ -592,9 +457,6 @@ export default function Baloons(props) {
         if (isArrowFlying || arrowsLeft() <= 0) return;
 
         if (playerState() !== PLAYER_STATE.RUNNING) return;
-
-
-        console.log("launchArrow")
 
         whooshAudio.play();
 
@@ -619,10 +481,7 @@ export default function Baloons(props) {
         arrow.quaternion.copy(worldQuaternion);  // ← Usa direttamente il quaternion!
 
 
-
-        // arrowsLeft--;
         setArrowsLeft(prev => prev - 1);
-        // document.getElementById('arrows').textContent = arrowsLeft;
 
 
         // Velocità nella direzione della camera
@@ -698,10 +557,6 @@ export default function Baloons(props) {
                 SceneManager.scene.remove(balloon);
                 balloons.splice(i, 1);
 
-                // // Aggiorna il punteggio
-                // score++;
-                // document.getElementById('score').textContent = score;
-
                 // Effetto di "pop" - piccola animazione
                 createPopEffect(balloon.position, color);
 
@@ -711,13 +566,6 @@ export default function Baloons(props) {
 
                     endGameWinner();
                 }
-
-                // // Se tutti i palloncini sono stati colpiti
-                // if (balloons.length === 0) {
-                //     setTimeout(() => {
-                //         alert('Congratulazioni! Hai colpito tutti i palloncini!');
-                //     }, 500);
-                // }
             }
         }
     }
