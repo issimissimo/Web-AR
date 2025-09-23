@@ -23,14 +23,14 @@ export default function pointLights(props) {
 
         onTap: () => {
 
-            if (props.enabled) {
+            if (props.enabled && !currentLight()) {
 
                 console.log("TAPPPP....")
 
                 switch (game.appMode) {
                     case "save":
                         game.super.onTap(); // sound
-                        spawnModelOnTap();
+                        spawnLightOnTap();
                         break;
 
                     case "load":
@@ -46,7 +46,7 @@ export default function pointLights(props) {
 
     const [currentLight, setCurrentLight] = createSignal(null);
     const [intensity, setIntensity] = createSignal(5);
-    const [color, setColor] = createSignal('#ff0000');
+    const [color, setColor] = createSignal('#ffffff');
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
 
 
@@ -113,34 +113,34 @@ export default function pointLights(props) {
     });
 
 
-    // remove or add default light
-    // when data change
-    createEffect(() => {
+    // // remove or add default light
+    // // when data change
+    // createEffect(() => {
 
-        if (!game.gameData()) return;
+    //     if (!game.gameData()) return;
 
-        const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
-        if (game.gameData().length > 0) {
-            if (defaultLight) {
-                SceneManager.scene.remove(SceneManager.light);
-                console.log("defaultLight rimossa!")
-            }
-        }
-        else {
-            if (!defaultLight) {
-                SceneManager.scene.add(SceneManager.light);
-                console.log("defaultLight tornata!")
-            }
-        }
-    });
+    //     const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
+    //     if (game.gameData().length > 0) {
+    //         if (defaultLight) {
+    //             SceneManager.scene.remove(SceneManager.light);
+    //             console.log("defaultLight rimossa!")
+    //         }
+    //     }
+    //     else {
+    //         if (!defaultLight) {
+    //             SceneManager.scene.add(SceneManager.light);
+    //             console.log("defaultLight tornata!")
+    //         }
+    //     }
+    // });
 
 
     createEffect(() => {
         if (currentLight()) {
-            console.log(intensity());
-            console.log(color());
-            currentLight().intensity = intensity();
-            currentLight().color = new THREE.Color(color());
+            // console.log(intensity());
+            // console.log(color());
+            currentLight().intensity = intensity() * 2;
+            // currentLight().color = new THREE.Color(color());
         }
 
     })
@@ -154,28 +154,47 @@ export default function pointLights(props) {
 
 
     // spawn light on TAP
-    function spawnModelOnTap() {
+    function spawnLightOnTap() {
         const lightPosition = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix());
-        const lightColor = color();
-        const lightIntensity = intensity();
 
-        const _light = createLight(lightPosition, lightColor, lightIntensity);
+        const _light = createLight(lightPosition, new THREE.Color(color()), intensity());
         setCurrentLight(_light);
         console.log("currentLight:", currentLight())
+
+        // // get the difference from positions
+        // const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
+
+
+        // const diffPosition = new THREE.Vector3();
+        // diffPosition.subVectors(referencePosition, lightPosition);
+
+        // const newData = {
+        //     diffPosition: { x: diffPosition.x, y: diffPosition.y, z: diffPosition.z },
+        //     color: lightColor,
+        //     intensity: lightIntensity
+        // };
+        // game.setGameData((prev) => [...prev, newData]);
+    }
+
+
+    function finalizeLight() {
 
         // get the difference from positions
         const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
 
-
         const diffPosition = new THREE.Vector3();
-        diffPosition.subVectors(referencePosition, lightPosition);
+        diffPosition.subVectors(referencePosition, currentLight().position);
 
         const newData = {
             diffPosition: { x: diffPosition.x, y: diffPosition.y, z: diffPosition.z },
-            color: lightColor,
-            intensity: lightIntensity
+            color: currentLight().color,
+            intensity: currentLight().intensity
         };
         game.setGameData((prev) => [...prev, newData]);
+
+        setCurrentLight(null);
+
+        console.log("light stored:", game.gameData());
     }
 
 
@@ -203,7 +222,9 @@ export default function pointLights(props) {
     function createLight(position, color, intensity) {
         const newLight = new THREE.PointLight(color, intensity);
         newLight.position.copy(position);
-        newLight.name = "light";
+        newLight.color = color;
+        newLight.intensity = intensity;
+        newLight.name = "pointLight";
         game.addToScene(newLight);
 
         const pointLightHelper = new THREE.PointLightHelper(newLight, 0.1);
@@ -247,7 +268,7 @@ export default function pointLights(props) {
     return (
 
         <>
-            <button onClick={() => spawnModelOnTap()}>SPAWN!</button>
+            <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
             {/* <button onClick={() => {
                 if (currentLight()) {
 
@@ -267,9 +288,9 @@ export default function pointLights(props) {
                     <>
                         {currentLight() && (
                             <>
-                                <ColorPicker color={color} setColor={setColor} />
+                                {/* <ColorPicker color={color} setColor={setColor} /> */}
                                 <HorizontalSlider value={intensity} setValue={setIntensity} />
-                                <button onClick={() => console.log("DONE")}>DONE</button>
+                                <button onClick={() => finalizeLight()}>DONE</button>
                             </>
                         )}
 

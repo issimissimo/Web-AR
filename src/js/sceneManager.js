@@ -24,7 +24,7 @@ const SceneManager = {
         // Inizializzazione scena ThreeJS
         this.scene = new Scene();
         this.camera = new PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-        this.light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
+        this.light = new HemisphereLight(0xffffff, 0x8b8b8b, 1);
         this.light.position.set(0.5, 1, 0.25);
         this.light.name = "defaultLight"
         this.scene.add(this.light);
