@@ -1,10 +1,9 @@
-import { onMount, createSignal, useContext, createEffect } from 'solid-js';
+import { onMount, createSignal, useContext } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
 import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 import { AppMode } from '@/main';
 import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
-// import { GlbLoader } from '@tools/three/modelTools';
 import { getObjOffsetMatrix, getGlobalMatrixFromOffsetMatrix } from '@tools/three/maths';
 import { LoadAudio } from '@tools/three/audioTools';
 
@@ -126,6 +125,7 @@ export function useGame(gameName, gameId, config = {}) {
     const game = {
         name: gameName,
         id: gameId,
+        APP_MODE: AppMode,
         appMode: context.appMode,
         setInitialized,
         handleBlurredCover: context.handleBlurredCover,

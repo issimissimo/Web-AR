@@ -71,10 +71,6 @@ export default function pointLights(props) {
             console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
             game.setGameData(defaultGameData);
         }
-        // // or setup the lights from data
-        // else {
-        //     loadLights(); //TODO -- NOOO! Non qui!!!!! prima dobbiamo aver fatto la localizzazione!!!
-        // }
 
         // reset
         setLastSavedGameData([...game.gameData()]);
@@ -137,8 +133,6 @@ export default function pointLights(props) {
 
     // spawn light on TAP
     function spawnLightOnTap() {
-        // const lightPosition = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix());
-
         const _light = createLight(Reticle.getHitMatrix(), color(), intensity());
         setCurrentLight(_light);
         console.log("currentLight:", currentLight())
@@ -147,19 +141,8 @@ export default function pointLights(props) {
 
     function finalizeLight() {
 
-        // // get the difference from positions
-        // const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
-
-        // const diffPosition = new THREE.Vector3();
-        // diffPosition.subVectors(referencePosition, currentLight().position);
-
-
         const diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, currentLight());
-
-
         const newData = {
-            // diffPosition: { x: diffPosition.x, y: diffPosition.y, z: diffPosition.z },
-            // color: currentLight().color,
             intensity: currentLight().intensity,
             diffMatrix: diffMatrix
         };
@@ -185,21 +168,8 @@ export default function pointLights(props) {
             const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
                 (props.referenceMatrix, diffMatrix);
 
-
             const color = el.color;
             const intensity = el.intensity;
-
-
-            // const diffPosition = el.diffPosition;
-            // const color = el.color;
-            // const intensity = el.intensity;
-
-            // const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
-
-            // const position = referencePosition.clone().sub(
-            //     new THREE.Vector3(diffPosition.x, diffPosition.y, diffPosition.z)
-            // );
-
             createLight(globalMatrix, color, intensity)
         });
     }
@@ -207,13 +177,10 @@ export default function pointLights(props) {
 
     // Create the light and its helper
     function createLight(matrix, color, intensity) {
+
         const newLight = new THREE.PointLight(color, intensity);
         newLight.matrixAutoUpdate = false;
         newLight.matrix.copy(matrix);
-
-        // newLight.position.copy(position);
-        // newLight.color = color;
-        // newLight.color = new THREE.Color(0xffffff);
         newLight.intensity = intensity;
         newLight.name = "pointLight";
         game.addToScene(newLight);

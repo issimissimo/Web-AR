@@ -71,14 +71,9 @@ export default function ArSession(props) {
                 color: 0xf472b6,
             });
 
-        // // We don't want to show the Reticle now!
-        // Reticle.setVisible(false);
-
         // When reopening the ARSession it seem to stay "true"... 
         // let's force (not clear why I have to do that)
         setInitDetectionCompleted(false);
-
-        console.log("initDetectionCompleted:", initDetectionCompleted())
 
         // If Debug on desktop we must set the background 
         // to black, so to see something...
@@ -97,11 +92,10 @@ export default function ArSession(props) {
 
         // if we are "user" we must update the views number
         // of this marker (+1)
-        if (props.appMode === AppMode.LOAD) {
+        if (props.appMode === AppMode.LOAD && !config.debugOnDesktop) {
             firebase.firestore.updateMarkerViews(props.userId, props.marker.id);
         }
 
-        //TODO - questo lo spostiamo quando sono tutti pronti
         // On TAP on screen
         // event listener
         SceneManager.controller.addEventListener("select", () => {
@@ -174,7 +168,7 @@ export default function ArSession(props) {
         for (const el of props.marker.games) {
             if (el.enabled) {
 
-                _modulesToLoad ++;
+                _modulesToLoad++;
 
                 // load dynamically the module
                 // await loadModule(el.id, el.name);
@@ -242,7 +236,7 @@ export default function ArSession(props) {
 
     const checkAllGamesReady = () => {
 
-        
+
         console.log("=== ArSession: checkAllGamesReady")
         console.log("======= modules to load:", _modulesToLoad)
         console.log("======= games initialized:", _gamesInitialized)
@@ -271,11 +265,7 @@ export default function ArSession(props) {
                     setGamesVisible(false);
                     // Show the Localization view
                     setLocalizationState(() => LOCALIZATION_STATE.REQUIRED);
-
                     break;
-                }
-                else {
-                    console.log("============= ", _game.name, "NON RICHIEDE LOCALIZZAZIONE...")
                 }
             }
 
