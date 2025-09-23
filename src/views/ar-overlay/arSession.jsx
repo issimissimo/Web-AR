@@ -255,22 +255,10 @@ export default function ArSession(props) {
         if (_gamesInitialized === _modulesToLoad &&
             props.gamesRunning.length === _modulesToLoad) {
 
-            
-
-            console.log("=== ArSession: all games initialized and set!!!")
-            setGamesInitialized(true);
-
-            // it should not be necessary here... :/
-            updateClickableDomElements();
-
-
             // If just one of the game need localization,
             // we need to show the Localization component
             // as soon as all the games initialized
-
             for (let i = 0; i < props.gamesRunning.length; i++) {
-
-
 
                 const _game = props.gamesRunning[i];
 
@@ -290,7 +278,12 @@ export default function ArSession(props) {
                     console.log("============= ", _game.name, "NON RICHIEDE LOCALIZZAZIONE...")
                 }
             }
-            
+
+            console.log("=== ArSession: all games initialized and set!!!")
+            setGamesInitialized(true);
+
+            // it should not be necessary here... :/
+            updateClickableDomElements();
         }
     }
 

@@ -409,15 +409,15 @@ export default function Baloons(props) {
 
     //#region [Game Logics]
 
-    function loadEnv() {
-        const rgbeLoader = new RGBELoader();
-        const fileUrl = "images/hdr/empty_warehouse_1k.hdr";
-        rgbeLoader.load(fileUrl, (envMap) => {
-            envMap.mapping = THREE.EquirectangularReflectionMapping;
-            SceneManager.scene.environment = envMap;
-            SceneManager.scene.environmentIntensity = 1.2;
-        });
-    }
+    // function loadEnv() {
+    //     const rgbeLoader = new RGBELoader();
+    //     const fileUrl = "images/hdr/empty_warehouse_1k.hdr";
+    //     rgbeLoader.load(fileUrl, (envMap) => {
+    //         envMap.mapping = THREE.EquirectangularReflectionMapping;
+    //         SceneManager.scene.environment = envMap;
+    //         SceneManager.scene.environmentIntensity = 1.2;
+    //     });
+    // }
 
 
 

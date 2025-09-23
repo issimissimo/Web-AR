@@ -13,6 +13,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons"
 
 
 const defaultGameData = [];
+let _enabled = false;
 
 
 export default function pointLights(props) {
@@ -67,12 +68,13 @@ export default function pointLights(props) {
 
         // set default data if no data are saved
         if (!game.gameData()) {
+            console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
             game.setGameData(defaultGameData);
         }
-        // or setup the lights from data
-        else {
-            loadLights();
-        }
+        // // or setup the lights from data
+        // else {
+        //     loadLights(); //TODO -- NOOO! Non qui!!!!! prima dobbiamo aver fatto la localizzazione!!!
+        // }
 
         // reset
         setLastSavedGameData([...game.gameData()]);
@@ -99,8 +101,9 @@ export default function pointLights(props) {
     // setup Reticle
     // as soon as this game is enabled
     createEffect(() => {
-        if (props.enabled) {
+        if (props.enabled && !_enabled) {
             console.log("POINTLIGHTS ENABLED:", props.enabled)
+            _enabled = true;
 
 
             if (game.appMode === "save" || config.debugOnDesktop) {
@@ -111,13 +114,15 @@ export default function pointLights(props) {
             else {
                 Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
             }
+
+            loadLights();
         }
     });
 
 
     createEffect(() => {
         if (currentLight()) {
-            currentLight().intensity = intensity() * 2;
+            currentLight().intensity = intensity() / 2;
         }
 
     })
@@ -132,9 +137,9 @@ export default function pointLights(props) {
 
     // spawn light on TAP
     function spawnLightOnTap() {
-        const lightPosition = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix());
+        // const lightPosition = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix());
 
-        const _light = createLight(lightPosition, color(), intensity());
+        const _light = createLight(Reticle.getHitMatrix(), color(), intensity());
         setCurrentLight(_light);
         console.log("currentLight:", currentLight())
     }
@@ -142,16 +147,21 @@ export default function pointLights(props) {
 
     function finalizeLight() {
 
-        // get the difference from positions
-        const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
+        // // get the difference from positions
+        // const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
 
-        const diffPosition = new THREE.Vector3();
-        diffPosition.subVectors(referencePosition, currentLight().position);
+        // const diffPosition = new THREE.Vector3();
+        // diffPosition.subVectors(referencePosition, currentLight().position);
+
+
+        const diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, currentLight());
+
 
         const newData = {
-            diffPosition: { x: diffPosition.x, y: diffPosition.y, z: diffPosition.z },
+            // diffPosition: { x: diffPosition.x, y: diffPosition.y, z: diffPosition.z },
             // color: currentLight().color,
-            intensity: currentLight().intensity
+            intensity: currentLight().intensity,
+            diffMatrix: diffMatrix
         };
         game.setGameData((prev) => [...prev, newData]);
 
@@ -163,29 +173,45 @@ export default function pointLights(props) {
 
     // Load all lights
     function loadLights() {
-        console.log("Adesso creo tutte le luci salvate....")
+        console.log(">>>>>>>>>>>>> CREO ", game.gameData().length, " LUCI SALVATE!!!")
 
         game.gameData().forEach((el) => {
             console.log(el)
-            const diffPosition = el.diffPosition;
+
+
+            // position
+            const diffMatrix = new THREE.Matrix4();
+            diffMatrix.fromArray(el.diffMatrix.elements);
+            const globalMatrix = game.getGlobalMatrixFromOffsetMatrix
+                (props.referenceMatrix, diffMatrix);
+
+
             const color = el.color;
             const intensity = el.intensity;
 
-            const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
 
-            const position = referencePosition.clone().sub(
-                new THREE.Vector3(diffPosition.x, diffPosition.y, diffPosition.z)
-            );
+            // const diffPosition = el.diffPosition;
+            // const color = el.color;
+            // const intensity = el.intensity;
 
-            createLight(position, color, intensity)
+            // const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
+
+            // const position = referencePosition.clone().sub(
+            //     new THREE.Vector3(diffPosition.x, diffPosition.y, diffPosition.z)
+            // );
+
+            createLight(globalMatrix, color, intensity)
         });
     }
 
 
     // Create the light and its helper
-    function createLight(position, color, intensity) {
+    function createLight(matrix, color, intensity) {
         const newLight = new THREE.PointLight(color, intensity);
-        newLight.position.copy(position);
+        newLight.matrixAutoUpdate = false;
+        newLight.matrix.copy(matrix);
+
+        // newLight.position.copy(position);
         // newLight.color = color;
         // newLight.color = new THREE.Color(0xffffff);
         newLight.intensity = intensity;
@@ -240,7 +266,7 @@ export default function pointLights(props) {
                             onUndo={handleUndo}
                             onSave={handleSave}
                             undoActive={game.gameData().length > 0}
-                            saveActive={hasUnsavedChanges()}
+                            saveActive={hasUnsavedChanges() && !currentLight()}
                         />
                     </>
                 )
