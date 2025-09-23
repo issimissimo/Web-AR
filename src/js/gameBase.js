@@ -19,6 +19,7 @@ export function useGame(gameName, gameId, config = {}) {
     let gameAssets = [];
     const [initialized, setInitialized] = createSignal(false);
     const [gameData, setGameData] = createSignal(null);
+    let _initialized = false;
 
     // const loader = new GlbLoader();
     let audioTap;
@@ -31,7 +32,9 @@ export function useGame(gameName, gameId, config = {}) {
     });
 
     createEffect(() => {
-        if (initialized()) {
+        if (initialized() && !_initialized) {
+            _initialized = true;
+            console.log(`<<<<<< ${gameName} è inizializzato`)
             context.onInitialized();
         }
     })

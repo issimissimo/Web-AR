@@ -16,7 +16,7 @@ const SliderContainer = styled.div`
 const SliderTrack = styled.div`
   width: 100%;
   height: 8px;
-  background: linear-gradient(90deg, #e2e8f0 0%, #3b82f6 100%);
+  background: linear-gradient(90deg, #474747 0%, #ffffff 100%);
   border-radius: 4px;
   position: relative;
   cursor: pointer;

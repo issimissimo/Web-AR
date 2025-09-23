@@ -22,7 +22,7 @@ export default function envMapBasic(props) {
         },
 
         close: () => {
-          
+
         },
     });
 
@@ -74,6 +74,12 @@ export default function envMapBasic(props) {
             SceneManager.scene.environment = envMap;
             SceneManager.scene.environmentIntensity = game.gameData().exposure;
             SceneManager.scene.remove(SceneManager.light);
+
+            const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
+            if (defaultLight) {
+                SceneManager.scene.remove(SceneManager.light);
+                console.log("defaultLight rimossa!")
+            }
 
             /*
             * Don't forget to call "game.setInitialized(true)" at finish 

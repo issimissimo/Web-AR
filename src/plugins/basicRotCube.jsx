@@ -7,6 +7,8 @@ import Reticle from '@js/reticle';
 import ContactShadowsXR from '@tools/three/contactShadowsXR';
 import SceneManager from '@js/sceneManager';
 
+
+
 import * as THREE from "three";
 
 
@@ -74,6 +76,7 @@ export default function basicRotCube(props) {
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
         */
+       console.log("ADESSO CHIAMO SET INITIALIZED PER ROT CUBE!!!!!")
         game.setInitialized(true)
     }
 

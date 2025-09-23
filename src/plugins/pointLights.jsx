@@ -6,9 +6,10 @@ import Reticle from '@js/reticle';
 import Toolbar from '@views/ar-overlay/Toolbar';
 import { config } from '@js/config';
 import * as THREE from "three";
-import SceneManager from '@js/sceneManager';
 import HorizontalSlider from '@views/ar-overlay/HorizontalSlider';
-import ColorPicker from '@views/ar-overlay/ColorPicker';
+// import ColorPicker from '@views/ar-overlay/ColorPicker';
+import Button from '@components/Button';
+import { faCheck } from "@fortawesome/free-solid-svg-icons"
 
 
 const defaultGameData = [];
@@ -46,7 +47,7 @@ export default function pointLights(props) {
 
     const [currentLight, setCurrentLight] = createSignal(null);
     const [intensity, setIntensity] = createSignal(5);
-    const [color, setColor] = createSignal('#ffffff');
+    const [color, setColor] = createSignal(0xffffff);
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
 
 
@@ -79,6 +80,7 @@ export default function pointLights(props) {
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
         */
+       console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
         game.setInitialized(true)
     });
 
@@ -113,34 +115,9 @@ export default function pointLights(props) {
     });
 
 
-    // // remove or add default light
-    // // when data change
-    // createEffect(() => {
-
-    //     if (!game.gameData()) return;
-
-    //     const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
-    //     if (game.gameData().length > 0) {
-    //         if (defaultLight) {
-    //             SceneManager.scene.remove(SceneManager.light);
-    //             console.log("defaultLight rimossa!")
-    //         }
-    //     }
-    //     else {
-    //         if (!defaultLight) {
-    //             SceneManager.scene.add(SceneManager.light);
-    //             console.log("defaultLight tornata!")
-    //         }
-    //     }
-    // });
-
-
     createEffect(() => {
         if (currentLight()) {
-            // console.log(intensity());
-            // console.log(color());
             currentLight().intensity = intensity() * 2;
-            // currentLight().color = new THREE.Color(color());
         }
 
     })
@@ -157,23 +134,9 @@ export default function pointLights(props) {
     function spawnLightOnTap() {
         const lightPosition = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix());
 
-        const _light = createLight(lightPosition, new THREE.Color(color()), intensity());
+        const _light = createLight(lightPosition, color(), intensity());
         setCurrentLight(_light);
         console.log("currentLight:", currentLight())
-
-        // // get the difference from positions
-        // const referencePosition = new Vector3().setFromMatrixPosition(props.referenceMatrix);
-
-
-        // const diffPosition = new THREE.Vector3();
-        // diffPosition.subVectors(referencePosition, lightPosition);
-
-        // const newData = {
-        //     diffPosition: { x: diffPosition.x, y: diffPosition.y, z: diffPosition.z },
-        //     color: lightColor,
-        //     intensity: lightIntensity
-        // };
-        // game.setGameData((prev) => [...prev, newData]);
     }
 
 
@@ -187,7 +150,7 @@ export default function pointLights(props) {
 
         const newData = {
             diffPosition: { x: diffPosition.x, y: diffPosition.y, z: diffPosition.z },
-            color: currentLight().color,
+            // color: currentLight().color,
             intensity: currentLight().intensity
         };
         game.setGameData((prev) => [...prev, newData]);
@@ -222,12 +185,13 @@ export default function pointLights(props) {
     function createLight(position, color, intensity) {
         const newLight = new THREE.PointLight(color, intensity);
         newLight.position.copy(position);
-        newLight.color = color;
+        // newLight.color = color;
+        // newLight.color = new THREE.Color(0xffffff);
         newLight.intensity = intensity;
         newLight.name = "pointLight";
         game.addToScene(newLight);
 
-        const pointLightHelper = new THREE.PointLightHelper(newLight, 0.1);
+        const pointLightHelper = new THREE.PointLightHelper(newLight, 0.1, 0xf2e600);
         pointLightHelper.name = "helper";
         game.addToScene(pointLightHelper);
 
@@ -248,41 +212,14 @@ export default function pointLights(props) {
         box-sizing: border-box;
         padding: 2em;
     `
-    const Title = styled('h2')`
-        text-align: center;
-    `
-
-    const Description = styled('p')`
-        text-align: center;
-    `
-
-    const Button = styled('button')`
-        margin: 1em;
-    `
-
 
 
     /*
-    * RENDER (Will be shown ONLY after initialization completed)
+    * RENDER
     */
     return (
-
         <>
-            <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
-            {/* <button onClick={() => {
-                if (currentLight()) {
-
-                    console.log("PRIMA:", currentLight())
-                    // console.log("newcolor:", color())
-
-                    const newColor = new THREE.Color(color());
-                    console.log("newcolor:", newColor)
-
-                    currentLight().color = newColor;
-                    // console.log("DOPO:", currentLight())
-                }
-            }}>SET COLOR</button> */}
-
+            {/* <button onClick={() => spawnLightOnTap()}>SPAWN!</button> */}
             {
                 props.enabled && (
                     <>
@@ -290,7 +227,10 @@ export default function pointLights(props) {
                             <>
                                 {/* <ColorPicker color={color} setColor={setColor} /> */}
                                 <HorizontalSlider value={intensity} setValue={setIntensity} />
-                                <button onClick={() => finalizeLight()}>DONE</button>
+                                {/* <button onClick={() => finalizeLight()}>DONE</button> */}
+                                <Button onClick={finalizeLight} icon={faCheck} small={true}>
+                                    Fatto!
+                                </Button>
                             </>
                         )}
 
