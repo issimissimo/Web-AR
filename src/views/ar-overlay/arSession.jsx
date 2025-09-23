@@ -38,7 +38,6 @@ export default function ArSession(props) {
     const [initDetectionCompleted, setInitDetectionCompleted] = createSignal(false);
     const [localizationState, setLocalizationState] = createSignal(LOCALIZATION_STATE.NONE);
     const [referenceMatrix, setReferenceMatrix] = createSignal(new Matrix4());
-    const [loading, setLoading] = createSignal(true);
     const [modules, setModules] = createSignal([]);
     const [gamesInitialized, setGamesInitialized] = createSignal(false);
     const [gamesEnabled, setGamesEnabled] = createSignal(false);
@@ -55,6 +54,16 @@ export default function ArSession(props) {
 
     //#region [lifeCycle]
     onMount(() => {
+
+        // Well, if we do some changes on some scripts,
+        // arSession is mounted again each time, so we need
+        // to reset the props.gamesRunning.
+        // This is necessary to be able to iterate when
+        // we need to do changes to the UI and not to have reload each time
+        if (props.gamesRunning.length > 0) {
+            console.warn("WARNING: I'm going to reset props.gamesRunning. If you are doing some changes on the scripts it's normal.");
+            props.resetGamesRunning;
+        }
 
         // Let's start immediately darkening the background...
         // setBlurVisible(true);
@@ -98,17 +107,30 @@ export default function ArSession(props) {
 
         // On TAP on screen
         // event listener
-        SceneManager.controller.addEventListener("select", () => {
-
-            // Avoid TAP on DOM elements
-            if (!_tapEnabled) {
-                _tapEnabled = true;
-                return;
+        if (!SceneManager.initialized()) {
+            if (!config.debugOnDesktop) {
+                console.error("SceneManager is not initialized!");
+                alert("SceneManager is not initialized!");
             }
+            else {
+                SceneManager.init();
+                console.warn("WARNING: SceneManager is actually NOT initialized,and I have initialized it for you. If you are DEBUGGING on desktop AND you have made some changes it's normal, otherwise it's a problem!");
+            }
+        }
+        else {
+            SceneManager.controller.addEventListener("select", () => {
 
-            // Call onTap function of all the gamesRunning
-            props.gamesRunning.forEach((el) => el.onTap());
-        });
+                // Avoid TAP on DOM elements
+                if (!_tapEnabled) {
+                    _tapEnabled = true;
+                    return;
+                }
+
+                // Call onTap function of all the gamesRunning
+                props.gamesRunning.forEach((el) => el.onTap());
+            });
+        }
+
 
         // Load games of this marker
         if (props.marker.games.length > 0) {

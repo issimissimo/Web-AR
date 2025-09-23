@@ -406,6 +406,7 @@ export default function Main() {
                             onBack={handleReset}
                             planeFound={planeFound()}
                             gamesRunning={gamesRunning()}
+                            resetGamesRunning={setGamesRunning(() => [])}
                             addGame={el => setGamesRunning(prev => [...prev, el])}
                             onNewGameSaved={() => {
                                 // setupMarker(currentMarker().id, currentMarker().name)

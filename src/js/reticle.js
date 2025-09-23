@@ -12,6 +12,7 @@ import ConcentricRings from "@tools/three/ConcentricRings";
 // import { GlbLoader } from "@tools/three/modelTools";
 import { GLBFile } from '@tools/three/modelTools';
 import { LoadTexture } from "@tools/three/textureTools";
+import { config } from '@js/config';
 
 
 let _renderer = null;
@@ -141,7 +142,7 @@ const Reticle = {
         if (!SceneManager.initialized()) {
             const errorMsg = "XrReticle: SceneManager not set";
             console.error(errorMsg);
-            alert(errorMsg);
+            if (!config.debugOnDesktop) alert(errorMsg);
             return false;
         }
 
@@ -381,7 +382,7 @@ const Reticle = {
         _camera = null;
 
         _surfTypeMode = this.SURF_TYPE_MODE.ALL;
-        
+
 
         console.log("Reticle destroyed successfully");
         console.log("Reticle surfType:", _surfTypeMode)
