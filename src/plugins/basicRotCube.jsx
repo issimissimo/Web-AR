@@ -74,10 +74,10 @@ export default function basicRotCube(props) {
         // });
 
         /*
-        * Don't forget to call "game.setInitialized(true)" at finish 
+        * Don't forget to call "game.setInitialized()" at finish 
         */
-       console.log("ADESSO CHIAMO SET INITIALIZED PER ROT CUBE!!!!!")
-        game.setInitialized(true)
+        console.log("ADESSO CHIAMO SET INITIALIZED PER ROT CUBE!!!!!")
+        game.setInitialized()
     }
 
 

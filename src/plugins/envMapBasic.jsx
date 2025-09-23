@@ -82,9 +82,9 @@ export default function envMapBasic(props) {
             }
 
             /*
-            * Don't forget to call "game.setInitialized(true)" at finish 
+            * Don't forget to call "game.setInitialized()" at finish 
             */
-            game.setInitialized(true)
+            game.setInitialized()
         });
     }
 

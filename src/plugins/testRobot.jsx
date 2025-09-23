@@ -127,9 +127,9 @@ export default function testRobot(props) {
         game.handleBlurredCover({ visible: true })
 
         /*
-         * Don't forget to call "game.setInitialized(true)" at finish
+         * Don't forget to call "game.setInitialized()" at finish
          */
-        game.setInitialized(true)
+        game.setInitialized()
     })
 
     createEffect(async () => {

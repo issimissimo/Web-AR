@@ -9,7 +9,6 @@ export default function InitialDetection() {
 
     onMount(()=>{
         // console.log("**** INTIAL DETECTION - ON MOUNT")
-        Reticle.setSurfType(Reticle.SURF_TYPE_MODE.ALL)
     })
 
     return (

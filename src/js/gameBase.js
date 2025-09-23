@@ -17,7 +17,6 @@ export function useGame(gameName, gameId, config = {}) {
     const context = useContext(Context);
     const gameDetails = PLUGINS_LIST.find(g => g.fileName === gameName);
     let gameAssets = [];
-    const [initialized, setInitialized] = createSignal(false);
     const [gameData, setGameData] = createSignal(null);
     let _initialized = false;
 
@@ -31,13 +30,14 @@ export function useGame(gameName, gameId, config = {}) {
         context.onLoaded(game);
     });
 
-    createEffect(() => {
-        if (initialized() && !_initialized) {
+
+    const setInitialized = () => {
+        if (!_initialized) {
             _initialized = true;
             console.log(`<<<<<< ${gameName} è inizializzato`)
             context.onInitialized();
         }
-    })
+    }
 
 
     // Load game data from Realtime Database
@@ -127,7 +127,6 @@ export function useGame(gameName, gameId, config = {}) {
         name: gameName,
         id: gameId,
         appMode: context.appMode,
-        initialized,
         setInitialized,
         handleBlurredCover: context.handleBlurredCover,
         getObjOffsetMatrix,
@@ -147,7 +146,6 @@ export function useGame(gameName, gameId, config = {}) {
         gameDetails,
         gameData,
         setGameData,
-        // loader
     }
 
     return {

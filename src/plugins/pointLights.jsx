@@ -80,8 +80,8 @@ export default function pointLights(props) {
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
         */
-       console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
-        game.setInitialized(true)
+        console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
+        game.setInitialized()
     });
 
 
@@ -166,6 +166,7 @@ export default function pointLights(props) {
         console.log("Adesso creo tutte le luci salvate....")
 
         game.gameData().forEach((el) => {
+            console.log(el)
             const diffPosition = el.diffPosition;
             const color = el.color;
             const intensity = el.intensity;

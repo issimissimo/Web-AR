@@ -380,7 +380,11 @@ const Reticle = {
         _scene = null;
         _camera = null;
 
+        _surfTypeMode = this.SURF_TYPE_MODE.ALL;
+        
+
         console.log("Reticle destroyed successfully");
+        console.log("Reticle surfType:", _surfTypeMode)
     },
 
     initialized() {
