@@ -1,4 +1,4 @@
-import { onMount, createSignal, useContext } from 'solid-js';
+import { onMount, createSignal, useContext, createEffect, onCleanup } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
 import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 import { AppMode } from '@/main';
@@ -6,6 +6,7 @@ import { Context } from '@views/ar-overlay/arSession';
 import SceneManager from '@js/sceneManager';
 import { getObjOffsetMatrix, getGlobalMatrixFromOffsetMatrix } from '@tools/three/maths';
 import { LoadAudio } from '@tools/three/audioTools';
+import { render } from 'solid-js/web';
 
 
 
@@ -20,6 +21,7 @@ export function useGame(gameName, gameId, config = {}) {
     const [mountEl, setMountEl] = createSignal(null);
     let _disposer = null;
     let _initialized = false;
+    let _hasMountedView = false;
 
     // const loader = new GlbLoader();
     let audioTap;
@@ -61,6 +63,32 @@ export function useGame(gameName, gameId, config = {}) {
             console.log(`<<<<<< ${gameName} è inizializzato`)
             context.onInitialized();
         }
+    }
+
+    // Allow plugins to register a render function which will be mounted
+    // automatically into the shared mount element when it becomes available.
+    const mountView = (viewFn) => {
+        if (_hasMountedView) return; // only mount once per game instance
+        _hasMountedView = true;
+
+        createEffect(() => {
+            const el = mountEl();
+            if (!el || _disposer) return;
+            try {
+                _disposer = render(viewFn, el);
+                console.log(`${gameName}: mounted view into`, el);
+            } catch (err) {
+                console.error(`${gameName}: error mounting view`, err);
+            }
+        });
+
+        onCleanup(() => {
+            if (_disposer) {
+                try { _disposer(); } catch (e) { }
+                _disposer = null;
+                console.log(`${gameName}: disposed mounted view`);
+            }
+        });
     }
 
 
@@ -181,6 +209,8 @@ export function useGame(gameName, gameId, config = {}) {
         gameData,
         setGameData,
         mountEl
+        ,
+        mountView
     }
 
 

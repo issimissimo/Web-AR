@@ -313,7 +313,7 @@ const Inventory = (props) => {
         gap: 1rem;
         align-items: flex-start; */
        
-        background-color: #ff00aa;
+        /* background-color: #ff00aa; */
         flex: 1;
     `
 

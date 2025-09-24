@@ -1,5 +1,4 @@
-import { onMount, onCleanup, createEffect, createSignal, createMemo } from 'solid-js';
-import { render } from 'solid-js/web';
+import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { Vector3 } from 'three';
@@ -51,14 +50,10 @@ export default function pointLights(props) {
     const [intensity, setIntensity] = createSignal(5);
     const [color, setColor] = createSignal(0xffffff);
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
-    const [mountEl, setMountEl] = createSignal(null);
-    let _disposer = null;
 
     const hasUnsavedChanges = createMemo(() =>
         JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
     );
-
-
 
     /*
     * On mount
@@ -82,24 +77,6 @@ export default function pointLights(props) {
         */
         console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
         game.setInitialized()
-
-        // // Wait for the #plugins-ui container to exist. The container may be
-        // // created dynamically by other Solid components, so querying it
-        // // immediately can return null. Use a MutationObserver with a
-        // // short timeout fallback and store the element in a signal so the
-        // // Portal can be rendered reactively below.
-        // const waitFor = () => new Promise((resolve) => {
-        //     const el = document.getElementById('plugins-ui');
-        //     if (el) return resolve(el);
-        //     const obs = new MutationObserver(() => {
-        //         const f = document.getElementById('plugins-ui');
-        //         if (f) { obs.disconnect(); resolve(f); }
-        //     });
-        //     obs.observe(document.body, { childList: true, subtree: true });
-        // });
-
-        // const el = await waitFor();
-        // if (el) setMountEl(el);
     });
 
 
@@ -274,8 +251,6 @@ export default function pointLights(props) {
     }
 
 
-    createEffect(() => {
-        if (!game.mountEl() || _disposer) return;
-        _disposer = render(renderView, game.mountEl());
-    });
+    // Delegate mounting to the shared game hook
+    game.mountView(renderView);
 }

@@ -30,8 +30,6 @@ export default function basicRotCube(props) {
     */
 
 
-    let _disposer = null;
-
     /*
     * On mount
     */
@@ -89,11 +87,6 @@ export default function basicRotCube(props) {
             </>
         )
     }
-
-
-    createEffect(() => {
-        if (!game.mountEl() || _disposer) return;
-        _disposer = render(renderView, game.mountEl());
-    });
-
+    // Delegate mounting to the shared game hook
+    game.mountView(renderView);
 }
