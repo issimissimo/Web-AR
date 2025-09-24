@@ -76,8 +76,19 @@ export const PLUGINS_LIST = [
         requirements: {}
     },
     {
-        fileName: "basicRotCube",
-        title: 'Cubo che ruota',
+        fileName: "basicCube",
+        title: 'Cubo base',
+        description: 'Da eliminare, solo di test',
+        icon: '/icons/360.svg',
+        category: '3D',
+        allowed: 1,
+        localized: false,
+        tags: [],
+        requirements: {}
+    },
+    {
+        fileName: "basicSphere",
+        title: 'Sfera base',
         description: 'Da eliminare, solo di test',
         icon: '/icons/360.svg',
         category: '3D',

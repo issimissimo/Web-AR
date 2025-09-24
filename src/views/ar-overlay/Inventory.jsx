@@ -250,7 +250,8 @@ const Inventory = (props) => {
         flex: 1;
         display: flex;
         flex-direction: column;
-        background-color: green;
+        margin-top: 1rem;
+        /* background-color: green; */
     `
 
     const InventoryItemsContainer = styled(FitHeightScrollable)`
@@ -291,9 +292,27 @@ const Inventory = (props) => {
     /** 
      * Set the selected game id!
     */
+    // const handleToggle = (id) => {
+    //     props.setSelectedGameId(id !== props.selectedGameId ? id : null);
+    // };
+
+
     const handleToggle = (id) => {
-        props.setSelectedGameId(id !== props.selectedGameId ? id : null);
+        const previousSelectedId = props.selectedGameId;
+        const newSelectedId = id !== props.selectedGameId ? id : null;
+
+        props.setSelectedGameId(null); // importante! dobbiamo cancellare il DOM prima di procedere
+
+        console.log(`Game selection change: ${previousSelectedId} -> ${newSelectedId}`);
+
+        // IMPORTANTE: Aggiungi un piccolo delay per permettere al createEffect di pulire
+        // il DOM prima che il nuovo componente tenti di montare la sua view
+        setTimeout(() => {
+            props.setSelectedGameId(newSelectedId);
+            console.log(`Game selection changed: ${newSelectedId}`);
+        }, 10);
     };
+
 
     const Middle = styled("div")`
         /* display: flex;
@@ -309,7 +328,7 @@ const Inventory = (props) => {
 
     const GameUI = styled("div")`
         /* display: flex;
-        flex-wrap: wrap;
+        flex-wrap: wrap;    
         gap: 1rem;
         align-items: flex-start; */
        
@@ -339,7 +358,7 @@ const Inventory = (props) => {
        height: fit-content;
         /* width: ${(props) => props.width || "100%"}; */
         flex-shrink: 0;
-        padding: 0.6rem;
+        padding: 0.5rem;
         padding-left: 1.2rem;
         padding-right: 1.2rem;
         /* margin-bottom: 1rem; */
@@ -347,7 +366,7 @@ const Inventory = (props) => {
         font-weight: 400;
         font-family: inherit;
         border-radius: 90px;
-        background: ${props => props.isOn ? 'var(--color-secondary-dark)' : 'var(--color-background-transparent)'};
+        background: ${props => props.isOn ? 'var(--color-primary-dark)' : 'var(--color-background-transparent)'};
         border: none;
         /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
         color: white;
@@ -417,9 +436,9 @@ const Inventory = (props) => {
                     }
                 </ItemsContainer>
 
-                    <GameUI id="plugins-ui">
+                <GameUI id="plugins-ui">
 
-                    </GameUI>
+                </GameUI>
 
             </Middle>
 

@@ -87,6 +87,15 @@ export default function pointLights(props) {
     })
 
 
+    createEffect(() => {
+        if (!props.selected && currentLight()) {
+            game.removePreviousFromScene();
+            game.removePreviousFromScene();
+            setCurrentLight(null);
+        }
+    })
+
+
     const handleUndo = () => {
         // super
         game.onUndo();

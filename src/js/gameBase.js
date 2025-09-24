@@ -9,7 +9,6 @@ import { LoadAudio } from '@tools/three/audioTools';
 import { render } from 'solid-js/web';
 
 
-
 // ===== HOOK BASE =====
 export function useGame(gameName, gameId, config = {}) {
 
@@ -49,7 +48,6 @@ export function useGame(gameName, gameId, config = {}) {
 
         const el = await waitFor();
         if (el) {
-            console.log("RRRRRRRRRRRRRRRRRRRRRRR")
             setMountEl(el);
         }
     });
@@ -150,8 +148,8 @@ export function useGame(gameName, gameId, config = {}) {
     const setVisibleByName = (assetName, value) => {
         gameAssets.forEach(asset => {
             if (asset.name === assetName && !asset.customProps.hidden) {
-                console.log(asset)
                 asset.visible = value;
+                console.log(asset)
             }
         });
     }

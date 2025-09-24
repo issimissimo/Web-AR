@@ -1,21 +1,15 @@
 import { onMount, createEffect } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { MeshStandardMaterial, Mesh } from 'three';
-import { render } from 'solid-js/web';
-
-
-
 import * as THREE from "three";
 
 
-
-
-export default function basicRotCube(props) {
+export default function basicSphere(props) {
 
     /*
     * Put here derived functions from Game
     */
-    const { game } = useGame("basicRotCube", props.id, {
+    const { game } = useGame("basicSphere", props.id, {
 
         onTap: () => {
         },
@@ -26,11 +20,6 @@ export default function basicRotCube(props) {
 
 
     /*
-    * DATA
-    */
-
-
-    /*
     * On mount
     */
     onMount(() => {
@@ -38,31 +27,28 @@ export default function basicRotCube(props) {
     });
 
     createEffect(() => {
-        console.log("BASIC ROT CUBE __ selected:", props.selected)
+        console.log("basicSphere __ selected:", props.selected)
     })
 
 
     /*
     * SETUP SCENE
     */
-    let cube;
+    let sphere;
     function setupScene() {
 
-        console.log("***** basicRotCube - setup")
-        // Reticle.setEnabled(false);
-
-        // const cubeGeometry = new BoxGeometry(0.2, 0.2, 0.2);
-        const cubeGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-        const cubeMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
-        cube = new Mesh(cubeGeometry, cubeMaterial);
-        cube.position.set(0, -0.5, -1);
-        game.addToScene(cube);
+        console.log("***** basicSphere - setup")
+        const sphereGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+        const sphereMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
+        sphere = new Mesh(sphereGeometry, sphereMaterial);
+        sphere.position.set(0, -0.5, -1);
+        game.addToScene(sphere);
 
 
         /*
         * Don't forget to call "game.setInitialized()" at finish 
         */
-        console.log("ADESSO CHIAMO SET INITIALIZED PER ROT CUBE!!!!!")
+        console.log("ADESSO CHIAMO SET INITIALIZED PER basicSphere !!!!!")
         game.setInitialized()
     }
 
@@ -80,7 +66,7 @@ export default function basicRotCube(props) {
                 {
                     props.selected && (
                         <>
-                            CIAO SONO IL CUBO!
+                            CIAO SONO LA SFERA!
                         </>
                     )
                 }
