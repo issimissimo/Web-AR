@@ -17,6 +17,8 @@ export function useGame(gameName, gameId, config = {}) {
     const gameDetails = PLUGINS_LIST.find(g => g.fileName === gameName);
     let gameAssets = [];
     const [gameData, setGameData] = createSignal(null);
+    const [mountEl, setMountEl] = createSignal(null);
+    let _disposer = null;
     let _initialized = false;
 
     // const loader = new GlbLoader();
@@ -27,7 +29,30 @@ export function useGame(gameName, gameId, config = {}) {
         audioTap = await new LoadAudio('sounds/tap.ogg', SceneManager.listener);
         audioUndo = await new LoadAudio('sounds/undo.ogg', SceneManager.listener);
         context.onLoaded(game);
+
+        // Wait for the #plugins-ui container to exist. The container may be
+        // created dynamically by other Solid components, so querying it
+        // immediately can return null. Use a MutationObserver with a
+        // short timeout fallback and store the element in a signal so the
+        // Portal can be rendered reactively below.
+        const waitFor = () => new Promise((resolve) => {
+            const el = document.getElementById('plugins-ui');
+            if (el) return resolve(el);
+            const obs = new MutationObserver(() => {
+                const f = document.getElementById('plugins-ui');
+                if (f) { obs.disconnect(); resolve(f); }
+            });
+            obs.observe(document.body, { childList: true, subtree: true });
+        });
+
+        const el = await waitFor();
+        if (el) {
+            console.log("RRRRRRRRRRRRRRRRRRRRRRR")
+            setMountEl(el);
+        }
     });
+
+
 
 
     const setInitialized = () => {
@@ -155,6 +180,7 @@ export function useGame(gameName, gameId, config = {}) {
         gameDetails,
         gameData,
         setGameData,
+        mountEl
     }
 
     return {

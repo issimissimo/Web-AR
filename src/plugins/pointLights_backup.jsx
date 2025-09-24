@@ -1,5 +1,4 @@
 import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
-import { render } from 'solid-js/web';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { Vector3 } from 'three';
@@ -11,6 +10,7 @@ import HorizontalSlider from '@views/ar-overlay/HorizontalSlider';
 // import ColorPicker from '@views/ar-overlay/ColorPicker';
 import Button from '@components/Button';
 import { faCheck } from "@fortawesome/free-solid-svg-icons"
+import CustomPortal from '@tools/solid/CustomPortal';
 
 
 const defaultGameData = [];
@@ -51,8 +51,7 @@ export default function pointLights(props) {
     const [intensity, setIntensity] = createSignal(5);
     const [color, setColor] = createSignal(0xffffff);
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
-    const [mountEl, setMountEl] = createSignal(null);
-    let _disposer = null;
+
 
     const hasUnsavedChanges = createMemo(() =>
         JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
@@ -82,24 +81,6 @@ export default function pointLights(props) {
         */
         console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
         game.setInitialized()
-
-        // // Wait for the #plugins-ui container to exist. The container may be
-        // // created dynamically by other Solid components, so querying it
-        // // immediately can return null. Use a MutationObserver with a
-        // // short timeout fallback and store the element in a signal so the
-        // // Portal can be rendered reactively below.
-        // const waitFor = () => new Promise((resolve) => {
-        //     const el = document.getElementById('plugins-ui');
-        //     if (el) return resolve(el);
-        //     const obs = new MutationObserver(() => {
-        //         const f = document.getElementById('plugins-ui');
-        //         if (f) { obs.disconnect(); resolve(f); }
-        //     });
-        //     obs.observe(document.body, { childList: true, subtree: true });
-        // });
-
-        // const el = await waitFor();
-        // if (el) setMountEl(el);
     });
 
 
@@ -201,7 +182,7 @@ export default function pointLights(props) {
         });
 
         // hide the helpers
-        game.setVisibleByName("helper", props.selected);
+        game.setVisibleByName("helper", false);
     }
 
 
@@ -241,55 +222,33 @@ export default function pointLights(props) {
     /*
     * RENDER
     */
-
-   
-    createEffect(() => {
-        // const el = mountEl();
-        const el = game.mountEl();
-        if (!el) return;
-        if (_disposer) return;
-
-        _disposer = render(() => (
-
+    return (
+        <CustomPortal>
             <>
-                {
-                    props.selected && (
-                        <>
-                            <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
-                            {currentLight() && (
-                                <>
-                                    {/* <ColorPicker color={color} setColor={setColor} /> */}
-                                    <HorizontalSlider value={intensity} setValue={setIntensity} />
-                                    <Button onClick={storeLightInData} icon={faCheck} small={true}>
-                                        Fatto!
-                                    </Button>
-                                </>
-                            )}
+                {props.selected && (
+                    <>
+                        <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
+                        {currentLight() && (
+                            <>
+                                {/* <ColorPicker color={color} setColor={setColor} /> */}
+                                <HorizontalSlider value={intensity} setValue={setIntensity} />
+                                <Button onClick={storeLightInData} icon={faCheck} small={true}>
+                                    Fatto!
+                                </Button>
+                            </>
+                        )}
 
-                            <Toolbar
-                                buttons={["undo", "save"]}
-                                onUndo={handleUndo}
-                                onSave={handleSave}
-                                undoActive={game.gameData().length > 0}
-                                saveActive={hasUnsavedChanges() && !currentLight()}
-                            />
-                        </>
-                    )
-                }
+                        <Toolbar
+                            buttons={["undo", "save"]}
+                            onUndo={handleUndo}
+                            onSave={handleSave}
+                            undoActive={game.gameData().length > 0}
+                            saveActive={hasUnsavedChanges() && !currentLight()}
+                        />
+                    </>
+                )}
             </>
-           
-               
-           
-
-
-        ), el);
-
-        // return () => {
-        //     if (_disposer) {
-        //         try { _disposer(); } catch (e) { }
-        //         _disposer = null;
-        //     }
-        // };
-    });
+        </CustomPortal>
+    );
 
 }
