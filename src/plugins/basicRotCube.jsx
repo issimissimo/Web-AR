@@ -147,23 +147,8 @@ export default function basicRotCube(props) {
 
 
     createEffect(() => {
-        const el = game.mountEl();
-        if (!el) {
-            console.error("NO EL!")
-            return;
-        }
-        if (_disposer) {
-            console.error("ALREADY DISPOSER")
-            return;
-        }
-
-        // Use the reusable renderView function to keep JSX in one place
-        _disposer = render(renderView, el);
-    });
-
-    // Ensure we dispose the programmatic render when this component unmounts
-    onCleanup(() => {
-        if (_disposer) _disposer = null;
+        if (!game.mountEl() || _disposer) return;
+        _disposer = render(renderView, game.mountEl());
     });
 
 }

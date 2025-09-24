@@ -275,16 +275,7 @@ export default function pointLights(props) {
 
 
     createEffect(() => {
-        const el = game.mountEl();
-        if (!el || _disposer) return;
-
-        // Use the reusable renderView function to keep JSX in one place
-        _disposer = render(renderView, el);
+        if (!game.mountEl() || _disposer) return;
+        _disposer = render(renderView, game.mountEl());
     });
-
-    // Ensure we dispose the programmatic render when this component unmounts
-    onCleanup(() => {
-        if (_disposer) _disposer = null;
-    });
-
 }
