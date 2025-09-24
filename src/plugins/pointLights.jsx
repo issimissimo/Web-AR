@@ -1,4 +1,4 @@
-import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
+import { onMount, onCleanup, createEffect, createSignal, createMemo } from 'solid-js';
 import { render } from 'solid-js/web';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
@@ -242,15 +242,8 @@ export default function pointLights(props) {
     * RENDER
     */
 
-   
-    createEffect(() => {
-        // const el = mountEl();
-        const el = game.mountEl();
-        if (!el) return;
-        if (_disposer) return;
-
-        _disposer = render(() => (
-
+    const renderView = () => {
+        return (
             <>
                 {
                     props.selected && (
@@ -277,19 +270,21 @@ export default function pointLights(props) {
                     )
                 }
             </>
-           
-               
-           
+        )
+    }
 
 
-        ), el);
+    createEffect(() => {
+        const el = game.mountEl();
+        if (!el || _disposer) return;
 
-        // return () => {
-        //     if (_disposer) {
-        //         try { _disposer(); } catch (e) { }
-        //         _disposer = null;
-        //     }
-        // };
+        // Use the reusable renderView function to keep JSX in one place
+        _disposer = render(renderView, el);
+    });
+
+    // Ensure we dispose the programmatic render when this component unmounts
+    onCleanup(() => {
+        if (_disposer) _disposer = null;
     });
 
 }

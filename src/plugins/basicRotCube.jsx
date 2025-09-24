@@ -1,8 +1,9 @@
-import { onMount, createEffect } from 'solid-js';
+import { onMount, createEffect, onCleanup } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { BoxGeometry, MeshStandardMaterial, Mesh, HemisphereLight, Vector3 } from 'three';
 import Reticle from '@js/reticle';
+import { render } from 'solid-js/web';
 
 import ContactShadowsXR from '@tools/three/contactShadowsXR';
 import SceneManager from '@js/sceneManager';
@@ -34,6 +35,7 @@ export default function basicRotCube(props) {
     */
 
 
+    let _disposer = null;
 
     /*
     * On mount
@@ -42,7 +44,7 @@ export default function basicRotCube(props) {
         setupScene();
     });
 
-    createEffect(()=>{
+    createEffect(() => {
         console.log("BASIC ROT CUBE __ selected:", props.selected)
     })
 
@@ -128,19 +130,40 @@ export default function basicRotCube(props) {
     /*
     * RENDER (Will be shown ONLY after initialization completed)
     */
-    return (
-        props.selected ?
 
-            <Container>
-                <Title>{game.gameDetails.title}</Title>
-                <Description>{game.gameDetails.description}</Description>
-                {/* <Button
-                    onClick={() => game.saveGame()}
-                >Test salva game</Button> */}
-            </Container>
+    const renderView = () => {
+        return (
+            <>
+                {
+                    props.selected && (
+                        <>
+                            CIAO SONO IL CUBO!
+                        </>
+                    )
+                }
+            </>
+        )
+    }
 
-            :
-            <div />
-    );
+
+    createEffect(() => {
+        const el = game.mountEl();
+        if (!el) {
+            console.error("NO EL!")
+            return;
+        }
+        if (_disposer) {
+            console.error("ALREADY DISPOSER")
+            return;
+        }
+
+        // Use the reusable renderView function to keep JSX in one place
+        _disposer = render(renderView, el);
+    });
+
+    // Ensure we dispose the programmatic render when this component unmounts
+    onCleanup(() => {
+        if (_disposer) _disposer = null;
+    });
 
 }
