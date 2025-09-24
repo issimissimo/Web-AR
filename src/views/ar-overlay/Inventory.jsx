@@ -303,7 +303,7 @@ const Inventory = (props) => {
         display: flex;
         flex-direction: column;
        
-        background-color: #1100ff;
+        /* background-color: #1100ff; */
         flex: 1;
     `
 
@@ -322,7 +322,7 @@ const Inventory = (props) => {
         flex-wrap: wrap;
         gap: 1rem;
         /* align-items: flex-start; */
-        background-color: #ffee00;
+        /* background-color: #ffee00; */
     `
 
     const Bottom = styled("div")`
@@ -344,7 +344,7 @@ const Inventory = (props) => {
         padding-right: 1.2rem;
         /* margin-bottom: 1rem; */
         font-size: small;
-        font-weight: 500;
+        font-weight: 400;
         font-family: inherit;
         border-radius: 90px;
         background: ${props => props.isOn ? 'var(--color-secondary-dark)' : 'var(--color-background-transparent)'};

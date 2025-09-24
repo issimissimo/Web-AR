@@ -1,5 +1,5 @@
 import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
-import { Portal } from 'solid-js/web';
+import { render } from 'solid-js/web';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { Vector3 } from 'three';
@@ -52,7 +52,7 @@ export default function pointLights(props) {
     const [color, setColor] = createSignal(0xffffff);
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
     const [mountEl, setMountEl] = createSignal(null);
-
+    let _disposer = null;
 
     const hasUnsavedChanges = createMemo(() =>
         JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
@@ -88,28 +88,17 @@ export default function pointLights(props) {
         // immediately can return null. Use a MutationObserver with a
         // short timeout fallback and store the element in a signal so the
         // Portal can be rendered reactively below.
-        const waitForPluginsUI = () => new Promise((resolve) => {
+        const waitFor = () => new Promise((resolve) => {
             const el = document.getElementById('plugins-ui');
             if (el) return resolve(el);
-
             const obs = new MutationObserver(() => {
-                const found = document.getElementById('plugins-ui');
-                if (found) {
-                    obs.disconnect();
-                    resolve(found);
-                }
+                const f = document.getElementById('plugins-ui');
+                if (f) { obs.disconnect(); resolve(f); }
             });
             obs.observe(document.body, { childList: true, subtree: true });
-
-            // Fallback timeout: stop observing after 3s and resolve whatever
-            // is present (possibly null).
-            setTimeout(() => {
-                try { obs.disconnect(); } catch (e) { }
-                resolve(document.getElementById('plugins-ui'));
-            }, 3000);
         });
 
-        const el = await waitForPluginsUI();
+        const el = await waitFor();
         if (el) setMountEl(el);
     });
 
@@ -252,38 +241,54 @@ export default function pointLights(props) {
     /*
     * RENDER
     */
-    return (
-        mountEl() ? (
-            <Portal mount={mountEl()}>
-                <>
-                    {
-                        props.selected && (
-                            <>
-                                <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
-                                {currentLight() && (
-                                    <>
-                                        {/* <ColorPicker color={color} setColor={setColor} /> */}
-                                        <HorizontalSlider value={intensity} setValue={setIntensity} />
-                                        {/* <button onClick={() => finalizeLight()}>DONE</button> */}
-                                        <Button onClick={storeLightInData} icon={faCheck} small={true}>
-                                            Fatto!
-                                        </Button>
-                                    </>
-                                )}
 
-                                <Toolbar
-                                    buttons={["undo", "save"]}
-                                    onUndo={handleUndo}
-                                    onSave={handleSave}
-                                    undoActive={game.gameData().length > 0}
-                                    saveActive={hasUnsavedChanges() && !currentLight()}
-                                />
-                            </>
-                        )
-                    }
-                </>
-            </Portal>
-        ) : null
-    );
+   
+    createEffect(() => {
+        const el = mountEl();
+        if (!el) return;
+        if (_disposer) return;
+
+        _disposer = render(() => (
+
+            <>
+                {
+                    props.selected && (
+                        <>
+                            <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
+                            {currentLight() && (
+                                <>
+                                    {/* <ColorPicker color={color} setColor={setColor} /> */}
+                                    <HorizontalSlider value={intensity} setValue={setIntensity} />
+                                    <Button onClick={storeLightInData} icon={faCheck} small={true}>
+                                        Fatto!
+                                    </Button>
+                                </>
+                            )}
+
+                            <Toolbar
+                                buttons={["undo", "save"]}
+                                onUndo={handleUndo}
+                                onSave={handleSave}
+                                undoActive={game.gameData().length > 0}
+                                saveActive={hasUnsavedChanges() && !currentLight()}
+                            />
+                        </>
+                    )
+                }
+            </>
+           
+               
+           
+
+
+        ), el);
+
+        return () => {
+            if (_disposer) {
+                try { _disposer(); } catch (e) { }
+                _disposer = null;
+            }
+        };
+    });
 
 }

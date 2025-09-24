@@ -10,8 +10,10 @@ import { Context } from "@views/ar-overlay/arSession"
 const ContainerToolbar = styled(Motion.div)`
     position: absolute;
     right: 1.5em;
-    top: 20%;
-    height: 50vh;
+    top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+    /* height: 50vh; */
     display: flex;
     display: flex;
     flex-direction: column;
