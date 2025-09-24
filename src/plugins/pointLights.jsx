@@ -83,6 +83,13 @@ export default function pointLights(props) {
     });
 
 
+    // toggle the visibility of the helpers
+    createEffect(() => {
+        console.log("POINT LIGHTS __ selected:", props.selected)
+        game.setVisibleByName("helper", props.selected);
+    })
+
+
     const handleUndo = () => {
         // super
         game.onUndo();
@@ -111,7 +118,7 @@ export default function pointLights(props) {
                 Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
             }
 
-            loadLights();
+            loadAllLights();
         }
     });
 
@@ -139,7 +146,7 @@ export default function pointLights(props) {
     }
 
 
-    function finalizeLight() {
+    function storeLightInData() {
 
         const diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, currentLight());
         const newData = {
@@ -155,7 +162,7 @@ export default function pointLights(props) {
 
 
     // Load all lights
-    function loadLights() {
+    function loadAllLights() {
         console.log(">>>>>>>>>>>>> CREO ", game.gameData().length, " LUCI SALVATE!!!")
 
         game.gameData().forEach((el) => {
@@ -172,6 +179,9 @@ export default function pointLights(props) {
             const intensity = el.intensity;
             createLight(globalMatrix, color, intensity)
         });
+
+        // hide the helpers
+        game.setVisibleByName("helper", props.selected);
     }
 
 
@@ -215,14 +225,15 @@ export default function pointLights(props) {
         <>
             {/* <button onClick={() => spawnLightOnTap()}>SPAWN!</button> */}
             {
-                props.enabled && (
+                props.selected && (
                     <>
+                        <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
                         {currentLight() && (
                             <>
                                 {/* <ColorPicker color={color} setColor={setColor} /> */}
                                 <HorizontalSlider value={intensity} setValue={setIntensity} />
                                 {/* <button onClick={() => finalizeLight()}>DONE</button> */}
-                                <Button onClick={finalizeLight} icon={faCheck} small={true}>
+                                <Button onClick={storeLightInData} icon={faCheck} small={true}>
                                     Fatto!
                                 </Button>
                             </>

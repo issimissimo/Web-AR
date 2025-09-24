@@ -88,10 +88,18 @@ export function useGame(gameName, gameId, config = {}) {
         gameAssets = [];
     }
 
-
     const setVisible = (value) => {
         gameAssets.forEach(asset => {
             if (asset.isMesh && !asset.customProps.hidden) asset.visible = value;
+        });
+    }
+
+    const setVisibleByName = (assetName, value) => {
+        gameAssets.forEach(asset => {
+            if (asset.name === assetName && !asset.customProps.hidden) {
+                console.log(asset)
+                asset.visible = value;
+            }
         });
     }
 
@@ -143,6 +151,7 @@ export function useGame(gameName, gameId, config = {}) {
         removePreviousFromScene,
         removeAllFromScene,
         setVisible,
+        setVisibleByName,
         gameDetails,
         gameData,
         setGameData,

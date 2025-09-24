@@ -233,7 +233,6 @@ const InventoryItem = (props) => {
 
 const Inventory = (props) => {
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null);
-    const [selectedPluginId, setSelectedPluginId] = createSignal(null);
     const [visible, setVisible] = createSignal(false)
     const context = useContext(Context)
 
@@ -289,16 +288,29 @@ const Inventory = (props) => {
         return totalAllowed
     }
 
+    /** 
+     * Set the selected game id!
+    */
     const handleToggle = (id) => {
         props.setSelectedGameId(id !== props.selectedGameId ? id : null);
     };
 
     const Middle = styled("div")`
         /* display: flex;
-        align-items: center;
-        flex-direction: column; */
-        /* background-color: #1100ff; */
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-start; */
+       
+        background-color: #1100ff;
         flex: 1;
+    `
+
+    const ItemsContainer = styled("div")`
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        /* align-items: flex-start; */
+        background-color: #ffee00;
     `
 
     const Bottom = styled("div")`
@@ -306,18 +318,19 @@ const Inventory = (props) => {
         align-items: center;
         justify-content: center;
         /* background-color: red; */
-        height: 60px;
+        /* height: 60px; */
     `
 
     const StyledToggleButton = styled('div')`
         position: relative;
-        
        width: fit-content;
+       height: fit-content;
         /* width: ${(props) => props.width || "100%"}; */
         flex-shrink: 0;
         padding: 0.6rem;
         padding-left: 1.2rem;
         padding-right: 1.2rem;
+        /* margin-bottom: 1rem; */
         font-size: small;
         font-weight: 500;
         font-family: inherit;
@@ -332,7 +345,7 @@ const Inventory = (props) => {
         -webkit-tap-highlight-color: transparent;
         transition: background 0.05s, color 0.05s;
     `
-  //#region [ToggleButton]
+    //#region [ToggleButton]
     const ToggleButton = (props) => {
 
         // const [isOn, setIson] = createSignal(props.isOn ?? false);
@@ -359,12 +372,12 @@ const Inventory = (props) => {
 
     return (
         <InventoryContainer id="InventoryContainer">
-            <CategoriesPicker
+            {/* <CategoriesPicker
                 // visible={visible()}
                 visible={true}
                 currentCategoryName={currentCategoryName()}
                 onCategoryPicked={(name) => handleCategorySelected(name)}
-            ></CategoriesPicker>
+            ></CategoriesPicker> */}
 
             {/* <Button
                 active={true}
@@ -377,26 +390,27 @@ const Inventory = (props) => {
             </Button> */}
 
             <Middle>
-                {/* <ToggleButton>Luci puntiformi</ToggleButton> */}
 
-                {
-                    props.gamesRunning.map(game => (
-                        <ToggleButton
-                            id={game.id}
-                            onToggle={(id) => handleToggle(id)}
-                            isOn={game.id === props.selectedGameId}
-                        >
-                            {getPluginTitle(game.name)}
-                        </ToggleButton>
-                    ))
-                }
+                <ItemsContainer>
+                    {
+                        props.gamesRunning.map(game => (
+                            <ToggleButton
+                                id={game.id}
+                                onToggle={(id) => handleToggle(id)}
+                                isOn={game.id === props.selectedGameId}
+                            >
+                                {getPluginTitle(game.name)}
+                            </ToggleButton>
+                        ))
+                    }
+                </ItemsContainer>
 
 
 
             </Middle>
 
             <Bottom>
-                <ButtonCircle
+                {/* <ButtonCircle
                     data-interactive
                     // active={props.saveActive ?? true}
                     // visible={props.buttons.includes("save")}
@@ -407,7 +421,13 @@ const Inventory = (props) => {
                     border={false}
                 >
                     <Fa icon={faPlus} size="1.3x" class="icon" />
-                </ButtonCircle>
+                </ButtonCircle> */}
+                <CategoriesPicker
+                    // visible={visible()}
+                    visible={true}
+                    currentCategoryName={currentCategoryName()}
+                    onCategoryPicked={(name) => handleCategorySelected(name)}
+                ></CategoriesPicker>
             </Bottom>
         </InventoryContainer>
     )
