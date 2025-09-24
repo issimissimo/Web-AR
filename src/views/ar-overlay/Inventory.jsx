@@ -300,8 +300,20 @@ const Inventory = (props) => {
         flex-wrap: wrap;
         gap: 1rem;
         align-items: flex-start; */
+        display: flex;
+        flex-direction: column;
        
         background-color: #1100ff;
+        flex: 1;
+    `
+
+    const GameUI = styled("div")`
+        /* display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-start; */
+       
+        background-color: #ff00aa;
         flex: 1;
     `
 
@@ -405,7 +417,9 @@ const Inventory = (props) => {
                     }
                 </ItemsContainer>
 
+                    <GameUI id="plugins-ui">
 
+                    </GameUI>
 
             </Middle>
 

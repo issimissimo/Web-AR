@@ -1,4 +1,5 @@
 import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
+import { Portal } from 'solid-js/web';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { Vector3 } from 'three';
@@ -50,6 +51,7 @@ export default function pointLights(props) {
     const [intensity, setIntensity] = createSignal(5);
     const [color, setColor] = createSignal(0xffffff);
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
+    const [mountEl, setMountEl] = createSignal(null);
 
 
     const hasUnsavedChanges = createMemo(() =>
@@ -80,6 +82,35 @@ export default function pointLights(props) {
         */
         console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
         game.setInitialized()
+
+        // Wait for the #plugins-ui container to exist. The container may be
+        // created dynamically by other Solid components, so querying it
+        // immediately can return null. Use a MutationObserver with a
+        // short timeout fallback and store the element in a signal so the
+        // Portal can be rendered reactively below.
+        const waitForPluginsUI = () => new Promise((resolve) => {
+            const el = document.getElementById('plugins-ui');
+            if (el) return resolve(el);
+
+            const obs = new MutationObserver(() => {
+                const found = document.getElementById('plugins-ui');
+                if (found) {
+                    obs.disconnect();
+                    resolve(found);
+                }
+            });
+            obs.observe(document.body, { childList: true, subtree: true });
+
+            // Fallback timeout: stop observing after 3s and resolve whatever
+            // is present (possibly null).
+            setTimeout(() => {
+                try { obs.disconnect(); } catch (e) { }
+                resolve(document.getElementById('plugins-ui'));
+            }, 3000);
+        });
+
+        const el = await waitForPluginsUI();
+        if (el) setMountEl(el);
     });
 
 
@@ -222,34 +253,37 @@ export default function pointLights(props) {
     * RENDER
     */
     return (
-        <>
-            {/* <button onClick={() => spawnLightOnTap()}>SPAWN!</button> */}
-            {
-                props.selected && (
-                    <>
-                        <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
-                        {currentLight() && (
+        mountEl() ? (
+            <Portal mount={mountEl()}>
+                <>
+                    {
+                        props.selected && (
                             <>
-                                {/* <ColorPicker color={color} setColor={setColor} /> */}
-                                <HorizontalSlider value={intensity} setValue={setIntensity} />
-                                {/* <button onClick={() => finalizeLight()}>DONE</button> */}
-                                <Button onClick={storeLightInData} icon={faCheck} small={true}>
-                                    Fatto!
-                                </Button>
-                            </>
-                        )}
+                                <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
+                                {currentLight() && (
+                                    <>
+                                        {/* <ColorPicker color={color} setColor={setColor} /> */}
+                                        <HorizontalSlider value={intensity} setValue={setIntensity} />
+                                        {/* <button onClick={() => finalizeLight()}>DONE</button> */}
+                                        <Button onClick={storeLightInData} icon={faCheck} small={true}>
+                                            Fatto!
+                                        </Button>
+                                    </>
+                                )}
 
-                        <Toolbar
-                            buttons={["undo", "save"]}
-                            onUndo={handleUndo}
-                            onSave={handleSave}
-                            undoActive={game.gameData().length > 0}
-                            saveActive={hasUnsavedChanges() && !currentLight()}
-                        />
-                    </>
-                )
-            }
-        </>
+                                <Toolbar
+                                    buttons={["undo", "save"]}
+                                    onUndo={handleUndo}
+                                    onSave={handleSave}
+                                    undoActive={game.gameData().length > 0}
+                                    saveActive={hasUnsavedChanges() && !currentLight()}
+                                />
+                            </>
+                        )
+                    }
+                </>
+            </Portal>
+        ) : null
     );
 
 }
