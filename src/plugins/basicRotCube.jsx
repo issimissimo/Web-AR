@@ -1,4 +1,4 @@
-import { onMount } from 'solid-js';
+import { onMount, createEffect } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { BoxGeometry, MeshStandardMaterial, Mesh, HemisphereLight, Vector3 } from 'three';
@@ -41,6 +41,10 @@ export default function basicRotCube(props) {
     onMount(() => {
         setupScene();
     });
+
+    createEffect(()=>{
+        console.log("BASIC ROT CUBE __ selected:", props.selected)
+    })
 
 
     /*

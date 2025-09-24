@@ -5,11 +5,14 @@ import Fa from 'solid-fa';
 const StyledButton = styled(Motion.button)`
   position: relative;
   display: ${props => props.visible ? 'block' : 'none'};
-  width: 40px;
-  height: 40px;
+  /* width: 40px;
+  height: 40px; */
+  width: ${props => props.size ?? '40px'};
+  height: ${props => props.size ?? '40px'};
   padding: ${props => props.small ? "0" : "0.7rem"};
   border-radius: 50%;
-  background: var(--color-background-transparent);
+  /* background: var(--color-background-transparent); */
+  background: ${props => props.highlight ? 'var(--color-primary)' : 'var(--color-background-transparent)'};
   border: ${props => props.border ? "1px solid" : "none"};
   border-color: var(--color-white);
   pointer-events: ${props => props.active ? 'auto' : 'none'};
@@ -53,6 +56,8 @@ const ButtonCircle = (props) => {
       active={props.active ?? true}
       visible={props.visible ?? true}
       border={props.border ?? true}
+      size={props.size}
+      highlight={props.highlight}
       class="glass"
       style={props.style}
     >

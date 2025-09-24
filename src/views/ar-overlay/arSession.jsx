@@ -518,6 +518,9 @@ export default function ArSession(props) {
                                         addNewModule={(id, name) => loadModule(id, name, false, true)}
                                         saveEnabled={selectedGameId() !== null ? true : false}
                                         saveGame={handleSaveSelectedGame}
+                                        gamesRunning={props.gamesRunning}
+                                        selectedGameId={selectedGameId()}
+                                        setSelectedGameId={(id) => setSelectedGameId(id)}
                                     />
                         )}
                     </>
