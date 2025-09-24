@@ -23,6 +23,7 @@
     "firebase": "^11.8.1",
     "howler": "^2.2.4",
     "qrcode": "^1.5.3",
+    "solid-color": "^0.0.6",
     "solid-fa": "^0.2.0",
     "solid-motionone": "^1.0.4",
     "solid-styled-components": "^0.28.5",

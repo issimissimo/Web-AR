@@ -331,6 +331,8 @@ const Inventory = (props) => {
         flex-wrap: wrap;    
         gap: 1rem;
         align-items: flex-start; */
+        display: flex;
+        flex-direction: column;
        
         /* background-color: #ff00aa; */
         flex: 1;

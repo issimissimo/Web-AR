@@ -1,7 +1,9 @@
 import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
-import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
-import { Vector3 } from 'three';
+import { SliderPicker } from 'solid-color'
+import { useGame } from '@js/gameBase';
+
+
 import Reticle from '@js/reticle';
 import Toolbar from '@views/ar-overlay/Toolbar';
 import { config } from '@js/config';
@@ -48,7 +50,18 @@ export default function pointLights(props) {
 
     const [currentLight, setCurrentLight] = createSignal(null);
     const [intensity, setIntensity] = createSignal(5);
-    const [color, setColor] = createSignal(0xffffff);
+    // const [color, setColor] = createSignal(0xffffff);
+
+
+    const [color, setColor] = createSignal({
+        r: 68,
+        g: 107,
+        b: 158,
+        a: 1,
+    })
+
+
+
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
 
     const hasUnsavedChanges = createMemo(() =>
@@ -208,19 +221,21 @@ export default function pointLights(props) {
         return newLight;
     }
 
+    const handleChangeComplete = (color) => {
+        console.log(color.hex)
+        // setColor(color.rgb)
+    }
+
 
     /*
     * STYLE
     */
     const Container = styled('div')`
         width: 100%;
-        height: 100vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        padding: 2em;
+        justify-content: flex-end;
     `
 
 
@@ -236,13 +251,14 @@ export default function pointLights(props) {
                         <>
                             <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
                             {currentLight() && (
-                                <>
+                                <Container>
                                     {/* <ColorPicker color={color} setColor={setColor} /> */}
+                                    <SliderPicker color={color()} onChangeComplete={handleChangeComplete} />
                                     <HorizontalSlider value={intensity} setValue={setIntensity} />
                                     <Button onClick={storeLightInData} icon={faCheck} small={true}>
                                         Fatto!
                                     </Button>
-                                </>
+                                </Container>
                             )}
 
                             <Toolbar
