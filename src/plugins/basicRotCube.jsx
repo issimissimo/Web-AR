@@ -1,12 +1,7 @@
-import { onMount, createEffect, onCleanup } from 'solid-js';
+import { onMount, createEffect } from 'solid-js';
 import { useGame } from '@js/gameBase';
-import { styled } from 'solid-styled-components';
-import { BoxGeometry, MeshStandardMaterial, Mesh, HemisphereLight, Vector3 } from 'three';
-import Reticle from '@js/reticle';
+import { MeshStandardMaterial, Mesh } from 'three';
 import { render } from 'solid-js/web';
-
-import ContactShadowsXR from '@tools/three/contactShadowsXR';
-import SceneManager from '@js/sceneManager';
 
 
 
@@ -52,7 +47,7 @@ export default function basicRotCube(props) {
     /*
     * SETUP SCENE
     */
-    let cube, shadows;
+    let cube;
     function setupScene() {
 
         console.log("***** basicRotCube - setup")
@@ -66,19 +61,6 @@ export default function basicRotCube(props) {
         game.addToScene(cube);
 
 
-        // const light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
-        // light.position.set(0, 2, 0);
-        // game.addToScene(light);
-
-
-        // shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
-        //     position: new Vector3(0, -1, -1),
-        //     resolution: 512,
-        //     blur: 2,
-        //     animate: true,
-        //     updateFrequency: 2,
-        // });
-
         /*
         * Don't forget to call "game.setInitialized()" at finish 
         */
@@ -90,46 +72,9 @@ export default function basicRotCube(props) {
     /*
     * LOOP
     */
-    function loop() {
-        // cube.rotation.x += 0.01;
-        // cube.rotation.y += 0.01;
-
-        // shadows.update();
-    }
+    function loop() { }
 
 
-
-
-    /*
-    * STYLE
-    */
-    const Container = styled('div')`
-        width: 100%;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        padding: 2em;
-    `
-    const Title = styled('h2')`
-        text-align: center;
-    `
-
-    const Description = styled('p')`
-        text-align: center;
-    `
-
-    const Button = styled('button')`
-        margin: 1em;
-    `
-
-
-
-    /*
-    * RENDER (Will be shown ONLY after initialization completed)
-    */
 
     const renderView = () => {
         return (
