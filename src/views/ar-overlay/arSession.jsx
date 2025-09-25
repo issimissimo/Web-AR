@@ -1,4 +1,4 @@
-import { createSignal, createEffect, createContext, onMount, For } from 'solid-js';
+import { createSignal, createEffect, createContext, onMount, For, createRoot } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
 import { config } from '@js/config';
 import { Matrix4 } from 'three';
@@ -127,7 +127,19 @@ export default function ArSession(props) {
                 }
 
                 // Call onTap function of all the gamesRunning
-                props.gamesRunning.forEach((el) => el.onTap());
+                props.gamesRunning.forEach((el) => {
+                    try {
+                        // execute onTap inside a temporary reactive root so
+                        // any computations created are attached to a root and can be disposed.
+                        const disposer = createRoot(() => {
+                            try { el.onTap && el.onTap(); } catch (err) { console.error('Error in game onTap:', err); }
+                        });
+                        // Immediately dispose the temporary root to avoid leaking
+                        try { disposer(); } catch (e) { }
+                    } catch (e) {
+                        console.error('Error executing game onTap:', e);
+                    }
+                });
             };
 
             SceneManager.controller.addEventListener("select", onTap);
