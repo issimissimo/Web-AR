@@ -27,7 +27,7 @@ export default function pointLights(props) {
 
         onTap: () => {
 
-            if (props.enabled && !currentLight()) {
+            if (props.selected && !currentLight()) {
 
                 console.log("TAPPPP....")
 
@@ -249,7 +249,7 @@ export default function pointLights(props) {
                 {
                     props.selected && (
                         <>
-                            <button onClick={() => spawnLightOnTap()}>SPAWN!</button>
+                            {/* <button onClick={() => spawnLightOnTap()}>SPAWN!</button> */}
                             {currentLight() && (
                                 <Container>
                                     {/* <ColorPicker color={color} setColor={setColor} /> */}

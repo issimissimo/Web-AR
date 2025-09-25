@@ -360,7 +360,7 @@ const Inventory = (props) => {
        height: fit-content;
         /* width: ${(props) => props.width || "100%"}; */
         flex-shrink: 0;
-        padding: 0.5rem;
+        padding: 0.4rem;
         padding-left: 1.2rem;
         padding-right: 1.2rem;
         /* margin-bottom: 1rem; */
@@ -391,6 +391,7 @@ const Inventory = (props) => {
 
         return (
             <StyledToggleButton
+                data-interactive
                 onClick={handleOnClick}
                 style={props.style}
                 class="glass"

@@ -118,17 +118,52 @@ export default function ArSession(props) {
             }
         }
         else {
-            SceneManager.controller.addEventListener("select", () => {
 
+            // On Tap
+            const onTap = () => {
+                console.log("SIAMO SU ON TAP: _tapEnabled=", _tapEnabled)
                 // Avoid TAP on DOM elements
                 if (!_tapEnabled) {
+                    console.log("...E")
                     _tapEnabled = true;
+                    console.log(_tapEnabled)
                     return;
                 }
 
                 // Call onTap function of all the gamesRunning
                 props.gamesRunning.forEach((el) => el.onTap());
-            });
+            };
+
+            SceneManager.controller.addEventListener("select", onTap);
+
+            // For Debug
+            if (config.debugOnDesktop) {
+                document.addEventListener("click", (event) => {
+                    console.log("CLICKKK")
+                    // Controlla se l'elemento cliccato è uno di quelli "non tappabili"
+                    const clickedElement = event.target;
+                    const isNonTappable = clickedElement.matches('#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]') ||
+                        !!clickedElement.closest('#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]');
+
+
+                    _tapEnabled = !isNonTappable;
+                    onTap();
+                });
+            }
+
+
+            // SceneManager.controller.addEventListener("select", () => {
+
+            //     // Avoid TAP on DOM elements
+            //     if (!_tapEnabled) {
+            //         _tapEnabled = true;
+            //         return;
+            //     }
+
+            //     // Call onTap function of all the gamesRunning
+            //     props.gamesRunning.forEach((el) => el.onTap());
+            // });
+
         }
 
 
