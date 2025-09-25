@@ -65,6 +65,8 @@ export default function ArSession(props) {
             props.resetGamesRunning;
         }
 
+
+
         // Let's start immediately darkening the background...
         // setBlurVisible(true);
         handleBlurredCover({ visible: true });
@@ -80,9 +82,12 @@ export default function ArSession(props) {
                 color: 0xf472b6,
             });
 
+
+
         // When reopening the ARSession it seem to stay "true"... 
         // let's force (not clear why I have to do that)
         setInitDetectionCompleted(false);
+
 
         // If Debug on desktop we must set the background 
         // to black, so to see something...
@@ -98,6 +103,8 @@ export default function ArSession(props) {
         else {
             body.style.backgroundColor = "transparent"
         }
+
+
 
         // if we are "user" we must update the views number
         // of this marker (+1)
@@ -157,10 +164,8 @@ export default function ArSession(props) {
             }
         }
 
-
         // Load games of this marker
         if (props.marker.games.length > 0) {
-            // _modulesToLoad = props.marker.games.length;
             loadAllModules();
         }
         else {

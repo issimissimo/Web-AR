@@ -43,7 +43,7 @@ export default function envMapBasic(props) {
     * On mount
     */
     onMount(async () => {
-
+        console.log("|||||||||||||||||scene",SceneManager.scene)
         // load data
         await game.loadGameData();
 
@@ -70,7 +70,6 @@ export default function envMapBasic(props) {
     * SETUP SCENE
     */
     function setupScene() {
-
         // initialize environment
         const rgbeLoader = new RGBELoader()
         rgbeLoader.load(game.gameData().fileName, (envMap) => {
@@ -82,7 +81,7 @@ export default function envMapBasic(props) {
             const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
             if (defaultLight) {
                 SceneManager.scene.remove(SceneManager.light);
-                console.log("defaultLight rimossa!")
+                console.log("******************defaultLight rimossa!")
             }
 
             /*
