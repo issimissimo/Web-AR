@@ -1,22 +1,20 @@
-import {
-    onMount,
-    createSignal,
-    createMemo,
-    createEffect,
-    on
-} from "solid-js"
+import { onMount, createSignal, createMemo, createEffect, on } from "solid-js"
 import { useGame } from "@js/gameBase"
 import { styled } from "solid-styled-components"
 import SceneManager from "@js/sceneManager"
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader"
 import { EquirectangularReflectionMapping } from "three"
 import Toolbar from "@views/ar-overlay/Toolbar"
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons"
+import {
+    faChevronLeft,
+    faChevronRight,
+} from "@fortawesome/free-solid-svg-icons"
 import ButtonCircle from "@components/ButtonCircle"
-import Fa from 'solid-fa';
+import Fa from "solid-fa"
 
 export default function envMapBasic(props) {
     const [index, setIndex] = createSignal(0)
+    const [loading, setLoading] = createSignal(false)
     const [lastSavedGameData, setLastSavedGameData] = createSignal({})
     let files
     const hdrLoader = new HDRLoader()
@@ -25,11 +23,11 @@ export default function envMapBasic(props) {
      * Put here derived functions from Game
      */
     const { game } = useGame("envMapBasic", props.id, {
-        onTap: () => { },
+        onTap: () => {},
 
-        renderLoop: () => { },
+        renderLoop: () => {},
 
-        close: () => { },
+        close: () => {},
     })
 
     /*
@@ -61,6 +59,7 @@ export default function envMapBasic(props) {
 
         // load hdr
         loadEnv(() => {
+            
             /*
              * Don't forget to call "game.setInitialized()" at finish
              */
@@ -68,15 +67,17 @@ export default function envMapBasic(props) {
         })
     })
 
-    createEffect(on(
-        () => props.selected,
-        (newValue, prevValue) => {
-            // console.log(`Changed from ${prevValue} to ${newValue}`);
-            setTimeout(() => {
-                game.forceUpdateDomElements();
-            }, 50);
-        }
-    ));
+    createEffect(
+        on(
+            () => props.selected,
+            (newValue, prevValue) => {
+                // console.log(`Changed from ${prevValue} to ${newValue}`);
+                setTimeout(() => {
+                    game.forceUpdateDomElements()
+                }, 50)
+            }
+        )
+    )
 
     const next = () => {
         setIndex((i) => (i + 1) % files.length)
@@ -110,8 +111,10 @@ export default function envMapBasic(props) {
     }
 
     function loadEnv(callback = null) {
+        setLoading(true)
         const filePath = "images/hdr/" + game.gameData().fileName
         hdrLoader.load(filePath, (envMap) => {
+            setLoading(false)
             envMap.mapping = EquirectangularReflectionMapping
             SceneManager.scene.environment = envMap
             SceneManager.scene.environmentIntensity = game.gameData().exposure
@@ -152,6 +155,16 @@ export default function envMapBasic(props) {
         align-items: center;
     `
 
+    const FileNameContainer = styled("div")`
+        font-size: small;
+        font-weight: 500;
+        background-color: var(--color-secondary-dark);
+        padding: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-radius: 90px;
+    `
+
     /*
      * RENDER
      */
@@ -163,33 +176,27 @@ export default function envMapBasic(props) {
                     <>
                         <Container>
                             <SliderContainer data-interactive>
-                                <ButtonCircle
-                                    onClick={prev}
-                                    border={false}>
-                                    <Fa icon={faChevronLeft} size="1x" class="icon" />
+                                <ButtonCircle onClick={prev} border={false}>
+                                    <Fa
+                                        icon={faChevronLeft}
+                                        size="1x"
+                                        class="icon"
+                                    />
                                 </ButtonCircle>
-                                {files[index()]}
-                                <ButtonCircle
-                                    onClick={next}
-                                    border={false}>
-                                    <Fa icon={faChevronRight} size="1x" class="icon" />
+                                <FileNameContainer class="glass">
+                                    {loading()
+                                        ? "caricamento..."
+                                        : files[index()]}
+                                </FileNameContainer>
+                                <ButtonCircle onClick={next} border={false}>
+                                    <Fa
+                                        icon={faChevronRight}
+                                        size="1x"
+                                        class="icon"
+                                    />
                                 </ButtonCircle>
                             </SliderContainer>
                         </Container>
-
-                        {/* <SliderContainer data-interactive>
-                            <ButtonCircle
-                                onClick={prev}
-                                border={false}>
-                                <Fa icon={faChevronLeft} size="1x" class="icon" />
-                            </ButtonCircle>
-                            {files[index()]}
-                            <ButtonCircle
-                                onClick={next}
-                                border={false}>
-                                <Fa icon={faChevronRight} size="1x" class="icon" />
-                            </ButtonCircle>
-                        </SliderContainer> */}
 
                         <Toolbar
                             buttons={["save"]}
