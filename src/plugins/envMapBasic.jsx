@@ -2,6 +2,8 @@ import {
     onMount,
     createSignal,
     createMemo,
+    createEffect,
+    on
 } from "solid-js"
 import { useGame } from "@js/gameBase"
 import { styled } from "solid-styled-components"
@@ -9,6 +11,9 @@ import SceneManager from "@js/sceneManager"
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader"
 import { EquirectangularReflectionMapping } from "three"
 import Toolbar from "@views/ar-overlay/Toolbar"
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons"
+import ButtonCircle from "@components/ButtonCircle"
+import Fa from 'solid-fa';
 
 export default function envMapBasic(props) {
     const [index, setIndex] = createSignal(0)
@@ -20,11 +25,11 @@ export default function envMapBasic(props) {
      * Put here derived functions from Game
      */
     const { game } = useGame("envMapBasic", props.id, {
-        onTap: () => {},
+        onTap: () => { },
 
-        renderLoop: () => {},
+        renderLoop: () => { },
 
-        close: () => {},
+        close: () => { },
     })
 
     /*
@@ -62,6 +67,16 @@ export default function envMapBasic(props) {
             game.setInitialized()
         })
     })
+
+    createEffect(on(
+        () => props.selected,
+        (newValue, prevValue) => {
+            // console.log(`Changed from ${prevValue} to ${newValue}`);
+            setTimeout(() => {
+                game.forceUpdateDomElements();
+            }, 50);
+        }
+    ));
 
     const next = () => {
         setIndex((i) => (i + 1) % files.length)
@@ -128,6 +143,15 @@ export default function envMapBasic(props) {
         justify-content: flex-end;
     `
 
+    const SliderContainer = styled("div")`
+        width: 100%;
+        /* height: 100px; */
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 2rem;
+        align-items: center;
+    `
+
     /*
      * RENDER
      */
@@ -138,20 +162,34 @@ export default function envMapBasic(props) {
                 {props.selected && (
                     <>
                         <Container>
-                            <div
-                                style={{
-                                    display: "flex",
-                                    "align-items": "center",
-                                    gap: "1rem",
-                                }}
-                            >
-                                <button onClick={prev}>⬅</button>
-                                <span style={{ "font-size": "1.2rem" }}>
-                                    {files[index()]}
-                                </span>
-                                <button onClick={next}>➡</button>
-                            </div>
+                            <SliderContainer data-interactive>
+                                <ButtonCircle
+                                    onClick={prev}
+                                    border={false}>
+                                    <Fa icon={faChevronLeft} size="1x" class="icon" />
+                                </ButtonCircle>
+                                {files[index()]}
+                                <ButtonCircle
+                                    onClick={next}
+                                    border={false}>
+                                    <Fa icon={faChevronRight} size="1x" class="icon" />
+                                </ButtonCircle>
+                            </SliderContainer>
                         </Container>
+
+                        {/* <SliderContainer data-interactive>
+                            <ButtonCircle
+                                onClick={prev}
+                                border={false}>
+                                <Fa icon={faChevronLeft} size="1x" class="icon" />
+                            </ButtonCircle>
+                            {files[index()]}
+                            <ButtonCircle
+                                onClick={next}
+                                border={false}>
+                                <Fa icon={faChevronRight} size="1x" class="icon" />
+                            </ButtonCircle>
+                        </SliderContainer> */}
 
                         <Toolbar
                             buttons={["save"]}

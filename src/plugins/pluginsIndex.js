@@ -55,7 +55,7 @@ export const PLUGINS_LIST = [
     },
     {
         fileName: "envLight",
-        title: "Luce HDRI",
+        title: "Luce HDR localizzata",
         description: "Inserisci un'immagine HDRI 360 come luce ambientale",
         icon: '/icons/360.svg',
         category: 'Luci',
@@ -66,7 +66,7 @@ export const PLUGINS_LIST = [
     },
     {
         fileName: "envMapBasic",
-        title: "Immagine HDRI semplice",
+        title: "Luce HDR",
         description: "Inserisci un'immagine HDRI 360 come luce ambientale, senza localizzazione",
         icon: '/icons/360.svg',
         category: 'Luci',

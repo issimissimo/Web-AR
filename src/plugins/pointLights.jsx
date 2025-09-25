@@ -188,9 +188,7 @@ export default function pointLights(props) {
 
         setTimeout(() => {
             game.forceUpdateDomElements();
-        }, 1000)
-
-
+        }, 50)
     }
 
 
