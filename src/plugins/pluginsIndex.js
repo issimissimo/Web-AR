@@ -38,7 +38,7 @@ export const PLUGINS_LIST = [
         icon: '/icons/360.svg',
         category: 'Luci',
         allowed: 1,
-        localized: false,
+        localized: true,
         tags: [],
         requirements: {}
     },

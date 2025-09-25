@@ -59,7 +59,6 @@ export default function envMapBasic(props) {
 
         // load hdr
         loadEnv(() => {
-            
             /*
              * Don't forget to call "game.setInitialized()" at finish
              */

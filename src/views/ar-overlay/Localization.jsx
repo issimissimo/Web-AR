@@ -22,12 +22,13 @@ export default function Localization(props) {
             color: 0xf472b6,
         })
         context.forceUpdateDomElements();
+        context.handleBlurredCover({ visible: true, priority: 9999 })
     })
 
     const handleCloseInstructions = () => {
         setShowInstructions(false)
         Reticle.setVisible(true)
-        context.handleBlurredCover({ showHole: true });
+        context.handleBlurredCover({ showHole: true, priority: 9999 });
         context.forceUpdateDomElements();
     }
 

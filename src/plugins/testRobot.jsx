@@ -124,7 +124,7 @@ export default function testRobot(props) {
         )
 
         // blur background for instructions
-        game.handleBlurredCover({ visible: true })
+        game.handleBlurredCover({ visible: true, priority: 999 })
 
         /*
          * Don't forget to call "game.setInitialized()" at finish
