@@ -39,7 +39,9 @@ export default function basicSphere(props) {
 
         // console.log("***** basicSphere - setup")
         const sphereGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-        const sphereMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
+        const sphereMaterial = new MeshStandardMaterial({ color: 0x848484 });
+        sphereMaterial.roughness = 0.1;
+        sphereMaterial.metalness = 1;
         sphere = new Mesh(sphereGeometry, sphereMaterial);
         sphere.position.set(0, -0.5, -1);
         game.addToScene(sphere);

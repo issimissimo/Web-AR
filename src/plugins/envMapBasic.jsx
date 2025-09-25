@@ -1,162 +1,169 @@
-import { onMount, onCleanup, createEffect, createSignal, createMemo } from 'solid-js';
-import { useGame } from '@js/gameBase';
-import { styled } from 'solid-styled-components';
-import SceneManager from '@js/sceneManager';
-
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
-import { EquirectangularReflectionMapping } from 'three';
-import Toolbar from '@views/ar-overlay/Toolbar';
+import {
+    onMount,
+    createSignal,
+    createMemo,
+} from "solid-js"
+import { useGame } from "@js/gameBase"
+import { styled } from "solid-styled-components"
+import SceneManager from "@js/sceneManager"
+import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader"
+import { EquirectangularReflectionMapping } from "three"
+import Toolbar from "@views/ar-overlay/Toolbar"
 
 export default function envMapBasic(props) {
-
-    const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
+    const [index, setIndex] = createSignal(0)
+    const [lastSavedGameData, setLastSavedGameData] = createSignal({})
+    let files
+    const hdrLoader = new HDRLoader()
 
     /*
-    * Put here derived functions from Game
-    */
+     * Put here derived functions from Game
+     */
     const { game } = useGame("envMapBasic", props.id, {
+        onTap: () => {},
 
-        onTap: () => {
+        renderLoop: () => {},
 
-        },
-
-        renderLoop: () => {
-
-        },
-
-        close: () => {
-
-        },
-    });
-
+        close: () => {},
+    })
 
     /*
-    * DATA
-    */
-    const defaultGameData = {
-        fileName: "images/hdr/empty_warehouse_1k.hdr",
-        exposure: 1
-    }
-
-
-    /*
-    * On mount
-    */
+     * On mount
+     */
     onMount(async () => {
-        console.log("|||||||||||||||||scene",SceneManager.scene)
+        files = await listFiles("hdr/list.json")
+
         // load data
-        await game.loadGameData();
+        await game.loadGameData()
 
         // set default data if no data are saved
         if (!game.gameData()) {
             console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
-            game.setGameData(defaultGameData);
+            const newData = {
+                fileName: files[index()],
+                exposure: 1,
+            }
+            game.setGameData(newData)
+        } else {
+            const newIndex = files.findIndex(
+                (el) => el === game.gameData().fileName
+            )
+            setIndex(newIndex)
         }
 
         // reset
-        setLastSavedGameData(game.gameData());
-    });
+        setLastSavedGameData(() => game.gameData())
 
-
-    createEffect(() => {
-        if (game.gameData()) {
-            setupScene();
-        }
+        // load hdr
+        loadEnv(() => {
+            /*
+             * Don't forget to call "game.setInitialized()" at finish
+             */
+            game.setInitialized()
+        })
     })
 
-
-
-    /*
-    * SETUP SCENE
-    */
-    function setupScene() {
-        // initialize environment
-        const rgbeLoader = new RGBELoader()
-        rgbeLoader.load(game.gameData().fileName, (envMap) => {
-            envMap.mapping = EquirectangularReflectionMapping;
-            SceneManager.scene.environment = envMap;
-            SceneManager.scene.environmentIntensity = game.gameData().exposure;
-            SceneManager.scene.remove(SceneManager.light);
-
-            const defaultLight = SceneManager.scene.getObjectByName("defaultLight");
-            if (defaultLight) {
-                SceneManager.scene.remove(SceneManager.light);
-                console.log("******************defaultLight rimossa!")
-            }
-
-            /*
-            * Don't forget to call "game.setInitialized()" at finish 
-            */
-            game.setInitialized()
-        });
+    const next = () => {
+        setIndex((i) => (i + 1) % files.length)
+        finalize()
+    }
+    const prev = () => {
+        setIndex((i) => (i - 1 + files.length) % files.length)
+        finalize()
     }
 
+    const finalize = () => {
+        const newData = {
+            fileName: files[index()],
+            exposure: game.gameData().exposure,
+        }
+        game.setGameData(newData)
+        loadEnv()
+    }
 
-    const hasUnsavedChanges = createMemo(() =>
-        JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
-    );
-
+    const hasUnsavedChanges = createMemo(
+        () =>
+            JSON.stringify(game.gameData()) !==
+            JSON.stringify(lastSavedGameData())
+    )
 
     const handleSave = async () => {
         // save data
-        await game.saveGameData();
+        await game.saveGameData()
         // reset
-        setLastSavedGameData(game.gameData());
-    };
+        setLastSavedGameData(game.gameData())
+    }
 
+    function loadEnv(callback = null) {
+        const filePath = "images/hdr/" + game.gameData().fileName
+        hdrLoader.load(filePath, (envMap) => {
+            envMap.mapping = EquirectangularReflectionMapping
+            SceneManager.scene.environment = envMap
+            SceneManager.scene.environmentIntensity = game.gameData().exposure
 
+            const defaultLight =
+                SceneManager.scene.getObjectByName("defaultLight")
+            if (defaultLight) {
+                SceneManager.scene.remove(SceneManager.light)
+                console.log("******************defaultLight rimossa!")
+            }
+            callback?.()
+        })
+    }
 
+    async function listFiles(folderUrl) {
+        const res = await fetch(folderUrl)
+        if (!res.ok) throw new Error("Errore nel caricamento dei file")
+        return await res.json() // array di nomi file
+    }
 
     /*
-    * STYLE
-    */
-    const Container = styled('div')`
+     * STYLE
+     */
+    const Container = styled("div")`
         width: 100%;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
     `
-    const Title = styled('h2')`
-        text-align: center;
-    `
-
-    const Description = styled('p')`
-        text-align: center;
-    `
-
-
 
     /*
-    * RENDER
-    */
+     * RENDER
+     */
 
     const renderView = () => {
         return (
             <>
-                {
-                    props.selected && (
+                {props.selected && (
+                    <>
+                        <Container>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    "align-items": "center",
+                                    gap: "1rem",
+                                }}
+                            >
+                                <button onClick={prev}>⬅</button>
+                                <span style={{ "font-size": "1.2rem" }}>
+                                    {files[index()]}
+                                </span>
+                                <button onClick={next}>➡</button>
+                            </div>
+                        </Container>
 
-                        <>
-                            <Container>
-                                <Title>{game.gameDetails.title}</Title>
-                                <Description>{game.gameDetails.description}</Description>
-                            </Container>
-
-                            <Toolbar
-                                buttons={["save"]}
-                                onSave={handleSave}
-                                saveActive={hasUnsavedChanges()}
-                            />
-                        </>
-
-                    )
-                }
+                        <Toolbar
+                            buttons={["save"]}
+                            onSave={handleSave}
+                            saveActive={hasUnsavedChanges()}
+                        />
+                    </>
+                )}
             </>
         )
     }
 
     // Delegate mounting to the shared game hook
-    game.mountView(renderView);
-
+    game.mountView(renderView)
 }
