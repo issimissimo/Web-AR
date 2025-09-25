@@ -368,7 +368,7 @@ const Inventory = (props) => {
         font-weight: 400;
         font-family: inherit;
         border-radius: 90px;
-        background: ${props => props.isOn ? 'var(--color-primary-dark)' : 'var(--color-background-transparent)'};
+        background: ${props => props.isOn ? 'var(--color-primary)' : 'var(--color-background-transparent)'};
         border: none;
         /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
         color: white;

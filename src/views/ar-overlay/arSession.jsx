@@ -46,10 +46,14 @@ export default function ArSession(props) {
     // Blurred cover
     const [blurVisible, setBlurVisible] = createSignal(false);
     const [blurShowHole, setBlurShowHole] = createSignal(false);
+    const _blurredCoverStates = [];
+    let _blurredCoverTimeout = null;
 
     let _tapEnabled = true;
     let _modulesToLoad = 0;
     let _gamesInitialized = 0;
+
+
 
 
     //#region [lifeCycle]
@@ -64,8 +68,6 @@ export default function ArSession(props) {
             console.warn("WARNING: I'm going to reset props.gamesRunning. If you are doing some changes on the scripts it's normal.");
             props.resetGamesRunning;
         }
-
-
 
         // Let's start immediately darkening the background...
         // setBlurVisible(true);
@@ -83,8 +85,7 @@ export default function ArSession(props) {
             });
 
 
-
-        // When reopening the ARSession it seem to stay "true"... 
+            // When reopening the ARSession it seem to stay "true"... 
         // let's force (not clear why I have to do that)
         setInitDetectionCompleted(false);
 
@@ -208,9 +209,18 @@ export default function ArSession(props) {
         }
     })
 
-    // createEffect(() => {
-    //     console.log("UEEE GUARDA INIT DETECTION!!!...", initDetectionCompleted())
-    // })
+    
+    /** When init detection is completed
+    * we want to hide the blurred cover.
+    * If some other script want to show it, instead,
+    * the handleBlurredCover system should manage them
+    * on the basis of the "priority"
+    */
+    createEffect(() => {
+        if (initDetectionCompleted()){
+            handleBlurredCover({ visible: false, priority: 10 })
+        }
+    })
 
 
     /**
@@ -439,26 +449,66 @@ export default function ArSession(props) {
 
     const handleBlurredCover = (state = {}) => {
 
-        // TODO: gestire chiamate multiple incoerenti da script diversi...
+        console.log("|||||||||||||||||||||||||| handleBlurredCover:", state)
 
-
-        const priority = state.priority ?? 0;
-
-
-
-        setBlurVisible(() => state.visible ?? blurVisible());
-        setBlurShowHole(() => state.showHole ?? blurShowHole());
-
-        // Reset
-        if (!blurVisible() && blurShowHole()) {
-            setTimeout(() => {
-                console.log("RESET")
-                setBlurShowHole(false);
-            }, 1000);
+        // sistema di gestione di chiamate multiple incoerenti da script diversi...
+        const newState = {
+            visible: state.visible ?? blurVisible(),
+            showHole: state.showHole ?? blurShowHole(),
+            priority: state.priority ?? 0,
+            timestamp: Date.now() // For debug/logging
         }
+        _blurredCoverStates.push(newState);
+
+        if (_blurredCoverTimeout) {
+            clearTimeout(_blurredCoverTimeout);
+        }
+
+        // wait a little to check if some other state
+        // is arriving
+        _blurredCoverTimeout = setTimeout(() => {
+            try {
+                const highestState = _blurredCoverStates.reduce((max, current) => {
+                    return current.priority > max.priority ? current : max;
+                });
+
+                // just for debugging
+                if (_blurredCoverStates.length > 1) {
+                    console.log(`Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`);
+                }
+
+                setBlurVisible(highestState.visible);
+                setBlurShowHole(highestState.showHole);
+
+                // Reset
+                if (!blurVisible() && blurShowHole()) {
+                    setTimeout(() => {
+                        console.log("RESET")
+                        setBlurShowHole(false);
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Error in handleBlurredCover:', error);
+            } finally {
+                _blurredCoverStates.length = 0;
+                _blurredCoverTimeout = null;
+            }
+        }, 100);
+
+
+
+
+        // setBlurVisible(() => state.visible ?? blurVisible());
+        // setBlurShowHole(() => state.showHole ?? blurShowHole());
+
+        // // Reset
+        // if (!blurVisible() && blurShowHole()) {
+        //     setTimeout(() => {
+        //         console.log("RESET")
+        //         setBlurShowHole(false);
+        //     }, 1000);
+        // }
     }
-
-
 
 
     //#region [style]
