@@ -423,48 +423,41 @@ const Inventory = (props) => {
                 {!visible() ? "" : "Chiudi"}
             </Button> */}
 
-            <Middle>
+            <Middle id="middle">
 
-                <ItemsContainer>
-                    {
-                        props.gamesRunning.map(game => (
-                            <ToggleButton
-                                id={game.id}
-                                onToggle={(id) => handleToggle(id)}
-                                isOn={game.id === props.selectedGameId}
-                            >
-                                {getPluginTitle(game.name)}
-                            </ToggleButton>
-                        ))
-                    }
-                </ItemsContainer>
+                {/* LIST OF AVAILABLE AND RUNNING GAMES */}
+                {context.appMode === "save" &&
+                    <ItemsContainer>
+                        {
+                            props.gamesRunning.map(game => (
+                                <ToggleButton
+                                    id={game.id}
+                                    onToggle={(id) => handleToggle(id)}
+                                    isOn={game.id === props.selectedGameId}
+                                >
+                                    {getPluginTitle(game.name)}
+                                </ToggleButton>
+                            ))
+                        }
+                    </ItemsContainer>
+                }
 
-                <GameUI id="plugins-ui">
-
-                </GameUI>
+                {/* UI OF THE GAMES !!! */}
+                <GameUI id="plugins-ui" />
 
             </Middle>
 
-            <Bottom>
-                {/* <ButtonCircle
-                    data-interactive
-                    // active={props.saveActive ?? true}
-                    // visible={props.buttons.includes("save")}
-                    // border={false}
-                    // onClick={props.onSave}
-                    size={"60px"}
-                    highlight={true}
-                    border={false}
-                >
-                    <Fa icon={faPlus} size="1.3x" class="icon" />
-                </ButtonCircle> */}
-                <CategoriesPicker
-                    // visible={visible()}
-                    visible={true}
-                    currentCategoryName={currentCategoryName()}
-                    onCategoryPicked={(name) => handleCategorySelected(name)}
-                ></CategoriesPicker>
-            </Bottom>
+            {/* CATEGORY PICKER */}
+            {context.appMode === "save" &&
+                <Bottom data-interactive>
+                    <CategoriesPicker
+                        // visible={visible()}
+                        visible={true}
+                        currentCategoryName={currentCategoryName()}
+                        onCategoryPicked={(name) => handleCategorySelected(name)}
+                    ></CategoriesPicker>
+                </Bottom>
+            }
         </InventoryContainer>
     )
 }

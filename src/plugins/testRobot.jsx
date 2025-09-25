@@ -24,7 +24,7 @@ export default function testRobot(props) {
 
     let loadedModel, shadows, audioRobot, clippingReveal
     let robotGlb;
-    
+
 
     const handleCloseInstructions = () => {
         setShowInstructions(() => false)
@@ -42,7 +42,7 @@ export default function testRobot(props) {
         if (audioRobot) audioRobot.stop()
         if (clippingReveal) clippingReveal.dispose()
         Reticle.setEnabled(true)
-        
+
         robotGlb.resetAnimations();
 
         game.removePreviousFromScene()
@@ -144,7 +144,7 @@ export default function testRobot(props) {
      */
     const Container = styled("div")`
         width: 100%;
-        height: 100vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -156,32 +156,78 @@ export default function testRobot(props) {
     /*
      * RENDER (Will be shown ONLY after initialization completed)
      */
-    return (
-        <>
-            {props.enabled &&
-                (showInstructions() ? (
-                    <Container>
-                        <Message
-                            style={{ height: "auto" }}
-                            svgIcon={"icons/tap.svg"}
-                            showReadMore={false}
-                            showDoneButton={true}
-                            onDone={handleCloseInstructions}
-                        >
-                            Fai TAP sullo schermo per posizionare il robot Comau
-                            RACER 3 su un piano. <br></br> Evita i piani troppo
-                            riflettenti o uniformi.
-                        </Message>
-                    </Container>
-                ) : (
-                    <Toolbar
-                        buttons={["undo"]}
-                        onUndo={handleUndo}
-                        undoActive={spawned()}
-                    />
-                ))}
-        </>
-    )
+    // return (
+    //     <>
+    //         {props.enabled &&
+    //             (showInstructions() ? (
+    //                 <Container>
+    //                     <Message
+    //                         style={{ height: "auto" }}
+    //                         svgIcon={"icons/tap.svg"}
+    //                         showReadMore={false}
+    //                         showDoneButton={true}
+    //                         onDone={handleCloseInstructions}
+    //                     >
+    //                         Fai TAP sullo schermo per posizionare il robot Comau
+    //                         RACER 3 su un piano. <br></br> Evita i piani troppo
+    //                         riflettenti o uniformi.
+    //                     </Message>
+    //                 </Container>
+    //             ) : (
+    //                 <Toolbar
+    //                     buttons={["undo"]}
+    //                     onUndo={handleUndo}
+    //                     undoActive={spawned()}
+    //                 />
+    //             ))}
+    //     </>
+    // )
+
+
+    const renderView = () => {
+        return (
+            <>
+                {props.enabled &&
+                    (showInstructions() ? (
+                        <Container>
+                            <Message
+                                style={{ height: "auto" }}
+                                svgIcon={"icons/tap.svg"}
+                                showReadMore={false}
+                                showDoneButton={true}
+                                onDone={handleCloseInstructions}
+                            >
+                                Fai TAP sullo schermo per posizionare il robot Comau
+                                RACER 3 su un piano. <br></br> Evita i piani troppo
+                                riflettenti o uniformi.
+                            </Message>
+                        </Container>
+                    ) : (
+
+                        game.appMode == "save"
+                            ?
+                            props.selected && <Toolbar id="toolbar"
+                                buttons={["undo"]}
+                                onUndo={handleUndo}
+                                undoActive={spawned()}
+                            />
+                            :
+                            <Toolbar id="toolbar"
+                                buttons={["undo"]}
+                                onUndo={handleUndo}
+                                undoActive={spawned()}
+                            />
+                    ))}
+            </>
+        )
+    }
+
+    // Delegate mounting to the shared game hook
+    game.mountView(renderView);
+
+
+
+
 
     //#region [functions]
 

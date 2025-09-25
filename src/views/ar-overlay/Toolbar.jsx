@@ -1,6 +1,6 @@
 import { onMount, onCleanup, useContext } from "solid-js"
 import { styled } from "solid-styled-components"
-import { Motion } from 'solid-motionone';
+import { Motion } from "solid-motionone"
 import ButtonCircle from "@components/ButtonCircle"
 import SvgIcon from "@components/SvgIcon"
 import Fa from "solid-fa"
@@ -11,14 +11,14 @@ const ContainerToolbar = styled(Motion.div)`
     position: absolute;
     right: 1.5em;
     top: 50%;
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-    /* height: 50vh; */
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    height: 25vh;
     display: flex;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    pointer-events: ${props => props.visible ? 'auto' : 'none'};
+    pointer-events: ${(props) => (props.visible ? "auto" : "none")};
 `
 
 const Toolbar = (props) => {
@@ -35,7 +35,7 @@ const Toolbar = (props) => {
     return (
         <ContainerToolbar
             visible={props.visible ?? true}
-            animate={{ opacity: (props.visible ?? 1) ? 1 : 0 }}
+            animate={{ opacity: props.visible ?? 1 ? 1 : 0 }}
             transition={{ duration: 0.25 }}
         >
             {/* UNDO button */}

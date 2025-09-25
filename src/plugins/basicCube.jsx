@@ -26,9 +26,9 @@ export default function basicCube(props) {
         setupScene();
     });
 
-    createEffect(() => {
-        console.log("basicCube __ selected:", props.selected)
-    })
+    // createEffect(() => {
+    //     console.log("basicCube __ selected:", props.selected)
+    // })
 
 
     /*
@@ -37,7 +37,7 @@ export default function basicCube(props) {
     let cube;
     function setupScene() {
 
-        console.log("***** basicCube - setup")
+        // console.log("***** basicCube - setup")
         const cubeGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
         const cubeMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
         cube = new Mesh(cubeGeometry, cubeMaterial);
@@ -48,7 +48,7 @@ export default function basicCube(props) {
         /*
         * Don't forget to call "game.setInitialized()" at finish 
         */
-        console.log("ADESSO CHIAMO SET INITIALIZED PER basicCube !!!!!")
+        // console.log("ADESSO CHIAMO SET INITIALIZED PER basicCube !!!!!")
         game.setInitialized()
     }
 

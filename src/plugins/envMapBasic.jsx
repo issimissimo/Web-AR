@@ -1,12 +1,15 @@
-import { onMount, onCleanup, createEffect } from 'solid-js';
+import { onMount, onCleanup, createEffect, createSignal, createMemo } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import SceneManager from '@js/sceneManager';
 
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import { EquirectangularReflectionMapping } from 'three';
+import Toolbar from '@views/ar-overlay/Toolbar';
 
 export default function envMapBasic(props) {
+
+    const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
 
     /*
     * Put here derived functions from Game
@@ -39,18 +42,19 @@ export default function envMapBasic(props) {
     /*
     * On mount
     */
-    onMount(() => {
+    onMount(async () => {
 
-        // if (props.stored) {
-        //     // Load the game data from RealtimeDB
-        //     game.loadGameData()
-        // }
-        // else {
-        //     // Set default gameData
-        //     game.setGameData(() => defaultGameData)
-        // }
+        // load data
+        await game.loadGameData();
 
-        game.setGameData(() => defaultGameData)
+        // set default data if no data are saved
+        if (!game.gameData()) {
+            console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
+            game.setGameData(defaultGameData);
+        }
+
+        // reset
+        setLastSavedGameData(game.gameData());
     });
 
 
@@ -89,6 +93,19 @@ export default function envMapBasic(props) {
     }
 
 
+    const hasUnsavedChanges = createMemo(() =>
+        JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
+    );
+
+
+    const handleSave = async () => {
+        // save data
+        await game.saveGameData();
+        // reset
+        setLastSavedGameData(game.gameData());
+    };
+
+
 
 
     /*
@@ -96,13 +113,10 @@ export default function envMapBasic(props) {
     */
     const Container = styled('div')`
         width: 100%;
-        height: 100vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        padding: 2em;
+        justify-content: flex-end;
     `
     const Title = styled('h2')`
         text-align: center;
@@ -117,25 +131,33 @@ export default function envMapBasic(props) {
     /*
     * RENDER
     */
-    return (
-        <>
-            {
-                props.selected && game.initialized() && (
 
-                    <Container>
-                        <Title>{game.gameDetails.title}</Title>
-                        <Description>{game.gameDetails.description}</Description>
-                        {/* <Button
-                onClick={() => game.saveGame(gameData)}
-            >Test salva game e dati</Button> */}
-                        {/* <Button
-                onClick={() => game.loadData(props.id, (data) => setGameData(() => data))}
-            >Test carica dati</Button> */}
-                    </Container>
+    const renderView = () => {
+        return (
+            <>
+                {
+                    props.selected && (
 
-                )
-            }
-        </>
-    );
+                        <>
+                            <Container>
+                                <Title>{game.gameDetails.title}</Title>
+                                <Description>{game.gameDetails.description}</Description>
+                            </Container>
+
+                            <Toolbar
+                                buttons={["save"]}
+                                onSave={handleSave}
+                                saveActive={hasUnsavedChanges()}
+                            />
+                        </>
+
+                    )
+                }
+            </>
+        )
+    }
+
+    // Delegate mounting to the shared game hook
+    game.mountView(renderView);
 
 }

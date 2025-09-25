@@ -29,7 +29,6 @@ export function useGame(gameName, gameId, config = {}) {
     let _initialized = false
     let _hasMountedView = false
 
-    // const loader = new GlbLoader();
     let audioTap
     let audioUndo
 
@@ -85,7 +84,7 @@ export function useGame(gameName, gameId, config = {}) {
             if (!el || _disposer) return
             try {
                 _disposer = render(viewFn, el)
-                console.log(`${gameName}: mounted view into`, el)
+                // console.log(`${gameName}: mounted view into`, el)
             } catch (err) {
                 console.error(`${gameName}: error mounting view`, err)
             }
@@ -97,7 +96,7 @@ export function useGame(gameName, gameId, config = {}) {
                     _disposer()
                 } catch (e) {}
                 _disposer = null
-                console.log(`${gameName}: disposed mounted view`)
+                // console.log(`${gameName}: disposed mounted view`)
             }
         })
     }

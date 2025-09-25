@@ -537,8 +537,6 @@ export default function ArSession(props) {
 
                                     :
 
-                                    props.appMode === AppMode.SAVE &&
-
                                     <Inventory
                                         marker={props.marker}
                                         addNewModule={(id, name) => loadModule(id, name, false, true)}

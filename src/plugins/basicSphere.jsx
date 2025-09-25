@@ -26,9 +26,9 @@ export default function basicSphere(props) {
         setupScene();
     });
 
-    createEffect(() => {
-        console.log("basicSphere __ selected:", props.selected)
-    })
+    // createEffect(() => {
+    //     console.log("basicSphere __ selected:", props.selected)
+    // })
 
 
     /*
@@ -37,7 +37,7 @@ export default function basicSphere(props) {
     let sphere;
     function setupScene() {
 
-        console.log("***** basicSphere - setup")
+        // console.log("***** basicSphere - setup")
         const sphereGeometry = new THREE.SphereGeometry(0.2, 16, 16);
         const sphereMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
         sphere = new Mesh(sphereGeometry, sphereMaterial);
@@ -48,7 +48,7 @@ export default function basicSphere(props) {
         /*
         * Don't forget to call "game.setInitialized()" at finish 
         */
-        console.log("ADESSO CHIAMO SET INITIALIZED PER basicSphere !!!!!")
+        // console.log("ADESSO CHIAMO SET INITIALIZED PER basicSphere !!!!!")
         game.setInitialized()
     }
 

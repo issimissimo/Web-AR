@@ -4,7 +4,8 @@ import Fa from 'solid-fa';
 
 const StyledButton = styled(Motion.button)`
   position: relative;
-  display: ${props => props.visible ? 'block' : 'none'};
+  /* display: ${props => props.visible ? 'block' : 'none'}; */
+  visibility: ${props => props.visible ? 'visible' : 'hidden'};
   /* width: 40px;
   height: 40px; */
   width: ${props => props.size ?? '40px'};

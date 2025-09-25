@@ -20,6 +20,24 @@ let _enabled = false;
 
 export default function pointLights(props) {
 
+    const [currentLight, setCurrentLight] = createSignal(null);
+    const [intensity, setIntensity] = createSignal(5);
+    const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
+
+    // const [color, setColor] = createSignal(0xffffff);
+
+
+    const [color, setColor] = createSignal({
+        r: 68,
+        g: 107,
+        b: 158,
+        a: 1,
+    })
+
+
+
+
+
     /*
     * Put here derived functions from Game
     */
@@ -27,14 +45,24 @@ export default function pointLights(props) {
 
         onTap: () => {
 
-            if (props.selected && !currentLight()) {
+            if (props.selected) {
 
                 console.log("TAPPPP....")
 
                 switch (game.appMode) {
                     case "save":
-                        game.super.onTap(); // sound
-                        spawnLightOnTap();
+
+                        if (!currentLight()) {
+                            game.super.onTap(); // sound
+                            spawnLightOnTap();
+                        }
+
+                        else {
+                            storeLightInData();
+                        }
+
+
+
                         break;
 
                     case "load":
@@ -48,25 +76,10 @@ export default function pointLights(props) {
     });
 
 
-    const [currentLight, setCurrentLight] = createSignal(null);
-    const [intensity, setIntensity] = createSignal(5);
-    // const [color, setColor] = createSignal(0xffffff);
-
-
-    const [color, setColor] = createSignal({
-        r: 68,
-        g: 107,
-        b: 158,
-        a: 1,
-    })
-
-
-
-    const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
-
     const hasUnsavedChanges = createMemo(() =>
         JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
     );
+
 
     /*
     * On mount
@@ -88,30 +101,38 @@ export default function pointLights(props) {
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
         */
-        console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
+        // console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
         game.setInitialized()
     });
 
 
     // toggle the visibility of the helpers
+    // AND set the non tappable UI elements
     createEffect(() => {
         console.log("POINT LIGHTS __ selected:", props.selected)
         game.setVisibleByName("helper", props.selected);
+
+        game.forceUpdateDomElements();
     })
 
 
     createEffect(() => {
         if (!props.selected && currentLight()) {
-            game.removePreviousFromScene();
-            game.removePreviousFromScene();
+
+            //TODO: no! dobbiamo fare restore situazione originale, oppure lasciamo quella che è senza salvare
+            // game.removePreviousFromScene();
+            // game.removePreviousFromScene();
+
             setCurrentLight(null);
         }
     })
 
 
     const handleUndo = () => {
-        // super
+        // sound
         game.onUndo();
+        // deselect
+        if (currentLight()) setCurrentLight(null);
         // remove last 2 from scene (light and helper)
         game.removePreviousFromScene();
         game.removePreviousFromScene();
@@ -150,6 +171,8 @@ export default function pointLights(props) {
     })
 
     const handleSave = async () => {
+        // deselect
+        if (currentLight()) setCurrentLight(null);
         // save data
         await game.saveGameData();
         // reset
@@ -162,6 +185,12 @@ export default function pointLights(props) {
         const _light = createLight(Reticle.getHitMatrix(), color(), intensity());
         setCurrentLight(_light);
         console.log("currentLight:", currentLight())
+
+        setTimeout(() => {
+            game.forceUpdateDomElements();
+        }, 1000)
+
+
     }
 
 
@@ -238,6 +267,11 @@ export default function pointLights(props) {
         justify-content: flex-end;
     `
 
+    const ColorPickerContainer = styled('div')`
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    `
+
 
     /*
     * RENDER
@@ -252,12 +286,15 @@ export default function pointLights(props) {
                             {/* <button onClick={() => spawnLightOnTap()}>SPAWN!</button> */}
                             {currentLight() && (
                                 <Container>
+                                    <ColorPickerContainer id="slider" data-interactive>
+                                        <SliderPicker color={color()} onChangeComplete={handleChangeComplete} />
+                                    </ColorPickerContainer>
                                     {/* <ColorPicker color={color} setColor={setColor} /> */}
-                                    <SliderPicker color={color()} onChangeComplete={handleChangeComplete} />
-                                    <HorizontalSlider value={intensity} setValue={setIntensity} />
+
+                                    {/* <HorizontalSlider value={intensity} setValue={setIntensity} />
                                     <Button onClick={storeLightInData} icon={faCheck} small={true}>
                                         Fatto!
-                                    </Button>
+                                    </Button> */}
                                 </Container>
                             )}
 
