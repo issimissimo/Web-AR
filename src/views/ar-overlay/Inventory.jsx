@@ -97,6 +97,41 @@ const CategoriesPicker = (props) => {
         box-sizing: border-box;
     `
 
+    // return (
+    //     <CategoriesContainer>
+    //         {props.visible && (
+    //             <>
+    //                 <CategoryItem
+    //                     name={"installate"}
+    //                     icon={"someicon"}
+    //                     selected={state() === STATE.CURRENT}
+    //                     onClick={() => setState(state() === STATE.CURRENT ? STATE.NONE : STATE.CURRENT)}
+    //                 />
+    //                 {PLUGINS_CATEGORIES.map((category) => (
+    //                     <CategoryItem
+    //                         name={category.name}
+    //                         icon={category.icon}
+    //                         selected={state() === STATE.NEW &&
+    //                             props.currentCategoryName === category.name
+    //                             ? true
+    //                             : false
+    //                         }
+    //                         onClick={(name) => {
+    //                             if (state() === STATE.NEW &&
+    //                                 props.currentCategoryName === name) {
+    //                                 setState(STATE.NONE);
+    //                             }
+    //                             else{
+    //                                 setState(STATE.NEW);
+    //                                 props.onCategoryPicked(name);
+    //                             }
+    //                         }}
+    //                     />
+    //                 ))}
+    //             </>
+    //         )}
+    //     </CategoriesContainer>
+    // )
     return (
         <CategoriesContainer>
             {props.visible && (
@@ -104,25 +139,28 @@ const CategoriesPicker = (props) => {
                     <CategoryItem
                         name={"installate"}
                         icon={"someicon"}
-                        selected={state() === STATE.CURRENT}
-                        onClick={() => setState(state() === STATE.CURRENT ? STATE.NONE : STATE.CURRENT)}
+                        selected={props.state === props.STATE.CURRENT}
+                        onClick={() => props.setState(props.state === props.STATE.CURRENT
+                            ? props.STATE.NONE
+                            : props.STATE.CURRENT)
+                        }
                     />
                     {PLUGINS_CATEGORIES.map((category) => (
                         <CategoryItem
                             name={category.name}
                             icon={category.icon}
-                            selected={state() === STATE.NEW &&
+                            selected={props.state === props.STATE.NEW &&
                                 props.currentCategoryName === category.name
                                 ? true
                                 : false
                             }
                             onClick={(name) => {
-                                if (state() === STATE.NEW &&
+                                if (props.state === props.STATE.NEW &&
                                     props.currentCategoryName === name) {
-                                    setState(STATE.NONE);
+                                    props.setState(props.STATE.NONE);
                                 }
-                                else{
-                                    setState(STATE.NEW);
+                                else {
+                                    props.setState(props.STATE.NEW);
                                     props.onCategoryPicked(name);
                                 }
                             }}
@@ -257,6 +295,14 @@ const InventoryItem = (props) => {
 //#region [INVENTORY]
 
 const Inventory = (props) => {
+
+    const STATE = {
+        NONE: 'none',
+        CURRENT: 'current',
+        NEW: 'new'
+    }
+
+    const [state, setState] = createSignal(STATE.CURRENT);
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null);
     const [visible, setVisible] = createSignal(false)
     const context = useContext(Context)
@@ -454,6 +500,7 @@ const Inventory = (props) => {
                 {context.appMode === "save" &&
                     <ItemsContainer>
                         {
+                            state() === STATE.CURRENT &&
                             props.gamesRunning.map(game => (
                                 <ToggleButton
                                     id={game.id}
@@ -480,6 +527,9 @@ const Inventory = (props) => {
                         visible={true}
                         currentCategoryName={currentCategoryName()}
                         onCategoryPicked={(name) => handleCategorySelected(name)}
+                        state={state()}
+                        setState={(newState) => setState(newState)}
+                        STATE={STATE}
                     ></CategoriesPicker>
                 </Bottom>
             }
