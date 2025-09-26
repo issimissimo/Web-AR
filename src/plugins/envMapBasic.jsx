@@ -146,10 +146,8 @@ export default function envMapBasic(props) {
 
     const SliderContainer = styled("div")`
         width: 100%;
-        /* height: 100px; */
         display: flex;
         justify-content: space-between;
-        padding-bottom: 2rem;
         align-items: center;
     `
 

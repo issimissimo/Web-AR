@@ -81,14 +81,13 @@ const CategoryItem = (props) => {
 }
 
 const CategoriesPicker = (props) => {
-
     const STATE = {
-        NONE: 'none',
-        CURRENT: 'current',
-        NEW: 'new'
+        NONE: "none",
+        CURRENT: "current",
+        NEW: "new",
     }
 
-    const [state, setState] = createSignal(STATE.CURRENT);
+    const [state, setState] = createSignal(STATE.CURRENT)
 
     const CategoriesContainer = styled("div")`
         display: flex;
@@ -140,28 +139,33 @@ const CategoriesPicker = (props) => {
                         name={"installate"}
                         icon={"someicon"}
                         selected={props.state === props.STATE.CURRENT}
-                        onClick={() => props.setState(props.state === props.STATE.CURRENT
-                            ? props.STATE.NONE
-                            : props.STATE.CURRENT)
+                        onClick={() =>
+                            props.setState(
+                                props.state === props.STATE.CURRENT
+                                    ? props.STATE.NONE
+                                    : props.STATE.CURRENT
+                            )
                         }
                     />
                     {PLUGINS_CATEGORIES.map((category) => (
                         <CategoryItem
                             name={category.name}
                             icon={category.icon}
-                            selected={props.state === props.STATE.NEW &&
+                            selected={
+                                props.state === props.STATE.NEW &&
                                 props.currentCategoryName === category.name
-                                ? true
-                                : false
+                                    ? true
+                                    : false
                             }
                             onClick={(name) => {
-                                if (props.state === props.STATE.NEW &&
-                                    props.currentCategoryName === name) {
-                                    props.setState(props.STATE.NONE);
-                                }
-                                else {
-                                    props.setState(props.STATE.NEW);
-                                    props.onCategoryPicked(name);
+                                if (
+                                    props.state === props.STATE.NEW &&
+                                    props.currentCategoryName === name
+                                ) {
+                                    props.setState(props.STATE.NONE)
+                                } else {
+                                    props.setState(props.STATE.NEW)
+                                    props.onCategoryPicked(name)
                                 }
                             }}
                         />
@@ -275,7 +279,7 @@ const InventoryItem = (props) => {
                         style={{ "margin-top": "1rem" }}
                         active={true}
                         small={true}
-                    // onClick={handleModifyMarker}
+                        // onClick={handleModifyMarker}
                     >
                         Aggiungi
                         <Fa
@@ -291,19 +295,17 @@ const InventoryItem = (props) => {
     )
 }
 
-
 //#region [INVENTORY]
 
 const Inventory = (props) => {
-
     const STATE = {
-        NONE: 'none',
-        CURRENT: 'current',
-        NEW: 'new'
+        NONE: "none",
+        CURRENT: "current",
+        NEW: "new",
     }
 
-    const [state, setState] = createSignal(STATE.CURRENT);
-    const [currentCategoryName, setCurrentCategoryName] = createSignal(null);
+    const [state, setState] = createSignal(STATE.NEW)
+    const [currentCategoryName, setCurrentCategoryName] = createSignal(null)
     const [visible, setVisible] = createSignal(false)
     const context = useContext(Context)
 
@@ -313,9 +315,7 @@ const Inventory = (props) => {
         context.handleBlurredCover({ visible: visible() })
     }
 
-    const getRunningPlugins = () => {
-
-    }
+    const getRunningPlugins = () => {}
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -342,8 +342,8 @@ const Inventory = (props) => {
     }
 
     const getPluginTitle = (pluginName) => {
-        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName);
-        return pluginSpecs.title;
+        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
+        return pluginSpecs.title
     }
 
     const getPluginsAvailableByName = (pluginName) => {
@@ -360,30 +360,30 @@ const Inventory = (props) => {
         return totalAllowed
     }
 
-    /** 
+    /**
      * Set the selected game id!
-    */
+     */
     // const handleToggle = (id) => {
     //     props.setSelectedGameId(id !== props.selectedGameId ? id : null);
     // };
 
-
     const handleToggle = (id) => {
-        const previousSelectedId = props.selectedGameId;
-        const newSelectedId = id !== props.selectedGameId ? id : null;
+        const previousSelectedId = props.selectedGameId
+        const newSelectedId = id !== props.selectedGameId ? id : null
 
-        props.setSelectedGameId(null); // importante! dobbiamo cancellare il DOM prima di procedere
+        props.setSelectedGameId(null) // importante! dobbiamo cancellare il DOM prima di procedere
 
-        console.log(`Game selection change: ${previousSelectedId} -> ${newSelectedId}`);
+        console.log(
+            `Game selection change: ${previousSelectedId} -> ${newSelectedId}`
+        )
 
         // IMPORTANTE: Aggiungi un piccolo delay per permettere al createEffect di pulire
         // il DOM prima che il nuovo componente tenti di montare la sua view
         setTimeout(() => {
-            props.setSelectedGameId(newSelectedId);
-            console.log(`Game selection changed: ${newSelectedId}`);
-        }, 10);
-    };
-
+            props.setSelectedGameId(newSelectedId)
+            console.log(`Game selection changed: ${newSelectedId}`)
+        }, 10)
+    }
 
     const Middle = styled("div")`
         /* display: flex;
@@ -392,7 +392,7 @@ const Inventory = (props) => {
         align-items: flex-start; */
         display: flex;
         flex-direction: column;
-       
+
         /* background-color: #1100ff; */
         flex: 1;
     `
@@ -404,35 +404,49 @@ const Inventory = (props) => {
         align-items: flex-start; */
         display: flex;
         flex-direction: column;
-       
-        /* background-color: #ff00aa; */
+
+        background-color: #d16eb02d;
         flex: 1;
+        margin-bottom: 2rem;
     `
 
-    const ItemsContainer = styled("div")`
+    const CurrentItemsContainer = styled("div")`
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
-        overflow-y: auto;
         /* align-items: flex-start; */
         background-color: #ffee0039;
     `
 
+    const NewPanelContainer = styled("div")`
+        position: relative;
+        /* display: flex;
+    flex-direction: column; */
+        flex: 1;
+        /* background-color: #00ff8839; */
+        margin-bottom: 2rem;
+    `
+
     const PluginListContainer = styled("div")`
+        position: absolute;
         /* display: flex;
         align-items: center;
         justify-content: center; */
-        background-color: red;
+        background-color: #ff00006e;
         /* height: 60px; */
-        height: 100px;
+        overflow-y: auto;
+        height: 50%;
     `
 
     const PluginDetailsContainer = styled("div")`
+        position: absolute;
+        width: 100%;
         /* display: flex;
         align-items: center;
         justify-content: center; */
-        background-color: #3700ff;
-        height: 200px;
+        background-color: #3700ff37;
+        top: 50%;
+        bottom: 0;
         /* height: 60px; */
     `
 
@@ -444,10 +458,10 @@ const Inventory = (props) => {
         /* height: 60px; */
     `
 
-    const StyledToggleButton = styled('div')`
+    const StyledToggleButton = styled("div")`
         position: relative;
-       width: fit-content;
-       height: fit-content;
+        width: fit-content;
+        height: fit-content;
         /* width: ${(props) => props.width || "100%"}; */
         flex-shrink: 0;
         padding: 0.4rem;
@@ -458,7 +472,10 @@ const Inventory = (props) => {
         font-weight: 400;
         font-family: inherit;
         border-radius: 90px;
-        background: ${props => props.isOn ? 'var(--color-primary)' : 'var(--color-background-transparent)'};
+        background: ${(props) =>
+            props.isOn
+                ? "var(--color-primary)"
+                : "var(--color-background-transparent)"};
         border: none;
         /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
         color: white;
@@ -470,7 +487,6 @@ const Inventory = (props) => {
     `
     //#region [ToggleButton]
     const ToggleButton = (props) => {
-
         // const [isOn, setIson] = createSignal(props.isOn ?? false);
 
         const handleOnClick = () => {
@@ -490,7 +506,7 @@ const Inventory = (props) => {
                 {props.children}
             </StyledToggleButton>
         )
-    };
+    }
 
     //#region [RETURN]
 
@@ -514,12 +530,11 @@ const Inventory = (props) => {
             </Button> */}
 
             <Middle id="middle">
-
                 {/* LIST OF AVAILABLE AND RUNNING GAMES */}
-                {context.appMode === "save" &&
-                    <ItemsContainer id="ItemsContainer">
+                {context.appMode === "save" && (
+                    <CurrentItemsContainer id="ItemsContainer">
                         <Show when={state() === STATE.CURRENT}>
-                            {props.gamesRunning.map(game => (
+                            {props.gamesRunning.map((game) => (
                                 <ToggleButton
                                     id={game.id}
                                     onToggle={(id) => handleToggle(id)}
@@ -529,50 +544,66 @@ const Inventory = (props) => {
                                 </ToggleButton>
                             ))}
                         </Show>
-                        <Show when={state() === STATE.NEW}>
-                            <PluginListContainer id="PluginListContainer">
+                    </CurrentItemsContainer>
+                )}
 
-                            </PluginListContainer>
+                <Show when={state() === STATE.NEW}>
+                    <NewPanelContainer id="NewPanelContainer">
+                        <PluginListContainer id="PluginListContainer">
+                            {PLUGINS_LIST.map(
+                                (plugin) =>
+                                    plugin.category ===
+                                        currentCategoryName() && (
+                                        <InventoryItem
+                                            enabled={
+                                                plugin.allowed > 0
+                                                    ? true
+                                                    : false
+                                            }
+                                            available={
+                                                getPluginsAvailableByName(
+                                                    plugin.fileName
+                                                ) > 0
+                                                    ? true
+                                                    : false
+                                            }
+                                            title={plugin.title}
+                                            description={plugin.description}
+                                            icon={plugin.icon}
+                                            localizationRequired={
+                                                plugin.localized
+                                            }
+                                        />
+                                    )
+                            )}
+                        </PluginListContainer>
 
-                            <PluginDetailsContainer id="PluginDetailsContainer">
-
-                            </PluginDetailsContainer>
-                            {/* {PLUGINS_LIST.map(plugin => (
-                                plugin.category === currentCategoryName() &&
-                                <InventoryItem
-                                    enabled={plugin.allowed > 0 ? true : false}
-                                    available={getPluginsAvailableByName(plugin.fileName) > 0 ? true : false}
-                                    title={plugin.title}
-                                    description={plugin.description}
-                                    icon={plugin.icon}
-                                    localizationRequired={plugin.localized}
-                                />
-                            ))} */}
-                        </Show>
-                    </ItemsContainer>
-                }
+                        <PluginDetailsContainer id="PluginDetailsContainer"></PluginDetailsContainer>
+                    </NewPanelContainer>
+                </Show>
 
                 {/* UI OF THE GAMES !!! */}
                 <Show when={state() !== STATE.NEW}>
                     <GameUI id="plugins-ui" />
                 </Show>
-
             </Middle>
 
             {/* CATEGORY PICKER */}
-            {context.appMode === "save" &&
+            {context.appMode === "save" && (
                 <Bottom data-interactive>
                     <CategoriesPicker
                         // visible={visible()}
                         visible={true}
                         currentCategoryName={currentCategoryName()}
-                        onCategoryPicked={(name) => handleCategorySelected(name)}
+                        onCategoryPicked={(name) =>
+                            handleCategorySelected(name)
+                        }
                         state={state()}
                         setState={(newState) => setState(newState)}
                         STATE={STATE}
                     ></CategoriesPicker>
                 </Bottom>
-            }
+            )}
         </InventoryContainer>
     )
 }

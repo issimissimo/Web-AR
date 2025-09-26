@@ -267,7 +267,7 @@ export default function pointLights(props) {
 
     const ColorPickerContainer = styled('div')`
         margin-top: 2rem;
-        margin-bottom: 2rem;
+        /* margin-bottom: 2rem; */
     `
 
 
