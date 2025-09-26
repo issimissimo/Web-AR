@@ -21,15 +21,22 @@ export default function Localization(props) {
             texturePath: "images/qr-code.webp",
             color: 0xf472b6,
         })
-        context.forceUpdateDomElements();
-        context.handleBlurredCover({ visible: true, priority: 9999 })
+        context.forceUpdateDomElements()
+        context.handleBlurredCover({
+            visible: true,
+            showHole: false,
+            priority: 9999,
+        })
     })
 
     const handleCloseInstructions = () => {
         setShowInstructions(false)
         Reticle.setVisible(true)
-        context.handleBlurredCover({ showHole: true, priority: 9999 });
-        context.forceUpdateDomElements();
+        context.handleBlurredCover({
+            visible: true,
+            showHole: true,
+        })
+        context.forceUpdateDomElements()
     }
 
     const handleOnDone = () => {
@@ -46,7 +53,10 @@ export default function Localization(props) {
             const matrix = Reticle.getHitMatrix()
             props.setReferenceMatrix(matrix)
         }
-        context.handleBlurredCover({ visible: false })
+        context.handleBlurredCover({ 
+            visible: false,
+            priority: 0,
+        })
     }
 
     /*
@@ -60,8 +70,6 @@ export default function Localization(props) {
         align-items: center;
         justify-content: space-between;
         margin-top: -35px;
-
-        
     `
 
     const DoneCentralButton = styled("button")`
@@ -74,15 +82,6 @@ export default function Localization(props) {
         &:focus {
             outline: none;
         }
-        /* &:active {
-            background: ${(props) =>
-            props.grey
-                ? "var(--color-grey-dark)"
-                : "var(--color-primary-dark)"};
-            color: var(--color-background);
-            border-color: ${(props) =>
-            props.grey ? "var(--color-grey)" : "var(--color-primary)"};
-        } */
     `
 
     return (
@@ -112,9 +111,7 @@ export default function Localization(props) {
                     }}
                 >
                     Allinea il QR-Code
-                    <DoneCentralButton
-                        onClick={handleOnDone}
-                    />
+                    <DoneCentralButton onClick={handleOnDone} />
                     <Button
                         onClick={handleOnDone}
                         small={true}

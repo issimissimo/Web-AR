@@ -195,18 +195,38 @@ export default function ArSession(props) {
         }
     })
 
-    createEffect(() => {
-        if (
-            gamesInitialized() &&
-            initDetectionCompleted() &&
-            localizationState() !== LOCALIZATION_STATE.REQUIRED
-        ) {
-            console.log(
-                "=== ArSession: all requirements to set gamesEnabled = true"
-            )
-            setGamesEnabled(true)
-        }
-    })
+    // createEffect(() => {
+    //     if (
+    //         gamesInitialized() &&
+    //         initDetectionCompleted() &&
+    //         localizationState() !== LOCALIZATION_STATE.REQUIRED
+    //     ) {
+    //         console.log(
+    //             "=== ArSession: all requirements to set gamesEnabled = true"
+    //         )
+    //         setGamesEnabled(true)
+    //     }
+    // })
+
+
+    createEffect(
+        on(
+            [gamesInitialized, initDetectionCompleted, localizationState],
+            ([initialized, detectionCompleted, locState]) => {
+                if (
+                    initialized &&
+                    detectionCompleted &&
+                    locState !== LOCALIZATION_STATE.REQUIRED
+                ) {
+                    console.log(
+                        "=== ArSession: all requirements to set gamesEnabled = true"
+                    )
+                    setGamesEnabled(true)
+                }
+            }
+        )
+    )
+
 
     createEffect(() => {
         if (props.gamesRunning.length > 0) {
@@ -546,17 +566,6 @@ export default function ArSession(props) {
                 _blurredCoverTimeout = null
             }
         }, 200)
-
-        // setBlurVisible(() => state.visible ?? blurVisible());
-        // setBlurShowHole(() => state.showHole ?? blurShowHole());
-
-        // // Reset
-        // if (!blurVisible() && blurShowHole()) {
-        //     setTimeout(() => {
-        //         console.log("RESET")
-        //         setBlurShowHole(false);
-        //     }, 1000);
-        // }
     }
 
     //#region [style]

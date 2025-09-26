@@ -70,7 +70,6 @@ export default function envMapBasic(props) {
         on(
             () => props.selected,
             (newValue, prevValue) => {
-                // console.log(`Changed from ${prevValue} to ${newValue}`);
                 setTimeout(() => {
                     game.forceUpdateDomElements()
                 }, 50)

@@ -60,7 +60,7 @@ const CategoryItem = (props) => {
         <CategoryItemContainer
             animate={{ opacity: [0, 1], scale: props.selected ? 1 : 0.8 }}
             transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
-            onClick={() => props.onCategoryClicked(props.name)}
+            onClick={() => props.onClick(props.name)}
         >
             <IconContainer selected={props.selected}>
                 <SvgIcon
@@ -81,6 +81,15 @@ const CategoryItem = (props) => {
 }
 
 const CategoriesPicker = (props) => {
+
+    const STATE = {
+        NONE: 'none',
+        CURRENT: 'current',
+        NEW: 'new'
+    }
+
+    const [state, setState] = createSignal(STATE.CURRENT);
+
     const CategoriesContainer = styled("div")`
         display: flex;
         justify-content: space-around;
@@ -90,21 +99,37 @@ const CategoriesPicker = (props) => {
 
     return (
         <CategoriesContainer>
-            {props.visible &&
-                PLUGINS_CATEGORIES.map((category) => (
+            {props.visible && (
+                <>
                     <CategoryItem
-                        name={category.name}
-                        icon={category.icon}
-                        selected={
-                            props.currentCategoryName === category.name
+                        name={"installate"}
+                        icon={"someicon"}
+                        selected={state() === STATE.CURRENT}
+                        onClick={() => setState(state() === STATE.CURRENT ? STATE.NONE : STATE.CURRENT)}
+                    />
+                    {PLUGINS_CATEGORIES.map((category) => (
+                        <CategoryItem
+                            name={category.name}
+                            icon={category.icon}
+                            selected={state() === STATE.NEW &&
+                                props.currentCategoryName === category.name
                                 ? true
                                 : false
-                        }
-                        onCategoryClicked={(name) =>
-                            props.onCategoryPicked(name)
-                        }
-                    />
-                ))}
+                            }
+                            onClick={(name) => {
+                                if (state() === STATE.NEW &&
+                                    props.currentCategoryName === name) {
+                                    setState(STATE.NONE);
+                                }
+                                else{
+                                    setState(STATE.NEW);
+                                    props.onCategoryPicked(name);
+                                }
+                            }}
+                        />
+                    ))}
+                </>
+            )}
         </CategoriesContainer>
     )
 }
