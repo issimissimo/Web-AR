@@ -9,7 +9,7 @@ import { Context } from "@views/ar-overlay/arSession"
 
 const ContainerToolbar = styled(Motion.div)`
     position: absolute;
-    right: 1.5em;
+    right: 0;
     top: 50%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
@@ -45,6 +45,7 @@ const Toolbar = (props) => {
                 visible={props.buttons.includes("undo")}
                 border={false}
                 onClick={props.onUndo}
+                theme={"dark"}
             >
                 <SvgIcon src={"icons/undo.svg"} size={18} />
             </ButtonCircle>
@@ -55,6 +56,7 @@ const Toolbar = (props) => {
                 visible={props.buttons.includes("save")}
                 border={false}
                 onClick={props.onSave}
+                highlight={true}
             >
                 <Fa icon={faSave} size="1.3x" class="icon" />
             </ButtonCircle>

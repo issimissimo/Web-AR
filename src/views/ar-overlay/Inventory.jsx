@@ -20,6 +20,7 @@ import {
     faSadTear,
     faCheck,
     faTrash,
+    faLocationDot
 } from "@fortawesome/free-solid-svg-icons"
 
 import { PLUGINS_CATEGORIES, PLUGINS_LIST } from "@plugins/pluginsIndex"
@@ -304,7 +305,7 @@ const Inventory = (props) => {
         NEW: "new",
     }
 
-    const [state, setState] = createSignal(STATE.NEW)
+    const [state, setState] = createSignal(STATE.CURRENT)
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null)
     const [visible, setVisible] = createSignal(false)
     const context = useContext(Context)
@@ -346,8 +347,14 @@ const Inventory = (props) => {
         return pluginSpecs.title
     }
 
+    const getPluginLocalized = (pluginName) => {
+        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
+        return pluginSpecs.localized
+    }
+
     const getPluginIcon = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
+        if (pluginSpecs.icon) return pluginSpecs.icon;
         const categoryName = pluginSpecs.category
         const categorySpecs = PLUGINS_CATEGORIES.find(
             (g) => g.name === categoryName
@@ -415,6 +422,7 @@ const Inventory = (props) => {
         visibility: ${(props) => (props.visible ? "visible" : "hidden")};
         display: flex;
         flex-direction: column;
+        position: relative;
 
         /* background-color: #d16eb02d; */
         flex: 1;
@@ -493,8 +501,8 @@ const Inventory = (props) => {
         border-radius: 90px;
         background: ${(props) =>
             props.isOn
-                ? "var(--color-primary)"
-                : "var(--color-background-transparent)"};
+                ? "var(--color-secondary)"
+                : "var(--color-dark-transparent)"};
         border: none;
         /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
         color: white;
@@ -559,6 +567,7 @@ const Inventory = (props) => {
                                 onToggle={(id) => handleToggle(id)}
                                 isOn={game.id === props.selectedGameId}
                             >
+                                {getPluginLocalized(game.name) && <Fa icon={faLocationDot} size="1x" translateX={0} />}
                                 <SvgIcon
                                     src={getPluginIcon(game.name)}
                                     size={18}
