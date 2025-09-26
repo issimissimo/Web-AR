@@ -135,7 +135,7 @@ export const PLUGINS_LIST = [
         title: 'Test per robot Comau',
         description: 'Posiziona su una superficie il robot',
         icon: null,
-        category: '3D',
+        category: 'Custom',
         allowed: 1,
         localized: false,
         tags: [],

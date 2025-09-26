@@ -154,7 +154,7 @@ const CategoriesPicker = (props) => {
                             icon={category.icon}
                             selected={
                                 props.state === props.STATE.NEW &&
-                                props.currentCategoryName === category.name
+                                    props.currentCategoryName === category.name
                                     ? true
                                     : false
                             }
@@ -280,7 +280,7 @@ const InventoryItem = (props) => {
                         style={{ "margin-top": "1rem" }}
                         active={true}
                         small={true}
-                        // onClick={handleModifyMarker}
+                    // onClick={handleModifyMarker}
                     >
                         Aggiungi
                         <Fa
@@ -316,7 +316,7 @@ const Inventory = (props) => {
         context.handleBlurredCover({ visible: visible() })
     }
 
-    const getRunningPlugins = () => {}
+    const getRunningPlugins = () => { }
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -362,10 +362,9 @@ const Inventory = (props) => {
         return categorySpecs.icon
     }
 
-    const getPluginsAvailableByName = (pluginName) => {
+    const getPluginAllowed = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
         const totalAllowed = pluginSpecs.allowed
-        // console.log("totalAllowed:", totalAllowed)
         let nGames = 0
         if (props.marker.games) {
             props.marker.games.map((game) => {
@@ -452,12 +451,16 @@ const Inventory = (props) => {
 
     const PluginListContainer = styled("div")`
         position: absolute;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
         /* display: flex;
         align-items: center;
         justify-content: center; */
         background-color: #ff00006e;
         /* height: 60px; */
         overflow-y: auto;
+        width: 100%;
         height: 50%;
     `
 
@@ -504,7 +507,8 @@ const Inventory = (props) => {
                 ? "var(--color-secondary)"
                 : "var(--color-dark-transparent)"};
         border: none;
-        /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
+        pointer-events: ${(props) => (props.enabled ? "auto" : "none")};
+        opacity: ${(props) => (props.enabled ? 1 : 0.5)};
         color: white;
         box-shadow: none;
         outline: none;
@@ -512,7 +516,7 @@ const Inventory = (props) => {
         -webkit-tap-highlight-color: transparent;
         transition: background 0.05s, color 0.05s;
     `
-    
+
     const ToggleButton = (props) => {
 
         const handleOnClick = () => {
@@ -526,6 +530,7 @@ const Inventory = (props) => {
                 style={props.style}
                 class="glass"
                 isOn={props.isOn}
+                enabled={props.enabled ?? true}
             >
                 {props.children}
             </StyledToggleButton>
@@ -570,7 +575,7 @@ const Inventory = (props) => {
                                 {getPluginLocalized(game.name) && <Fa icon={faLocationDot} size="1x" translateX={0} />}
                                 <SvgIcon
                                     src={getPluginIcon(game.name)}
-                                    size={18}
+                                    size={16}
                                 />
                                 {getPluginTitle(game.name)}
                             </ToggleButton>
@@ -587,27 +592,20 @@ const Inventory = (props) => {
                             {PLUGINS_LIST.map(
                                 (plugin) =>
                                     plugin.category ===
-                                        currentCategoryName() && (
-                                        <InventoryItem
-                                            enabled={
-                                                plugin.allowed > 0
-                                                    ? true
-                                                    : false
-                                            }
-                                            available={
-                                                getPluginsAvailableByName(
-                                                    plugin.fileName
-                                                ) > 0
-                                                    ? true
-                                                    : false
-                                            }
-                                            title={plugin.title}
-                                            description={plugin.description}
-                                            icon={plugin.icon}
-                                            localizationRequired={
-                                                plugin.localized
-                                            }
-                                        />
+                                    currentCategoryName() && (
+                                        <ToggleButton
+                                            enabled={getPluginAllowed(plugin.fileName)}
+                                        // id={game.id}
+                                        // onToggle={(id) => handleToggle(id)}
+                                        // isOn={game.id === props.selectedGameId}
+                                        >
+                                            {plugin.localized && <Fa icon={faLocationDot} size="1x" translateX={0} />}
+                                            <SvgIcon
+                                                src={getPluginIcon(plugin.fileName)}
+                                                size={16}
+                                            />
+                                            {plugin.title}
+                                        </ToggleButton>
                                     )
                             )}
                         </PluginListContainer>

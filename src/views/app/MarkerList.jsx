@@ -1,26 +1,28 @@
-import { createEffect, createSignal } from 'solid-js';
-import { useFirebase } from '@hooks/useFirebase';
-import { styled } from 'solid-styled-components';
-import { Motion } from 'solid-motionone';
-
-import Header from './Header';
-
-import { Container, FitHeightScrollable, Title } from '@components/smallElements'
-import Button from '@components/button';
-import Message from '@components/Message';
-import Loader from '@components/Loader';
-
-import Fa from 'solid-fa';
-import { faPlus, faEdit, faEye, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
-
-
-
+import { createEffect, createSignal } from "solid-js"
+import { useFirebase } from "@hooks/useFirebase"
+import { styled } from "solid-styled-components"
+import { Motion } from "solid-motionone"
+import Header from "./Header"
+import {
+  Container,
+  FitHeightScrollable,
+} from "@components/smallElements"
+import Button from "@components/button"
+import Message from "@components/Message"
+import Loader from "@components/Loader"
+import Fa from "solid-fa"
+import {
+  faPlus,
+  faEdit,
+  faEye,
+  faThumbsUp,
+} from "@fortawesome/free-solid-svg-icons"
 
 //
 // STATISTICS
 //
 
-const StatisticsContainer = styled('div')`
+const StatisticsContainer = styled("div")`
     box-sizing: border-box;
     display: flex;
     width: 20%;
@@ -35,8 +37,7 @@ const StatisticsContainer = styled('div')`
     font-size: 0.7rem;
     font-weight: 500;
     padding: 0.5rem;
-  `;
-
+`
 
 const Statistic = (props) => {
   return (
@@ -47,9 +48,6 @@ const Statistic = (props) => {
   )
 }
 
-
-
-
 //
 // MARKER
 //
@@ -57,58 +55,62 @@ const Statistic = (props) => {
 const MarkerContainer = styled(Motion.div)`
     margin-top: 1rem;
     margin-bottom: 2rem;
-  `;
+`
 
-const TimestampContainer = styled('div')`
-  `;
+const TimestampContainer = styled("div")``
 
-const Timestamp = styled('p')`
+const Timestamp = styled("p")`
     font-size: 0.7rem;
     color: var(--color-grey);
     margin: 0;
     font-weight: 500;
-  `;
+`
 
-const NameContainer = styled('div')`
+const NameContainer = styled("div")`
     box-sizing: border-box;
     color: var(--color-white);
     width: fit-content;
-  `;
+`
 
-const Name = styled('p')`
+const Name = styled("p")`
     font-weight: 400;
     margin: 0;
     margin-top: 0.3rem;
-  `;
+`
 
-const BottomContainer = styled('div')`
+const BottomContainer = styled("div")`
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
     width: 100%;
     margin-top: 0.5rem;
-  `;
+`
 
-const EditButtonContainer = styled('div')`
+const EditButtonContainer = styled("div")`
     box-sizing: border-box;
     display: flex;
     width: 50%;
-  `;
-
+`
 
 const Marker = (props) => {
-
   return (
     <MarkerContainer
       animate={{ opacity: [0, 1] }}
-      transition={{ duration: 0.5, easing: "ease-in-out", delay: props.delay }}
+      transition={{
+        duration: 0.5,
+        easing: "ease-in-out",
+        delay: props.delay,
+      }}
     >
-
       <TimestampContainer>
-        <Timestamp>{`${props.marker.created.toDate().toLocaleDateString()} ${props.marker.created.toDate().toLocaleTimeString()}`}</Timestamp>
+        <Timestamp>{`${props.marker.created
+          .toDate()
+          .toLocaleDateString()} ${props.marker.created
+            .toDate()
+            .toLocaleTimeString()}`}</Timestamp>
       </TimestampContainer>
 
-      <NameContainer class='glass'>
+      <NameContainer class="glass">
         <Name>{props.marker.name}</Name>
       </NameContainer>
 
@@ -116,110 +118,106 @@ const Marker = (props) => {
         <Statistic icon={faEye}>{props.marker.views}</Statistic>
         <Statistic icon={faThumbsUp}>{props.marker.like}</Statistic>
         <EditButtonContainer>
-          <Button
-            active={true}
-            small={true}
-            onClick={props.onClick}
-          >Modifica
-            <Fa icon={faEdit} size="1x" translateX={1} class="icon" />
+          <Button active={true} small={true} onClick={props.onClick}>
+            Modifica
+            <Fa
+              icon={faEdit}
+              size="1x"
+              translateX={1}
+              class="icon"
+            />
           </Button>
         </EditButtonContainer>
       </BottomContainer>
-
     </MarkerContainer>
   )
-};
-
-
-
-
-
+}
 
 //
 // MARKERLIST
 //
 
-
-const MarkersListContainer = styled('div')`
+const MarkersListContainer = styled("div")`
     width: 100%;
     flex: 1;
     overflow-y: auto;
     margin-bottom: 2rem;
-  `;
-
+`
 
 const MarkersList = (props) => {
-
-  const firebase = useFirebase();
-  const [markers, setMarkers] = createSignal([]);
-  const [loading, setLoading] = createSignal(false);
-
+  const firebase = useFirebase()
+  const [markers, setMarkers] = createSignal([])
+  const [loading, setLoading] = createSignal(false)
 
   createEffect(() => {
-    if (firebase.auth.authLoading() || !firebase.auth.user()) return;
+    if (firebase.auth.authLoading() || !firebase.auth.user()) return
 
-    setLoading(() => true);
-    loadMarkers();
-  });
-
+    setLoading(() => true)
+    loadMarkers()
+  })
 
   /**
-  * Load all markers from Firestore
-  */
+   * Load all markers from Firestore
+   */
   const loadMarkers = async () => {
-    const data = await firebase.firestore.fetchMarkers(firebase.auth.user().uid);
-    setMarkers(data);
+    let data = await firebase.firestore.fetchMarkers(
+      firebase.auth.user().uid
+    )
+
+    // reorder by timestamp (last is the new one)
+    data = data.sort((a, b) => {
+      return a.created.seconds - b.created.seconds;
+    });
+
+    setMarkers(data)
 
     // hide the spinner
-    setLoading(() => false);
-  };
-
+    setLoading(() => false)
+  }
 
   return (
     <Container>
-
       {/* HEADER */}
-      <Header
-        showBack={false}
-        onClickUser={props.goToUserProfile}
-      >
-        <span style={{ color: 'var(--color-secondary)' }}>I tuoi </span>
-        <span style={{ color: 'var(--color-white)' }}>ambienti AR</span>
+      <Header showBack={false} onClickUser={props.goToUserProfile}>
+        <span style={{ color: "var(--color-secondary)" }}>I tuoi </span>
+        <span style={{ color: "var(--color-white)" }}>ambienti AR</span>
       </Header>
 
-      
       {/* CONTENT */}
-      {loading() ?
-
+      {loading() ? (
         <Loader />
-
-        :
-
-        <FitHeightScrollable id="FitHeight"
+      ) : (
+        <FitHeightScrollable
+          id="FitHeight"
           animate={{ opacity: [0, 1] }}
-          transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.25 }}
+          transition={{
+            duration: 0.5,
+            easing: "ease-in-out",
+            delay: 0.25,
+          }}
         >
-          {markers().length === 0 ?
-
+          {markers().length === 0 ? (
             <Message>
-              Non hai ancora nessun ambiente.<br></br> Inizia creandone uno<br></br><br></br>
-              Un ambiente AR è uno spazio fisico intorno a te in cui inserirai oggetti virtuali in realtà aumentata,<br></br>
+              Non hai ancora nessun ambiente.<br></br> Inizia
+              creandone uno<br></br>
+              <br></br>
+              Un ambiente AR è uno spazio fisico intorno a te in
+              cui inserirai oggetti virtuali in realtà aumentata,
+              <br></br>
               per essere visualizzati da altri nello stesso luogo.
             </Message>
-
-            :
-
+          ) : (
             <MarkersListContainer>
-              {
-                markers().map(marker => (
-                  <Marker
-                    marker={marker}
-                    onClick={() => props.onMarkerClicked(marker)}
-                  />
-                ))
-              }
+              {markers().map((marker) => (
+                <Marker
+                  marker={marker}
+                  onClick={() =>
+                    props.onMarkerClicked(marker)
+                  }
+                />
+              ))}
             </MarkersListContainer>
-          }
+          )}
 
           {/* CREATE BUTTON */}
           <Button
@@ -227,13 +225,13 @@ const MarkersList = (props) => {
             icon={faPlus}
             border={markers().length === 0 ? true : false}
             onClick={() => props.onCreateNewMarker()}
-          >Crea nuovo
+          >
+            Crea nuovo
           </Button>
         </FitHeightScrollable>
-
-      }
+      )}
     </Container>
-  );
-};
+  )
+}
 
 export default MarkersList
