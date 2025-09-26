@@ -346,6 +346,15 @@ const Inventory = (props) => {
         return pluginSpecs.title
     }
 
+    const getPluginIcon = (pluginName) => {
+        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
+        const categoryName = pluginSpecs.category
+        const categorySpecs = PLUGINS_CATEGORIES.find(
+            (g) => g.name === categoryName
+        )
+        return categorySpecs.icon
+    }
+
     const getPluginsAvailableByName = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
         const totalAllowed = pluginSpecs.allowed
@@ -390,6 +399,7 @@ const Inventory = (props) => {
         flex-wrap: wrap;
         gap: 1rem;
         align-items: flex-start; */
+        position: relative;
         display: flex;
         flex-direction: column;
 
@@ -402,10 +412,11 @@ const Inventory = (props) => {
         flex-wrap: wrap;    
         gap: 1rem;
         align-items: flex-start; */
+        visibility: ${(props) => (props.visible ? "visible" : "hidden")};
         display: flex;
         flex-direction: column;
 
-        background-color: #d16eb02d;
+        /* background-color: #d16eb02d; */
         flex: 1;
         margin-bottom: 2rem;
     `
@@ -415,16 +426,20 @@ const Inventory = (props) => {
         flex-wrap: wrap;
         gap: 1rem;
         /* align-items: flex-start; */
-        background-color: #ffee0039;
+        /* background-color: #ffee0039; */
     `
 
     const NewPanelContainer = styled("div")`
-        position: relative;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 2rem;
         /* display: flex;
     flex-direction: column; */
         flex: 1;
         /* background-color: #00ff8839; */
-        margin-bottom: 2rem;
+        /* margin-bottom: 2rem; */
     `
 
     const PluginListContainer = styled("div")`
@@ -458,8 +473,12 @@ const Inventory = (props) => {
         /* height: 60px; */
     `
 
+    //#region [ToggleButton]
     const StyledToggleButton = styled("div")`
         position: relative;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
         width: fit-content;
         height: fit-content;
         /* width: ${(props) => props.width || "100%"}; */
@@ -485,13 +504,10 @@ const Inventory = (props) => {
         -webkit-tap-highlight-color: transparent;
         transition: background 0.05s, color 0.05s;
     `
-    //#region [ToggleButton]
+    
     const ToggleButton = (props) => {
-        // const [isOn, setIson] = createSignal(props.isOn ?? false);
 
         const handleOnClick = () => {
-            // setIson(!isOn());
-
             props.onToggle(props.id)
         }
 
@@ -530,24 +546,33 @@ const Inventory = (props) => {
             </Button> */}
 
             <Middle id="middle">
-                {/* LIST OF AVAILABLE AND RUNNING GAMES */}
-                {context.appMode === "save" && (
-                    <CurrentItemsContainer id="ItemsContainer">
-                        <Show when={state() === STATE.CURRENT}>
-                            {props.gamesRunning.map((game) => (
-                                <ToggleButton
-                                    id={game.id}
-                                    onToggle={(id) => handleToggle(id)}
-                                    isOn={game.id === props.selectedGameId}
-                                >
-                                    {getPluginTitle(game.name)}
-                                </ToggleButton>
-                            ))}
-                        </Show>
+                {/* LIST OF RUNNING GAMES */}
+                <Show
+                    when={
+                        context.appMode === "save" && state() === STATE.CURRENT
+                    }
+                >
+                    <CurrentItemsContainer>
+                        {props.gamesRunning.map((game) => (
+                            <ToggleButton
+                                id={game.id}
+                                onToggle={(id) => handleToggle(id)}
+                                isOn={game.id === props.selectedGameId}
+                            >
+                                <SvgIcon
+                                    src={getPluginIcon(game.name)}
+                                    size={18}
+                                />
+                                {getPluginTitle(game.name)}
+                            </ToggleButton>
+                        ))}
                     </CurrentItemsContainer>
-                )}
+                </Show>
 
-                <Show when={state() === STATE.NEW}>
+                {/* LIST OF AVAILABLE GAMES */}
+                <Show
+                    when={context.appMode === "save" && state() === STATE.NEW}
+                >
                     <NewPanelContainer id="NewPanelContainer">
                         <PluginListContainer id="PluginListContainer">
                             {PLUGINS_LIST.map(
@@ -583,9 +608,7 @@ const Inventory = (props) => {
                 </Show>
 
                 {/* UI OF THE GAMES !!! */}
-                <Show when={state() !== STATE.NEW}>
-                    <GameUI id="plugins-ui" />
-                </Show>
+                <GameUI id="plugins-ui" visible={state() !== STATE.NEW} />
             </Middle>
 
             {/* CATEGORY PICKER */}
