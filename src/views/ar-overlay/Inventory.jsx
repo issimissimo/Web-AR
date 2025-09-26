@@ -1,4 +1,4 @@
-import { onMount, createSignal, useContext } from "solid-js"
+import { onMount, createSignal, useContext, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 
@@ -219,9 +219,9 @@ const InventoryItem = (props) => {
 
     return (
         <ItemContainer
-            // enabled={props.enabled}
-            animate={{ opacity: [0, props.enabled ? 1 : 0.5] }}
-            transition={{ duration: 1, easing: "ease-in-out", delay: 0.5 }}
+        // enabled={props.enabled}
+        // animate={{ opacity: [0, props.enabled ? 1 : 0.5] }}
+        // transition={{ duration: 1, easing: "ease-in-out", delay: 0.5 }}
         >
             <ItemHeader>
                 <ItemIconContainer>
@@ -413,8 +413,27 @@ const Inventory = (props) => {
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
+        overflow-y: auto;
         /* align-items: flex-start; */
-        /* background-color: #ffee00; */
+        background-color: #ffee0039;
+    `
+
+    const PluginListContainer = styled("div")`
+        /* display: flex;
+        align-items: center;
+        justify-content: center; */
+        background-color: red;
+        /* height: 60px; */
+        height: 100px;
+    `
+
+    const PluginDetailsContainer = styled("div")`
+        /* display: flex;
+        align-items: center;
+        justify-content: center; */
+        background-color: #3700ff;
+        height: 200px;
+        /* height: 60px; */
     `
 
     const Bottom = styled("div")`
@@ -498,10 +517,9 @@ const Inventory = (props) => {
 
                 {/* LIST OF AVAILABLE AND RUNNING GAMES */}
                 {context.appMode === "save" &&
-                    <ItemsContainer>
-                        {
-                            state() === STATE.CURRENT &&
-                            props.gamesRunning.map(game => (
+                    <ItemsContainer id="ItemsContainer">
+                        <Show when={state() === STATE.CURRENT}>
+                            {props.gamesRunning.map(game => (
                                 <ToggleButton
                                     id={game.id}
                                     onToggle={(id) => handleToggle(id)}
@@ -509,13 +527,35 @@ const Inventory = (props) => {
                                 >
                                     {getPluginTitle(game.name)}
                                 </ToggleButton>
-                            ))
-                        }
+                            ))}
+                        </Show>
+                        <Show when={state() === STATE.NEW}>
+                            <PluginListContainer id="PluginListContainer">
+
+                            </PluginListContainer>
+
+                            <PluginDetailsContainer id="PluginDetailsContainer">
+
+                            </PluginDetailsContainer>
+                            {/* {PLUGINS_LIST.map(plugin => (
+                                plugin.category === currentCategoryName() &&
+                                <InventoryItem
+                                    enabled={plugin.allowed > 0 ? true : false}
+                                    available={getPluginsAvailableByName(plugin.fileName) > 0 ? true : false}
+                                    title={plugin.title}
+                                    description={plugin.description}
+                                    icon={plugin.icon}
+                                    localizationRequired={plugin.localized}
+                                />
+                            ))} */}
+                        </Show>
                     </ItemsContainer>
                 }
 
                 {/* UI OF THE GAMES !!! */}
-                <GameUI id="plugins-ui" />
+                <Show when={state() !== STATE.NEW}>
+                    <GameUI id="plugins-ui" />
+                </Show>
 
             </Middle>
 
