@@ -1,7 +1,6 @@
 import { onMount, createSignal, createEffect, useContext, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
-
 import {
     Container,
     FitHeight,
@@ -24,6 +23,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 
 import { PLUGINS_CATEGORIES, PLUGINS_LIST } from "@plugins/pluginsIndex"
+
+
+//region CATEGORY ITEM
 
 const CategoryItem = (props) => {
     const CategoryItemContainer = styled(Motion.div)`
@@ -81,14 +83,9 @@ const CategoryItem = (props) => {
     )
 }
 
-const CategoriesPicker = (props) => {
-    const STATE = {
-        NONE: "none",
-        CURRENT: "current",
-        NEW: "new",
-    }
+//region CATEGORY PICKER
 
-    const [state, setState] = createSignal(STATE.CURRENT)
+const CategoriesPicker = (props) => {
 
     const CategoriesContainer = styled("div")`
         display: flex;
@@ -96,42 +93,6 @@ const CategoriesPicker = (props) => {
         width: 100%;
         box-sizing: border-box;
     `
-
-    // return (
-    //     <CategoriesContainer>
-    //         {props.visible && (
-    //             <>
-    //                 <CategoryItem
-    //                     name={"installate"}
-    //                     icon={"someicon"}
-    //                     selected={state() === STATE.CURRENT}
-    //                     onClick={() => setState(state() === STATE.CURRENT ? STATE.NONE : STATE.CURRENT)}
-    //                 />
-    //                 {PLUGINS_CATEGORIES.map((category) => (
-    //                     <CategoryItem
-    //                         name={category.name}
-    //                         icon={category.icon}
-    //                         selected={state() === STATE.NEW &&
-    //                             props.currentCategoryName === category.name
-    //                             ? true
-    //                             : false
-    //                         }
-    //                         onClick={(name) => {
-    //                             if (state() === STATE.NEW &&
-    //                                 props.currentCategoryName === name) {
-    //                                 setState(STATE.NONE);
-    //                             }
-    //                             else{
-    //                                 setState(STATE.NEW);
-    //                                 props.onCategoryPicked(name);
-    //                             }
-    //                         }}
-    //                     />
-    //                 ))}
-    //             </>
-    //         )}
-    //     </CategoriesContainer>
-    // )
     return (
         <CategoriesContainer>
             {props.visible && (
@@ -177,126 +138,9 @@ const CategoriesPicker = (props) => {
     )
 }
 
-const InventoryItem = (props) => {
-    const ItemContainer = styled(Motion.div)`
-        margin-top: 2rem;
-        /* margin-bottom: 2rem; */
-    `
 
-    const ItemHeader = styled("div")`
-        display: flex;
-        align-items: center;
-    `
 
-    const ItemIconContainer = styled("div")`
-        width: 60px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-    `
-
-    const ItemContent = styled("div")`
-        flex: 1;
-        box-sizing: border-box;
-        margin-left: 60px;
-    `
-
-    const ItemTitle = styled("p")`
-        font-size: 1rem;
-        margin: 0;
-    `
-
-    const ItemDescription = styled("div")`
-        font-size: small;
-        width: auto;
-        opacity: 0.75;
-        line-height: 180%;
-        margin-bottom: 1rem;
-    `
-
-    const SpecsContainer = styled("div")`
-        display: flex;
-        font-size: small;
-        color: var(--color-secondary);
-        gap: 0.5rem;
-        align-items: center;
-    `
-
-    return (
-        <ItemContainer
-        // enabled={props.enabled}
-        // animate={{ opacity: [0, props.enabled ? 1 : 0.5] }}
-        // transition={{ duration: 1, easing: "ease-in-out", delay: 0.5 }}
-        >
-            <ItemHeader>
-                <ItemIconContainer>
-                    {/* <SvgIcon src={props.icon} size={40} color={'var(--color-secondary)'} /> */}
-                </ItemIconContainer>
-
-                <ItemTitle>{props.title}</ItemTitle>
-            </ItemHeader>
-
-            <ItemContent>
-                <ItemDescription>{props.description}</ItemDescription>
-
-                {props.enabled &&
-                    props.available &&
-                    props.localizationRequired && (
-                        <SpecsContainer>
-                            <Fa
-                                icon={faLocationCrosshairs}
-                                size="1x"
-                                translateX={0}
-                                class="icon"
-                            />
-                            Richiede localizzazione
-                        </SpecsContainer>
-                    )}
-                {!props.available && props.enabled && (
-                    <SpecsContainer>
-                        <Fa
-                            icon={faCheck}
-                            size="1x"
-                            translateX={0}
-                            class="icon"
-                        />
-                        Aggiunto
-                    </SpecsContainer>
-                )}
-                {!props.enabled && (
-                    <SpecsContainer>
-                        <Fa
-                            icon={faSadTear}
-                            size="1x"
-                            translateX={0}
-                            class="icon"
-                        />
-                        Non disponibile
-                    </SpecsContainer>
-                )}
-
-                {props.enabled && props.available && (
-                    <Button
-                        style={{ "margin-top": "1rem" }}
-                        active={true}
-                        small={true}
-                    // onClick={handleModifyMarker}
-                    >
-                        Aggiungi
-                        <Fa
-                            icon={faPlus}
-                            size="1x"
-                            translateX={1}
-                            class="icon"
-                        />
-                    </Button>
-                )}
-            </ItemContent>
-        </ItemContainer>
-    )
-}
-
-//#region [INVENTORY]
+//region INVENTORY
 
 const Inventory = (props) => {
     const STATE = {
@@ -307,7 +151,6 @@ const Inventory = (props) => {
 
     const [state, setState] = createSignal(STATE.CURRENT)
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null)
-    const [visible, setVisible] = createSignal(false)
     const [selectedPlugin, setSelectedPlugin] = createSignal(null)
     const context = useContext(Context)
 
@@ -315,11 +158,17 @@ const Inventory = (props) => {
         console.log("SELECTED PLUGIN:", selectedPlugin())
     })
 
-    // const handleSetVisible = () => {
-    //     setVisible(() => !visible())
-    //     // props.onToggleUi(visible());
-    //     context.handleBlurredCover({ visible: visible() })
-    // }
+
+    createEffect(() => {
+        console.log("SELECTED STATE:", state())
+        if (state() === STATE.NEW) {
+            context.handleBlurredCover({ visible: true });
+        }
+        else {
+            // props.setSelectedGameId(null);
+            context.handleBlurredCover({ visible: false })
+        }
+    })
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -365,8 +214,42 @@ const Inventory = (props) => {
         return categorySpecs.icon
     }
 
+    // const getPluginAllowed = (pluginName) => {
+    //     const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName);
+
+    //     const totalAllowed = pluginSpecs.allowed
+    //     let nGames = 0
+    //     if (props.marker.games) {
+    //         props.marker.games.map((game) => {
+    //             if (game.name === pluginName) nGames++
+    //         })
+    //         return totalAllowed - nGames
+    //     }
+    //     return totalAllowed
+    // }
+
+
     const getPluginAllowed = (pluginName) => {
-        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
+
+        // Check if some of the installed games
+        // is "interactable", so that means that
+        // no other "interactable" plugins are allowed
+        let isSomeoneInteractable = false;
+        for (let i = 0; i < props.marker.games.length; i++) {
+            const game = props.marker.games[i];
+            const currentGameSpecs = PLUGINS_LIST.find((g) => g.fileName === game.name);
+            if (currentGameSpecs.interactable) {
+                isSomeoneInteractable = true;
+                break;
+            }
+        }
+        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName);
+        if (pluginSpecs.interactable && isSomeoneInteractable){
+            return false;
+        }
+
+        // Now check for the total allowed
+        // number 
         const totalAllowed = pluginSpecs.allowed
         let nGames = 0
         if (props.marker.games) {
@@ -376,6 +259,7 @@ const Inventory = (props) => {
             return totalAllowed - nGames
         }
         return totalAllowed
+
     }
 
     /**
@@ -499,7 +383,8 @@ const Inventory = (props) => {
         /* height: 60px; */
     `
 
-    //#region [ToggleButton]
+    // region TOGGLE BUTTON
+
     const StyledToggleButton = styled("div")`
         position: relative;
         display: flex;
@@ -555,26 +440,10 @@ const Inventory = (props) => {
         )
     }
 
-    //#region [RETURN]
+    //#region RENDER
 
     return (
         <InventoryContainer id="InventoryContainer">
-            {/* <CategoriesPicker
-                // visible={visible()}
-                visible={true}
-                currentCategoryName={currentCategoryName()}
-                onCategoryPicked={(name) => handleCategorySelected(name)}
-            ></CategoriesPicker> */}
-
-            {/* <Button
-                active={true}
-                icon={!visible() ? faPlus : faXmark}
-                border={!visible()}
-                background={visible() && 'transparent'}
-                onClick={handleSetVisible}
-            >
-                {!visible() ? "" : "Chiudi"}
-            </Button> */}
 
             <Middle id="middle">
                 {/* LIST OF RUNNING GAMES */}
@@ -654,10 +523,10 @@ const Inventory = (props) => {
                     </NewPanelContainer>
                 </Show>
 
-                {/* UI OF THE GAMES !!! N.B. We can't use Show here
+                {/* UI OF THE GAMES !!! DON'T TOUCH! N.B. We can't use Show here
                 because the dome element is observed and must be present*/}
                 <GameUI id="plugins-ui"
-                    visible={state() !== STATE.NEW} />
+                    visible={state() === STATE.CURRENT} />
             </Middle>
 
             {/* CATEGORY PICKER */}

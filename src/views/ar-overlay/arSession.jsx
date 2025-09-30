@@ -629,7 +629,7 @@ export default function ArSession(props) {
         box-sizing: border-box;
     `
 
-    //#region [return]
+    //#region RENDER
 
     return (
         <Context.Provider

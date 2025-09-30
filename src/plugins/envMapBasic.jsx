@@ -66,17 +66,6 @@ export default function envMapBasic(props) {
         })
     })
 
-    // createEffect(
-    //     on(
-    //         () => props.selected,
-    //         (newValue, prevValue) => {
-    //             setTimeout(() => {
-    //                 game.forceUpdateDomElements()
-    //             }, 50)
-    //         }
-    //     )
-    // )
-
     const next = () => {
         setIndex((i) => (i + 1) % files.length)
         finalize()
@@ -154,7 +143,6 @@ export default function envMapBasic(props) {
     const FileNameContainer = styled("div")`
         font-size: small;
         font-weight: 500;
-        background-color: var(--color-secondary-dark);
         padding: 1rem;
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;

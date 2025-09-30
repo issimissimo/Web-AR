@@ -39,6 +39,7 @@ export const PLUGINS_LIST = [
         category: 'Luci',
         allowed: 1,
         localized: true,
+        interactable: false,
         tags: [],
         requirements: {}
     },
@@ -50,6 +51,7 @@ export const PLUGINS_LIST = [
         category: 'Luci',
         allowed: 1,
         localized: false,
+        interactable: false,
         tags: [],
         requirements: {}
     },
@@ -61,6 +63,7 @@ export const PLUGINS_LIST = [
         category: 'Luci',
         allowed: 1,
         localized: true,
+        interactable: false,
         tags: [],
         requirements: {}
     },
@@ -72,6 +75,7 @@ export const PLUGINS_LIST = [
         category: 'Luci',
         allowed: 1,
         localized: false,
+        interactable: false,
         tags: [],
         requirements: {}
     },
@@ -83,6 +87,7 @@ export const PLUGINS_LIST = [
         category: '3D',
         allowed: 1,
         localized: false,
+        interactable: false,
         tags: [],
         requirements: {}
     },
@@ -94,6 +99,7 @@ export const PLUGINS_LIST = [
         category: '3D',
         allowed: 1,
         localized: false,
+        interactable: false,
         tags: [],
         requirements: {}
     },
@@ -105,6 +111,7 @@ export const PLUGINS_LIST = [
         category: '3D',
         allowed: 1,
         localized: false,
+        interactable: false,
         tags: [],
         requirements: {}
     },
@@ -116,6 +123,7 @@ export const PLUGINS_LIST = [
         category: 'Giochi',
         allowed: 1,
         localized: true,
+        interactable: true,
         tags: [],
         requirements: {}
     },
@@ -127,6 +135,7 @@ export const PLUGINS_LIST = [
         category: '3D',
         allowed: 1,
         localized: false,
+        interactable: true,
         tags: [],
         requirements: {}
     },
@@ -138,6 +147,7 @@ export const PLUGINS_LIST = [
         category: 'Custom',
         allowed: 1,
         localized: false,
+        interactable: true,
         tags: [],
         requirements: {}
     },

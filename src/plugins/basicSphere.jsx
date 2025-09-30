@@ -11,7 +11,7 @@ export default function basicSphere(props) {
     */
     const { game } = useGame("basicSphere", props.id, {
 
-        onTap: () => {
+        onTap: () => {console.log("TAP SFERA BASE")
         },
 
         renderLoop: () => loop()
