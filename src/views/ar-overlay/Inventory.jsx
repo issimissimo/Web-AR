@@ -1,4 +1,4 @@
-import { onMount, createSignal, useContext, Show } from "solid-js"
+import { onMount, createSignal, createEffect, useContext, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 
@@ -20,7 +20,7 @@ import {
     faSadTear,
     faCheck,
     faTrash,
-    faLocationDot
+    faLocationDot,
 } from "@fortawesome/free-solid-svg-icons"
 
 import { PLUGINS_CATEGORIES, PLUGINS_LIST } from "@plugins/pluginsIndex"
@@ -308,15 +308,18 @@ const Inventory = (props) => {
     const [state, setState] = createSignal(STATE.CURRENT)
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null)
     const [visible, setVisible] = createSignal(false)
+    const [selectedPlugin, setSelectedPlugin] = createSignal(null)
     const context = useContext(Context)
+
+    createEffect(() => {
+        console.log("SELECTED PLUGIN:", selectedPlugin())
+    })
 
     const handleSetVisible = () => {
         setVisible(() => !visible())
         // props.onToggleUi(visible());
         context.handleBlurredCover({ visible: visible() })
     }
-
-    const getRunningPlugins = () => { }
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -354,7 +357,7 @@ const Inventory = (props) => {
 
     const getPluginIcon = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
-        if (pluginSpecs.icon) return pluginSpecs.icon;
+        if (pluginSpecs.icon) return pluginSpecs.icon
         const categoryName = pluginSpecs.category
         const categorySpecs = PLUGINS_CATEGORIES.find(
             (g) => g.name === categoryName
@@ -452,7 +455,7 @@ const Inventory = (props) => {
     const PluginListContainer = styled("div")`
         position: absolute;
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         gap: 1rem;
         /* display: flex;
         align-items: center;
@@ -505,7 +508,10 @@ const Inventory = (props) => {
         background: ${(props) =>
             props.isOn
                 ? "var(--color-secondary)"
-                : "var(--color-dark-transparent)"};
+                : props.theme === "dark"
+                    ? 'var(--color-dark-transparent)'
+                    : 'var(--color-background-transparent)'
+        };
         border: none;
         pointer-events: ${(props) => (props.enabled ? "auto" : "none")};
         opacity: ${(props) => (props.enabled ? 1 : 0.5)};
@@ -518,7 +524,6 @@ const Inventory = (props) => {
     `
 
     const ToggleButton = (props) => {
-
         const handleOnClick = () => {
             props.onToggle(props.id)
         }
@@ -531,6 +536,7 @@ const Inventory = (props) => {
                 class="glass"
                 isOn={props.isOn}
                 enabled={props.enabled ?? true}
+                theme={props.theme ?? "dark"}
             >
                 {props.children}
             </StyledToggleButton>
@@ -572,7 +578,13 @@ const Inventory = (props) => {
                                 onToggle={(id) => handleToggle(id)}
                                 isOn={game.id === props.selectedGameId}
                             >
-                                {getPluginLocalized(game.name) && <Fa icon={faLocationDot} size="1x" translateX={0} />}
+                                {getPluginLocalized(game.name) && (
+                                    <Fa
+                                        icon={faLocationDot}
+                                        size="1x"
+                                        translateX={0}
+                                    />
+                                )}
                                 <SvgIcon
                                     src={getPluginIcon(game.name)}
                                     size={16}
@@ -594,14 +606,26 @@ const Inventory = (props) => {
                                     plugin.category ===
                                     currentCategoryName() && (
                                         <ToggleButton
-                                            enabled={getPluginAllowed(plugin.fileName)}
-                                        // id={game.id}
-                                        // onToggle={(id) => handleToggle(id)}
+                                            enabled={getPluginAllowed(
+                                                plugin.fileName
+                                            )}
+                                            // id={game.id}
+                                            onToggle={() =>
+                                                setSelectedPlugin(plugin)
+                                            }
                                         // isOn={game.id === props.selectedGameId}
                                         >
-                                            {plugin.localized && <Fa icon={faLocationDot} size="1x" translateX={0} />}
+                                            {plugin.localized && (
+                                                <Fa
+                                                    icon={faLocationDot}
+                                                    size="1x"
+                                                    translateX={0}
+                                                />
+                                            )}
                                             <SvgIcon
-                                                src={getPluginIcon(plugin.fileName)}
+                                                src={getPluginIcon(
+                                                    plugin.fileName
+                                                )}
                                                 size={16}
                                             />
                                             {plugin.title}
@@ -610,12 +634,18 @@ const Inventory = (props) => {
                             )}
                         </PluginListContainer>
 
-                        <PluginDetailsContainer id="PluginDetailsContainer"></PluginDetailsContainer>
+                        <Show when={selectedPlugin()}>
+                            <PluginDetailsContainer id="PluginDetailsContainer">
+                                {selectedPlugin().description}
+                            </PluginDetailsContainer>
+                        </Show>
                     </NewPanelContainer>
                 </Show>
 
-                {/* UI OF THE GAMES !!! */}
-                <GameUI id="plugins-ui" visible={state() !== STATE.NEW} />
+                {/* UI OF THE GAMES !!! N.B. We can't use Show here
+                because the dome element is observed and must be present*/}
+                <GameUI id="plugins-ui"
+                    visible={state() !== STATE.NEW} />
             </Middle>
 
             {/* CATEGORY PICKER */}
