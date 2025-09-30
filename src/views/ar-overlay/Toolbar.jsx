@@ -24,13 +24,13 @@ const ContainerToolbar = styled(Motion.div)`
 const Toolbar = (props) => {
     const context = useContext(Context)
 
-    onMount(() => {
-        context.forceUpdateDomElements()
-    })
+    // onMount(() => {
+    //     context.forceUpdateDomElements()
+    // })
 
-    onCleanup(() => {
-        context.forceUpdateDomElements()
-    })
+    // onCleanup(() => {
+    //     context.forceUpdateDomElements()
+    // })
 
     return (
         <ContainerToolbar

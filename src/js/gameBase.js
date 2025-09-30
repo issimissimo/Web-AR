@@ -196,7 +196,6 @@ export function useGame(gameName, gameId, config = {}) {
         renderLoop,
         close,
         onUndo,
-        forceUpdateDomElements: context.forceUpdateDomElements,
         loadGameData,
         saveGameData,
         addToScene,

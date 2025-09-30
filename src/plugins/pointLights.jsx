@@ -112,7 +112,7 @@ export default function pointLights(props) {
         console.log("POINT LIGHTS __ selected:", props.selected)
         game.setVisibleByName("helper", props.selected);
 
-        game.forceUpdateDomElements();
+        // game.forceUpdateDomElements();
     })
 
 
@@ -186,9 +186,9 @@ export default function pointLights(props) {
         setCurrentLight(_light);
         console.log("currentLight:", currentLight())
 
-        setTimeout(() => {
-            game.forceUpdateDomElements();
-        }, 50)
+        // setTimeout(() => {
+        //     game.forceUpdateDomElements();
+        // }, 50)
     }
 
 

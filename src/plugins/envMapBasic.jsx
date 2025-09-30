@@ -66,16 +66,16 @@ export default function envMapBasic(props) {
         })
     })
 
-    createEffect(
-        on(
-            () => props.selected,
-            (newValue, prevValue) => {
-                setTimeout(() => {
-                    game.forceUpdateDomElements()
-                }, 50)
-            }
-        )
-    )
+    // createEffect(
+    //     on(
+    //         () => props.selected,
+    //         (newValue, prevValue) => {
+    //             setTimeout(() => {
+    //                 game.forceUpdateDomElements()
+    //             }, 50)
+    //         }
+    //     )
+    // )
 
     const next = () => {
         setIndex((i) => (i + 1) % files.length)

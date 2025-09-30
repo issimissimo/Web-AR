@@ -31,7 +31,7 @@ export default function testRobot(props) {
         Reticle.setVisible(true)
         // game.blurBackground(false);
         game.handleBlurredCover({ visible: false })
-        game.forceUpdateDomElements()
+        // game.forceUpdateDomElements()
     }
 
     const handleUndo = () => {

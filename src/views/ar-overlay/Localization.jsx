@@ -21,7 +21,6 @@ export default function Localization(props) {
             texturePath: "images/qr-code.webp",
             color: 0xf472b6,
         })
-        context.forceUpdateDomElements()
         context.handleBlurredCover({
             visible: true,
             showHole: false,
@@ -36,7 +35,6 @@ export default function Localization(props) {
             visible: true,
             showHole: true,
         })
-        context.forceUpdateDomElements()
     }
 
     const handleOnDone = () => {
@@ -90,7 +88,6 @@ export default function Localization(props) {
                 <Message
                     style={{ height: "auto" }}
                     icon={faQrcode}
-                    // svgIcon={"icons/phone.svg"}
                     showReadMore={false}
                     showDoneButton={true}
                     onDone={handleCloseInstructions}

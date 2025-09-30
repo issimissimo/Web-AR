@@ -3,6 +3,7 @@ import {
     createEffect,
     createContext,
     onMount,
+    onCleanup,
     For,
     createRoot,
     on,
@@ -63,6 +64,10 @@ export default function ArSession(props) {
 
     //#region [lifeCycle]
     onMount(() => {
+
+        // Initialize the DOM Observer for interactive elements
+        setupDomObserver();
+
         // Well, if we do some changes on some scripts,
         // arSession is mounted again each time, so we need
         // to reset the props.gamesRunning.
@@ -125,7 +130,7 @@ export default function ArSession(props) {
             } else {
                 SceneManager.init()
                 console.warn(
-                    "WARNING: SceneManager is actually NOT initialized,and I have initialized it for you. If you are DEBUGGING on desktop AND you have made some changes it's normal, otherwise it's a problem!"
+                    "WARNING: SceneManager is actually NOT initialized, and I have initialized it for you. If you are DEBUGGING on desktop AND you have made some changes it's normal, otherwise it's a problem!"
                 )
             }
         } else {
@@ -152,7 +157,7 @@ export default function ArSession(props) {
                         // Immediately dispose the temporary root to avoid leaking
                         try {
                             disposer()
-                        } catch (e) {}
+                        } catch (e) { }
                     } catch (e) {
                         console.error("Error executing game onTap:", e)
                     }
@@ -193,6 +198,11 @@ export default function ArSession(props) {
             )
             setGamesInitialized(true)
         }
+    })
+
+    onCleanup(() => {
+        cleanupDomObserver();
+        removeClickableDomElements();
     })
 
     // createEffect(() => {
@@ -394,7 +404,44 @@ export default function ArSession(props) {
      * but, since it's very unpredictable yo know the interactable DOM elements
      * on the page, it should be called also when something on the page change
      */
+    let _mutationObserver = null;
+    let _updateTimeout = null;
     let _clickableDomElements = []
+    function setupDomObserver() {
+        if (_mutationObserver) {
+            _mutationObserver.disconnect();
+        }
+        const targetNode = document.getElementById('ar-overlay');
+        if (!targetNode) {
+            console.error('ar-overlay non trovato, observer non avviato');
+            return;
+        }
+        const callback = (mutationsList) => {
+            // Controlla se ci sono cambiamenti ai nodi figli
+            const hasChanges = mutationsList.some(m => m.type === 'childList');
+            if (hasChanges) {
+                clearTimeout(_updateTimeout);
+                _updateTimeout = setTimeout(() => {
+                    updateClickableDomElements();
+                }, 100);
+            }
+        };
+        // Configurazione: osserva aggiunte/rimozioni di nodi in tutto il subtree
+        const config = {
+            childList: true,  // osserva aggiunte/rimozioni di nodi figli
+            subtree: true,    // osserva anche tutti i discendenti
+        };
+        // Crea e avvia l'observer
+        _mutationObserver = new MutationObserver(callback);
+        _mutationObserver.observe(targetNode, config);
+        console.log('MutationObserver avviato su #ar-overlay');
+    }
+    function cleanupDomObserver() {
+        if (_mutationObserver) {
+            _mutationObserver.disconnect();
+            _mutationObserver = null;
+        }
+    }
     function updateClickableDomElements() {
         removeClickableDomElements()
         _clickableDomElements = document.querySelectorAll(
@@ -593,7 +640,6 @@ export default function ArSession(props) {
                 userId: props.userId,
                 markerId: props.marker.id,
                 handleBlurredCover: (state) => handleBlurredCover(state),
-                forceUpdateDomElements: updateClickableDomElements,
             }}
         >
             <Main id="arSession">
@@ -632,7 +678,7 @@ export default function ArSession(props) {
                             (!initDetectionCompleted() ? (
                                 <InitialDetection />
                             ) : localizationState() ===
-                              LOCALIZATION_STATE.REQUIRED ? (
+                                LOCALIZATION_STATE.REQUIRED ? (
                                 <Localization
                                     planeFound={props.planeFound}
                                     setReferenceMatrix={(matrix) =>
@@ -649,7 +695,6 @@ export default function ArSession(props) {
                                         selectedGameId() !== null ? true : false
                                     }
                                     saveGame={handleSaveSelectedGame}
-                                    gamesRunning={props.gamesRunning}
                                     selectedGameId={selectedGameId()}
                                     setSelectedGameId={(id) =>
                                         setSelectedGameId(id)

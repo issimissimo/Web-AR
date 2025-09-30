@@ -315,11 +315,11 @@ const Inventory = (props) => {
         console.log("SELECTED PLUGIN:", selectedPlugin())
     })
 
-    const handleSetVisible = () => {
-        setVisible(() => !visible())
-        // props.onToggleUi(visible());
-        context.handleBlurredCover({ visible: visible() })
-    }
+    // const handleSetVisible = () => {
+    //     setVisible(() => !visible())
+    //     // props.onToggleUi(visible());
+    //     context.handleBlurredCover({ visible: visible() })
+    // }
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -329,19 +329,19 @@ const Inventory = (props) => {
         /* background-color: green; */
     `
 
-    const InventoryItemsContainer = styled(FitHeightScrollable)`
-        margin-bottom: 2rem;
-    `
+    // const InventoryItemsContainer = styled(FitHeightScrollable)`
+    //     margin-bottom: 2rem;
+    // `
 
     onMount(() => {
         setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name)
         // console.log(PLUGINS_LIST)
 
         console.log(props.marker)
-        console.log(props.gamesRunning)
     })
 
     const handleCategorySelected = (categoryName) => {
+        setSelectedPlugin(null);
         setCurrentCategoryName(() => categoryName)
     }
 
@@ -403,6 +403,16 @@ const Inventory = (props) => {
         }, 10)
     }
 
+    const handleSelectNewPlugin = (newPlugin) => {
+        if (selectedPlugin()) {
+            if (!newPlugin || newPlugin.fileName === selectedPlugin().fileName) {
+                setSelectedPlugin(null);
+                return;
+            }
+        }
+        setSelectedPlugin(newPlugin);
+    }
+
     const Middle = styled("div")`
         /* display: flex;
         flex-wrap: wrap;
@@ -422,6 +432,8 @@ const Inventory = (props) => {
         gap: 1rem;
         align-items: flex-start; */
         visibility: ${(props) => (props.visible ? "visible" : "hidden")};
+        pointer-events: ${(props) => (props.visible ? "auto" : "none")};
+        opacity: ${(props) => (props.visible ? 1 : 0)};
         display: flex;
         flex-direction: column;
         position: relative;
@@ -572,11 +584,12 @@ const Inventory = (props) => {
                     }
                 >
                     <CurrentItemsContainer>
-                        {props.gamesRunning.map((game) => (
+                        {props.marker.games.map((game) => (
                             <ToggleButton
                                 id={game.id}
                                 onToggle={(id) => handleToggle(id)}
                                 isOn={game.id === props.selectedGameId}
+                                enabled={game.enabled}
                             >
                                 {getPluginLocalized(game.name) && (
                                     <Fa
@@ -609,11 +622,10 @@ const Inventory = (props) => {
                                             enabled={getPluginAllowed(
                                                 plugin.fileName
                                             )}
-                                            // id={game.id}
                                             onToggle={() =>
-                                                setSelectedPlugin(plugin)
+                                                handleSelectNewPlugin(plugin)
                                             }
-                                        // isOn={game.id === props.selectedGameId}
+                                            isOn={selectedPlugin() ? selectedPlugin().fileName === plugin.fileName : false}
                                         >
                                             {plugin.localized && (
                                                 <Fa
