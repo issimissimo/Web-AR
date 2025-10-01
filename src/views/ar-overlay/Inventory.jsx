@@ -20,6 +20,7 @@ import {
     faCheck,
     faTrash,
     faLocationDot,
+    faHandPointUp
 } from "@fortawesome/free-solid-svg-icons"
 
 import { PLUGINS_CATEGORIES, PLUGINS_LIST } from "@plugins/pluginsIndex"
@@ -204,6 +205,11 @@ const Inventory = (props) => {
         return pluginSpecs.localized
     }
 
+    const getPluginInteractable = (pluginName) => {
+        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
+        return pluginSpecs.interactable
+    }
+
     const getPluginIcon = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
         if (pluginSpecs.icon) return pluginSpecs.icon
@@ -244,7 +250,7 @@ const Inventory = (props) => {
             }
         }
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName);
-        if (pluginSpecs.interactable && isSomeoneInteractable){
+        if (pluginSpecs.interactable && isSomeoneInteractable) {
             return false;
         }
 
@@ -295,6 +301,12 @@ const Inventory = (props) => {
             }
         }
         setSelectedPlugin(newPlugin);
+    }
+
+    // Add a new plugin to this marker!!
+    const handleAddNewPlugin = () => {
+        props.addNewPluginToMarker(selectedPlugin().fileName);
+        setSelectedPlugin(null);
     }
 
     const Middle = styled("div")`
@@ -363,17 +375,7 @@ const Inventory = (props) => {
         height: 50%;
     `
 
-    const PluginDetailsContainer = styled("div")`
-        position: absolute;
-        width: 100%;
-        /* display: flex;
-        align-items: center;
-        justify-content: center; */
-        background-color: #3700ff37;
-        top: 50%;
-        bottom: 0;
-        /* height: 60px; */
-    `
+
 
     const Bottom = styled("div")`
         display: flex;
@@ -440,6 +442,39 @@ const Inventory = (props) => {
         )
     }
 
+
+
+    //region PLUGIN DETAILS
+
+    const PluginDetailsContainer = styled("div")`
+        position: absolute;
+        width: 100%;
+        /* display: flex;
+        align-items: center;
+        justify-content: center; */
+        background-color: #3700ff37;
+        top: 50%;
+        bottom: 0;
+        /* height: 60px; */
+    `
+
+    const PluginDetails = () => {
+        return (
+            <PluginDetailsContainer>
+                {selectedPlugin().description}
+                <Button
+                    onClick={handleAddNewPlugin}
+                    small={true}
+                    icon={faPlus}
+                    width={"65%"}
+                >
+                    Aggiungi
+                </Button>
+            </PluginDetailsContainer>
+        )
+    }
+
+
     //#region RENDER
 
     return (
@@ -464,7 +499,12 @@ const Inventory = (props) => {
                                     <Fa
                                         icon={faLocationDot}
                                         size="1x"
-                                        translateX={0}
+                                    />
+                                )}
+                                {getPluginInteractable(game.name) && (
+                                    <Fa
+                                        icon={faHandPointUp}
+                                        size="1x"
                                     />
                                 )}
                                 <SvgIcon
@@ -503,6 +543,12 @@ const Inventory = (props) => {
                                                     translateX={0}
                                                 />
                                             )}
+                                            {plugin.interactable && (
+                                                <Fa
+                                                    icon={faHandPointUp}
+                                                    size="1x"
+                                                />
+                                            )}
                                             <SvgIcon
                                                 src={getPluginIcon(
                                                     plugin.fileName
@@ -515,11 +561,11 @@ const Inventory = (props) => {
                             )}
                         </PluginListContainer>
 
+                        {/* PLUGIN DETAILS */}
                         <Show when={selectedPlugin()}>
-                            <PluginDetailsContainer id="PluginDetailsContainer">
-                                {selectedPlugin().description}
-                            </PluginDetailsContainer>
+                            <PluginDetails />
                         </Show>
+
                     </NewPanelContainer>
                 </Show>
 
@@ -533,7 +579,6 @@ const Inventory = (props) => {
             {context.appMode === "save" && (
                 <Bottom data-interactive>
                     <CategoriesPicker
-                        // visible={visible()}
                         visible={true}
                         currentCategoryName={currentCategoryName()}
                         onCategoryPicked={(name) =>

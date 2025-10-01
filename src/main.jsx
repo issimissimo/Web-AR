@@ -168,9 +168,10 @@ export default function Main() {
      * and set it as currentMarker
      */
     const setupMarker = async (marker = null, callback = null) => {
-        // If no Games are provided, load the all the Games basic properties
+        // If no Games are provided, load the all the Games
         // from firestore for this marker
         if (marker.id && !marker.data.games) {
+            console.log("no marker.data.games provided, now loading them from firestore!")
             marker.data.games = await firebase.firestore.fetchGames(
                 userId(),
                 marker.id

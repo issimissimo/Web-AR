@@ -218,6 +218,10 @@ export default function ArSession(props) {
     //     }
     // })
 
+    createEffect(()=>{
+        console.log("ADESSO E' SELEZIONATO IL GAME con ID:", selectedGameId());
+    })
+
 
     createEffect(
         on(
@@ -491,34 +495,54 @@ export default function ArSession(props) {
         })
     }
 
-    const handleSaveSelectedGame = async () => {
-        const gameToSave = props.gamesRunning.find(
-            (el) => el.id === selectedGameId()
-        )
-        setSelectedGameId(null)
+    // const handleSaveSelectedGame = async () => {
+    //     const gameToSave = props.gamesRunning.find(
+    //         (el) => el.id === selectedGameId()
+    //     )
+    //     setSelectedGameId(null)
 
-        console.log("GAME TO SAVE:", gameToSave)
-        console.log("GAME DATA TO SAVE:", gameToSave.gameData())
+    //     console.log("GAME TO SAVE:", gameToSave)
+    //     console.log("GAME DATA TO SAVE:", gameToSave.gameData())
 
+    //     const newGameId = await firebase.firestore.addGame(
+    //         props.userId,
+    //         props.marker.id,
+    //         gameToSave.name
+    //     )
+    //     console.log("Creato in Firestore il game con ID:", newGameId)
+
+    //     if (gameToSave.gameData()) {
+    //         try {
+    //             const path = `${props.userId}/markers/${props.marker.id}/games/${newGameId}`
+    //             await firebase.realtimeDb.saveData(path, gameToSave.gameData())
+    //             console.log("Creato in RealtimeDB il JSON con ID:", newGameId)
+    //         } catch (error) {
+    //             console.log("Errore nel salvataggio JSON:", error)
+    //         }
+    //     }
+
+    //     props.onNewGameSaved()
+    // }
+
+    const addNewPluginToMarker = async (pluginName) => {
+        console.log("ADESSO AGGIUNGO:", pluginName);
+
+        // save new plugin
         const newGameId = await firebase.firestore.addGame(
             props.userId,
             props.marker.id,
-            gameToSave.name
+            pluginName
         )
-        console.log("Creato in Firestore il game con ID:", newGameId)
 
-        if (gameToSave.gameData()) {
-            try {
-                const path = `${props.userId}/markers/${props.marker.id}/games/${newGameId}`
-                await firebase.realtimeDb.saveData(path, gameToSave.gameData())
-                console.log("Creato in RealtimeDB il JSON con ID:", newGameId)
-            } catch (error) {
-                console.log("Errore nel salvataggio JSON:", error)
-            }
-        }
+        console.log("Creato in Firestore il game con ID:", newGameId);
 
-        props.onNewGameSaved()
+        // refresh current marker
+        props.onNewGameSaved();
+
+        // load the new module
+        loadModule(newGameId, pluginName, true);
     }
+
 
     /**
      * Import module (game) on-demand.
@@ -688,13 +712,11 @@ export default function ArSession(props) {
                             ) : (
                                 <Inventory
                                     marker={props.marker}
-                                    addNewModule={(id, name) =>
-                                        loadModule(id, name, false, true)
-                                    }
-                                    saveEnabled={
-                                        selectedGameId() !== null ? true : false
-                                    }
-                                    saveGame={handleSaveSelectedGame}
+                                    // addNewModule={(name) =>
+                                    //     loadModule("temporaryModuleID", name, true)
+                                    // }
+                                    // saveGame={handleSaveSelectedGame}
+                                    addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
                                     selectedGameId={selectedGameId()}
                                     setSelectedGameId={(id) =>
                                         setSelectedGameId(id)
