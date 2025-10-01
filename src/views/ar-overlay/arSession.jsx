@@ -200,6 +200,21 @@ export default function ArSession(props) {
         }
     })
 
+
+    // createEffect(
+    //     on(
+    //         () => props.marker.games.length,
+    //         (gamesLength) => {
+    //             if (gamesLength > 0) {
+    //                 loadAllModules();
+    //             } else {
+    //                 setGamesInitialized(true);
+    //             }
+    //         }
+    //     )
+    // )
+
+
     onCleanup(() => {
         cleanupDomObserver();
         removeClickableDomElements();
@@ -537,6 +552,9 @@ export default function ArSession(props) {
         console.log("Creato in Firestore il game con ID:", newGameId);
 
         // refresh current marker
+        // (not sure that is necessary. Ideally we should automatically
+        // refresh the modules on props.marker.games changed, but
+        // actually does not work as it should)
         props.onNewGameSaved();
 
         // load the new module

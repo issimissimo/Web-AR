@@ -307,6 +307,8 @@ const Inventory = (props) => {
     const handleAddNewPlugin = () => {
         props.addNewPluginToMarker(selectedPlugin().fileName);
         setSelectedPlugin(null);
+        // change view to CURRENT
+        setState(STATE.CURRENT);
     }
 
     const Middle = styled("div")`
@@ -342,7 +344,7 @@ const Inventory = (props) => {
     const CurrentItemsContainer = styled("div")`
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 0.5rem;
         /* align-items: flex-start; */
         /* background-color: #ffee0039; */
     `
@@ -364,7 +366,7 @@ const Inventory = (props) => {
         position: absolute;
         display: flex;
         flex-direction: column-reverse;
-        gap: 1rem;
+        gap: 0.5rem;
         /* display: flex;
         align-items: center;
         justify-content: center; */
