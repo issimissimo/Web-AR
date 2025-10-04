@@ -133,7 +133,8 @@ export function useGame(gameName, gameId, config = {}) {
     }
 
     const removePreviousFromScene = () => {
-        const assetToRemove = gameAssets.pop()
+        const assetToRemove = gameAssets.pop();
+        console.log("adesso rimuovo dalla scena:", assetToRemove)
         SceneManager.scene.remove(assetToRemove)
     }
 

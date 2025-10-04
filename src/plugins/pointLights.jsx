@@ -148,6 +148,7 @@ export default function pointLights(props) {
 
 
     function handleUndo() {
+        console.log("UNDO STARTED:", game.gameData())
         // sound
         game.onUndo();
         // deselect
@@ -176,7 +177,6 @@ export default function pointLights(props) {
     function spawnLightOnTap() {
         const _light = createLight(Reticle.getHitMatrix(), color(), intensity());
         setCurrentLight(_light);
-        // console.log("currentLight:", currentLight())
     }
 
 
@@ -228,6 +228,14 @@ export default function pointLights(props) {
         newLight.matrix.copy(matrix);
         newLight.intensity = intensity;
         newLight.name = "pointLight";
+
+        // const pointLightHelper = new THREE.PointLightHelper(newLight, 0.1, 0xf2e600);
+        // pointLightHelper.name = "helper";
+        // pointLightHelper.matrixAutoUpdate = false;
+        // pointLightHelper.matrix.identity();
+        // newLight.add(pointLightHelper);
+
+
         game.addToScene(newLight);
 
         const pointLightHelper = new THREE.PointLightHelper(newLight, 0.1, 0xf2e600);
@@ -286,7 +294,7 @@ export default function pointLights(props) {
                                 buttons={["undo", "save"]}
                                 onUndo={handleUndo}
                                 onSave={handleSave}
-                                undoActive={game.gameData().length > 0}
+                                undoActive={game.gameData().length > 0 && !currentLight()}
                                 saveActive={hasUnsavedChanges() && !currentLight()}
                             />
                         </>
