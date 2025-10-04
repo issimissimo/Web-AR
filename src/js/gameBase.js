@@ -150,7 +150,7 @@ export function useGame(gameName, gameId, config = {}) {
         })
     }
 
-    const setVisibleByName = (assetName, value) => {
+    const setAssetVisibleByName = (assetName, value) => {
         gameAssets.forEach((asset) => {
             if (asset.name === assetName && !asset.customProps.hidden) {
                 asset.visible = value
@@ -202,7 +202,7 @@ export function useGame(gameName, gameId, config = {}) {
         removePreviousFromScene,
         removeAllFromScene,
         setVisible,
-        setVisibleByName,
+        setAssetVisibleByName: setAssetVisibleByName,
         gameDetails,
         gameData,
         setGameData,

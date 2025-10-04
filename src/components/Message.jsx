@@ -43,12 +43,15 @@ const Message = (props) => {
     <Fa icon={props.icon} color={"var(--color-secondary)"} translateY={-0.5} size="3x" class="icon" />
   );
 
+  const transitionDuration = props.fadeIn === false ? 0 : 0.5;
+  const transitionDelay = props.fadeIn === false ? 0 : 0.5;
+
   return (
     <MessageContainer
       class={props.class}
       style={props.style}
       animate={{ opacity: [0, 1] }}
-      transition={{ duration: 0.5, easing: "ease-in-out", delay: 0.25 }}
+      transition={{ duration: transitionDuration, easing: "ease-in-out", delay: transitionDelay }}
     >
       {props.icon && <Icon />}
       {props.svgIcon && <SvgIcon src={props.svgIcon} color={'var(--color-secondary)'} size={65} translateY={-2} />}

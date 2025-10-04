@@ -15,7 +15,7 @@ const StyledButton = styled(Motion.button)`
   font-family: inherit;
   border-radius: 90px;
   background: ${props => props.background ? props.background : 'var(--color-background)'};
-  border: ${props => props.border ? (props.small ? "1px solid" : "2px solid") : "2px solid"};
+  border: ${props => props.border ? (props.small ? "2px solid" : "2px solid") : "2px solid"};
   border-color: ${props => props.border ? (props.grey ? 'var(--color-grey)' : 'var(--color-primary)') : 'transparent'};
   pointer-events: ${props => props.active ? 'auto' : 'none'};
   color: ${props => props.grey ? 'var(--color-grey)' : 'var(--color-primary)'};

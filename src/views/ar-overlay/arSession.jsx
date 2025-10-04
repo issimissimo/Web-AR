@@ -233,9 +233,15 @@ export default function ArSession(props) {
     //     }
     // })
 
-    createEffect(()=>{
-        console.log("ADESSO E' SELEZIONATO IL GAME con ID:", selectedGameId());
-    })
+    // createEffect(() => {
+    //     console.log("ADESSO E' SELEZIONATO IL GAME con ID:", selectedGameId());
+    // })
+
+    createEffect(on(selectedGameId, (gameId) => {
+        if (gameId) {
+            console.log("ADESSO E' SELEZIONATO IL GAME con ID:", gameId);
+        }
+    }));
 
 
     createEffect(
@@ -250,7 +256,9 @@ export default function ArSession(props) {
                     console.log(
                         "=== ArSession: all requirements to set gamesEnabled = true"
                     )
-                    setGamesEnabled(true)
+                    setGamesEnabled(true);
+
+                    handleBlurredCover({ visible: false, priority: 1 });
                 }
             }
         )
@@ -276,7 +284,7 @@ export default function ArSession(props) {
             console.log(
                 "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
             )
-            setInitDetectionCompleted(true)
+            setInitDetectionCompleted(true);
         }
     })
 
@@ -286,16 +294,16 @@ export default function ArSession(props) {
      * the handleBlurredCover system should manage them
      * on the basis of the "priority"
      */
-    createEffect(
-        on(
-            () => initDetectionCompleted(),
-            (isCompleted) => {
-                if (isCompleted) {
-                    handleBlurredCover({ visible: false, priority: 1 })
-                }
-            }
-        )
-    )
+    // createEffect(
+    //     on(
+    //         () => initDetectionCompleted(),
+    //         (isCompleted) => {
+    //             if (isCompleted) {
+    //                 handleBlurredCover({ visible: false, priority: 1 })
+    //             }
+    //         }
+    //     )
+    // )
 
     /**
      * Load all the games (as bundles) of the marker.
@@ -307,7 +315,6 @@ export default function ArSession(props) {
                 _modulesToLoad++
 
                 // load dynamically the module
-                // await loadModule(el.id, el.name);
                 loadModule(el.id, el.name)
             }
         }
@@ -397,7 +404,7 @@ export default function ArSession(props) {
                     console.log(
                         "============= ",
                         _game.name,
-                        "RICHIEDE LOCALIZZAZIONE!!"
+                        "RICHIEDE DI INIZIARE LA LOCALIZZAZIONE!!"
                     )
 
                     // Hide all the meshes of all the games
@@ -475,7 +482,7 @@ export default function ArSession(props) {
                 passive: true,
             })
         })
-        console.log("clickable DOM elements:", _clickableDomElements)
+        // console.log("clickable DOM elements:", _clickableDomElements)
     }
     function removeClickableDomElements() {
         _clickableDomElements.forEach((element) => {
@@ -730,10 +737,6 @@ export default function ArSession(props) {
                             ) : (
                                 <Inventory
                                     marker={props.marker}
-                                    // addNewModule={(name) =>
-                                    //     loadModule("temporaryModuleID", name, true)
-                                    // }
-                                    // saveGame={handleSaveSelectedGame}
                                     addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
                                     selectedGameId={selectedGameId()}
                                     setSelectedGameId={(id) =>

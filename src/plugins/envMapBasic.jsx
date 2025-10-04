@@ -160,7 +160,7 @@ export default function envMapBasic(props) {
                     <>
                         <Container>
                             <SliderContainer data-interactive>
-                                <ButtonCircle onClick={prev} border={false}>
+                                <ButtonCircle onClick={prev} border={false} theme={'dark'}>
                                     <Fa
                                         icon={faChevronLeft}
                                         size="1x"
@@ -172,7 +172,7 @@ export default function envMapBasic(props) {
                                         ? "caricamento..."
                                         : files[index()]}
                                 </FileNameContainer>
-                                <ButtonCircle onClick={next} border={false}>
+                                <ButtonCircle onClick={next} border={false} theme={'dark'}>
                                     <Fa
                                         icon={faChevronRight}
                                         size="1x"

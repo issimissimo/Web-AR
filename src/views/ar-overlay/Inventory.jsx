@@ -8,6 +8,7 @@ import {
 } from "@components/smallElements"
 import Button from "@components/button"
 import ButtonSecondary from "@components/ButtonSecondary"
+import Message from "@components/Message"
 import ButtonCircle from "@components/ButtonCircle"
 import SvgIcon from "@components/SvgIcon"
 import { Context } from "@views/ar-overlay/arSession"
@@ -155,9 +156,9 @@ const Inventory = (props) => {
     const [selectedPlugin, setSelectedPlugin] = createSignal(null)
     const context = useContext(Context)
 
-    createEffect(() => {
-        console.log("SELECTED PLUGIN:", selectedPlugin())
-    })
+    // createEffect(() => {
+    //     console.log("SELECTED PLUGIN:", selectedPlugin())
+    // })
 
 
     createEffect(() => {
@@ -358,23 +359,25 @@ const Inventory = (props) => {
         /* display: flex;
     flex-direction: column; */
         flex: 1;
+        display: flex;
+        flex-direction: column;
         /* background-color: #00ff8839; */
         /* margin-bottom: 2rem; */
     `
 
     const PluginListContainer = styled("div")`
-        position: absolute;
+        /* position: absolute; */
         display: flex;
-        flex-direction: column-reverse;
+        flex-direction: column;
         gap: 0.5rem;
         /* display: flex;
         align-items: center;
         justify-content: center; */
-        background-color: #ff00006e;
+        /* background-color: #ff00006e; */
         /* height: 60px; */
         overflow-y: auto;
         width: 100%;
-        height: 50%;
+        /* height: 50%; */
     `
 
 
@@ -399,8 +402,8 @@ const Inventory = (props) => {
         /* width: ${(props) => props.width || "100%"}; */
         flex-shrink: 0;
         padding: 0.4rem;
-        padding-left: 1.2rem;
-        padding-right: 1.2rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
         /* margin-bottom: 1rem; */
         font-size: small;
         font-weight: 400;
@@ -449,21 +452,41 @@ const Inventory = (props) => {
     //region PLUGIN DETAILS
 
     const PluginDetailsContainer = styled("div")`
-        position: absolute;
+        /* position: absolute; */
+        flex: 1;
         width: 100%;
         /* display: flex;
         align-items: center;
         justify-content: center; */
-        background-color: #3700ff37;
+        /* background-color: #3700ff37; */
         top: 50%;
         bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        /* gap: 1rem; */
         /* height: 60px; */
     `
 
     const PluginDetails = () => {
         return (
             <PluginDetailsContainer>
-                {selectedPlugin().description}
+                <SvgIcon
+                    translateY={-0.5}
+                    src={getPluginIcon(selectedPlugin().fileName)}
+                    color={'var(--color-secondary)'}
+                    size={40}
+                />
+                <Message
+                    style={{ height: "auto" }}
+                    fadeIn={false}
+                    showReadMore={false}
+                    showDoneButton={false}
+                >
+                    {selectedPlugin().description}
+                </Message>
+
                 <Button
                     onClick={handleAddNewPlugin}
                     small={true}

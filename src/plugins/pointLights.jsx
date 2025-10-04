@@ -1,4 +1,4 @@
-import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
+import { onMount, createEffect, createSignal, createMemo, on } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import { SliderPicker } from 'solid-color'
 import { useGame } from '@js/gameBase';
@@ -8,14 +8,13 @@ import Reticle from '@js/reticle';
 import Toolbar from '@views/ar-overlay/Toolbar';
 import { config } from '@js/config';
 import * as THREE from "three";
-import HorizontalSlider from '@views/ar-overlay/HorizontalSlider';
+// import HorizontalSlider from '@views/ar-overlay/HorizontalSlider';
 // import ColorPicker from '@views/ar-overlay/ColorPicker';
-import Button from '@components/Button';
-import { faCheck } from "@fortawesome/free-solid-svg-icons"
+// import Button from '@components/Button';
+// import { faCheck } from "@fortawesome/free-solid-svg-icons"
 
 
 const defaultGameData = [];
-let _enabled = false;
 
 
 export default function pointLights(props) {
@@ -35,9 +34,6 @@ export default function pointLights(props) {
     })
 
 
-
-
-
     /*
     * Put here derived functions from Game
     */
@@ -47,32 +43,21 @@ export default function pointLights(props) {
 
             if (props.selected) {
 
-                console.log("TAPPPP....")
+                // if we have not created a new light
+                // create a new one
+                if (!currentLight()) {
+                    game.super.onTap();
+                    spawnLightOnTap();
+                }
 
-                switch (game.appMode) {
-                    case "save":
-
-                        if (!currentLight()) {
-                            game.super.onTap(); // sound
-                            spawnLightOnTap();
-                        }
-
-                        else {
-                            storeLightInData();
-                        }
-
-
-
-                        break;
-
-                    case "load":
-                        break;
+                // or store the current light data
+                else {
+                    storeLightInData();
                 }
             }
         },
 
         renderLoop: () => { }
-
     });
 
 
@@ -80,6 +65,8 @@ export default function pointLights(props) {
         JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
     );
 
+
+    // region LIFECYCLE
 
     /*
     * On mount
@@ -101,34 +88,61 @@ export default function pointLights(props) {
         /*
         * Don't forget to call "game.setInitialized(true)" at finish 
         */
-        // console.log("ADESSO CHIAMO SET INITIALIZED PER POINT LIGHT!!!!!")
         game.setInitialized()
     });
 
 
-    // toggle the visibility of the helpers
-    // AND set the non tappable UI elements
-    createEffect(() => {
-        console.log("POINT LIGHTS __ selected:", props.selected)
-        game.setVisibleByName("helper", props.selected);
+    // region EFFECTS
 
-        // game.forceUpdateDomElements();
-    })
+    // react when this component is selected or not,
+    // and when there's currentLight (that means that
+    // we have just created a new light)
+    createEffect(on([() => props.selected, currentLight], ([selected, light]) => {
 
+        // toggle the visibility of the helpers
+        game.setAssetVisibleByName("helper", selected);
 
-    createEffect(() => {
-        if (!props.selected && currentLight()) {
-
-            //TODO: no! dobbiamo fare restore situazione originale, oppure lasciamo quella che è senza salvare
-            // game.removePreviousFromScene();
-            // game.removePreviousFromScene();
-
+        // if this component is not selected anymore
+        // we don't want to have currentLight anymore too
+        if (!selected && light) {
             setCurrentLight(null);
+        };
+    }));
+
+
+    // react when this component is enabled
+    createEffect(on(() => props.enabled, (enabled) => {
+        if (enabled) {
+            console.log("POINTLIGHTS IS ENABLED!")
+
+            // setup Reticle
+            // as soon as this component is enabled
+            if (game.appMode === "save") {
+                Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
+                Reticle.setEnabled(true);
+                Reticle.setVisible(true);
+            }
+
+            // load all saved lights
+            loadAllLights();
         }
+    }))
+
+
+    createEffect(() => {
+        if (currentLight()) {
+            currentLight().intensity = intensity() / 2;
+        }
+
     })
 
 
-    const handleUndo = () => {
+
+
+    // region FUNCTIONS
+
+
+    function handleUndo () {
         // sound
         game.onUndo();
         // deselect
@@ -141,36 +155,7 @@ export default function pointLights(props) {
     };
 
 
-    // setup Reticle
-    // as soon as this game is enabled
-    createEffect(() => {
-        if (props.enabled && !_enabled) {
-            console.log("POINTLIGHTS ENABLED:", props.enabled)
-            _enabled = true;
-
-
-            if (game.appMode === "save" || config.debugOnDesktop) {
-                Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
-                Reticle.setEnabled(true);
-                Reticle.setVisible(true);
-            }
-            else {
-                Reticle.setEnabled(false); //TODO - questo può essere un problema, in congiunzione con altri games che invece vogliono il reticle...!
-            }
-
-            loadAllLights();
-        }
-    });
-
-
-    createEffect(() => {
-        if (currentLight()) {
-            currentLight().intensity = intensity() / 2;
-        }
-
-    })
-
-    const handleSave = async () => {
+    async function handleSave () {
         // deselect
         if (currentLight()) setCurrentLight(null);
         // save data
@@ -227,7 +212,7 @@ export default function pointLights(props) {
         });
 
         // hide the helpers
-        game.setVisibleByName("helper", props.selected);
+        game.setAssetVisibleByName("helper", props.selected);
     }
 
 
@@ -248,15 +233,15 @@ export default function pointLights(props) {
         return newLight;
     }
 
-    const handleChangeComplete = (color) => {
+    function handleChangeComplete (color) {
         console.log(color.hex)
         // setColor(color.rgb)
     }
 
 
-    /*
-    * STYLE
-    */
+    // region RENDER
+
+
     const Container = styled('div')`
         width: 100%;
         height: 100%;
@@ -269,11 +254,6 @@ export default function pointLights(props) {
         margin-top: 2rem;
         /* margin-bottom: 2rem; */
     `
-
-
-    /*
-    * RENDER
-    */
 
     const renderView = () => {
         return (
