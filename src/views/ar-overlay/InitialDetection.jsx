@@ -1,14 +1,11 @@
 import { onMount } from 'solid-js';
 import Message from '@components/Message';
-import { Centered } from '@components/smallElements';
 import { Motion } from "solid-motionone"
 import { styled } from "solid-styled-components"
-import Reticle from "@js/reticle"
 
 
 export default function InitialDetection() {
     
-
     onMount(()=>{
         // console.log("**** INTIAL DETECTION - ON MOUNT")
     })
@@ -26,6 +23,7 @@ export default function InitialDetection() {
         justify-content: space-evenly;
         margin: auto;
         z-index: 9;
+        pointer-events: none;
     `
 
     return (

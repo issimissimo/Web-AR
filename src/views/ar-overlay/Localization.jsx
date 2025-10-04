@@ -74,6 +74,7 @@ export default function Localization(props) {
         justify-content: space-evenly;
         margin: auto;
         z-index: 9;
+        pointer-events: none;
     `
 
     const DoneContainer = styled(Motion.div)`
