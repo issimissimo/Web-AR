@@ -151,5 +151,17 @@ export const PLUGINS_LIST = [
         tags: [],
         requirements: {}
     },
+    {
+        fileName: "fakeLocalization",
+        title: 'Fake per localizzazione',
+        description: 'Elimina appena possibile',
+        icon: null,
+        category: 'Custom',
+        allowed: 1,
+        localized: true,
+        interactable: false,
+        tags: [],
+        requirements: {}
+    },
 ];
 

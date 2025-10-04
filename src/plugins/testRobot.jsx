@@ -1,4 +1,4 @@
-import { onMount, createSignal, createEffect } from "solid-js"
+import { onMount, createSignal, createEffect, on } from "solid-js"
 import { styled } from "solid-styled-components"
 
 import { useGame } from "@js/gameBase"
@@ -123,8 +123,8 @@ export default function testRobot(props) {
             }
         )
 
-        // blur background for instructions
-        game.handleBlurredCover({ visible: true, priority: 999 })
+        // // blur background for instructions
+        // game.handleBlurredCover({ visible: true, priority: 999 })
 
         /*
          * Don't forget to call "game.setInitialized()" at finish
@@ -132,12 +132,23 @@ export default function testRobot(props) {
         game.setInitialized()
     })
 
-    createEffect(async () => {
+    // createEffect(async () => {
+    //     if (props.enabled) {
+    //         console.log("***** testRobot is enabled *****")
+    //         Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
+    //     }
+    // })
+
+    createEffect(on(() => props.enabled, (enabled) => {
         if (props.enabled) {
             console.log("***** testRobot is enabled *****")
+
             Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
+
+            // blur background for instructions
+            game.handleBlurredCover({ visible: true, priority: 999 })
         }
-    })
+    }))
 
     /*
      * STYLE

@@ -58,11 +58,13 @@ export default function basicCube(props) {
     */
     function loop() { }
 
-    createEffect(()=>{
+    createEffect(() => {
         console.log("BASIC CUBE SELECTED:", props.selected)
     })
 
-
+    createEffect(() => {
+        console.log("CIAAAAAAAAAAOOOOOOOOOO SONO IL CUUUBOOOO E SONO ENABLED = ", props.enabled)
+    })
 
     const renderView = () => {
         return (

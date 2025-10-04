@@ -243,6 +243,12 @@ export default function ArSession(props) {
         }
     }));
 
+    createEffect(() => {
+        console.log("*******************************")
+        console.log("gamesEnabled:", gamesEnabled())
+        console.log("*******************************")
+    })
+
 
     createEffect(
         on(
@@ -265,15 +271,16 @@ export default function ArSession(props) {
     )
 
 
-    createEffect(() => {
-        if (props.gamesRunning.length > 0) {
+    createEffect(on(() => props.gamesRunning, (gamesRunning) => {
+        if (gamesRunning.length > 0) {
             console.log(
                 "=== ArSession: Games running changed:",
-                props.gamesRunning
+                gamesRunning
             )
-            checkAllGamesReady()
+            checkAllGamesReady();
         }
-    })
+    }))
+
 
     /** As soon as the Reticle find a surface
      * we want to hide the "InitDetection" component
@@ -517,34 +524,7 @@ export default function ArSession(props) {
         })
     }
 
-    // const handleSaveSelectedGame = async () => {
-    //     const gameToSave = props.gamesRunning.find(
-    //         (el) => el.id === selectedGameId()
-    //     )
-    //     setSelectedGameId(null)
 
-    //     console.log("GAME TO SAVE:", gameToSave)
-    //     console.log("GAME DATA TO SAVE:", gameToSave.gameData())
-
-    //     const newGameId = await firebase.firestore.addGame(
-    //         props.userId,
-    //         props.marker.id,
-    //         gameToSave.name
-    //     )
-    //     console.log("Creato in Firestore il game con ID:", newGameId)
-
-    //     if (gameToSave.gameData()) {
-    //         try {
-    //             const path = `${props.userId}/markers/${props.marker.id}/games/${newGameId}`
-    //             await firebase.realtimeDb.saveData(path, gameToSave.gameData())
-    //             console.log("Creato in RealtimeDB il JSON con ID:", newGameId)
-    //         } catch (error) {
-    //             console.log("Errore nel salvataggio JSON:", error)
-    //         }
-    //     }
-
-    //     props.onNewGameSaved()
-    // }
 
     const addNewPluginToMarker = async (pluginName) => {
         console.log("ADESSO AGGIUNGO:", pluginName);
@@ -564,7 +544,10 @@ export default function ArSession(props) {
         // actually does not work as it should)
         props.onNewGameSaved();
 
-        // load the new module
+        // reset states and load the new module
+        setGamesInitialized(false);
+        setGamesEnabled(false);
+        _modulesToLoad++;
         loadModule(newGameId, pluginName, true);
     }
 
@@ -723,8 +706,10 @@ export default function ArSession(props) {
                             }}
                         </For>
 
-                        {gamesInitialized() &&
+                        {/* {gamesInitialized() &&
+
                             (!initDetectionCompleted() ? (
+
                                 <InitialDetection />
                             ) : localizationState() ===
                                 LOCALIZATION_STATE.REQUIRED ? (
@@ -736,6 +721,7 @@ export default function ArSession(props) {
                                 />
                             ) : (
                                 <Inventory
+                                    visible={true}
                                     marker={props.marker}
                                     addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
                                     selectedGameId={selectedGameId()}
@@ -743,7 +729,31 @@ export default function ArSession(props) {
                                         setSelectedGameId(id)
                                     }
                                 />
-                            ))}
+                            ))} */}
+                        {gamesInitialized() &&
+
+                            (!initDetectionCompleted()
+                                ? (<InitialDetection />)
+                                :
+                                localizationState() ===
+                                LOCALIZATION_STATE.REQUIRED && (
+                                    <Localization
+                                        planeFound={props.planeFound}
+                                        setReferenceMatrix={(matrix) =>
+                                            handleLocalizationCompleted(matrix)
+                                        }
+                                    />)
+                            )
+                        }
+                        <Inventory
+                            visible={gamesEnabled()}
+                            marker={props.marker}
+                            addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
+                            selectedGameId={selectedGameId()}
+                            setSelectedGameId={(id) =>
+                                setSelectedGameId(id)
+                            }
+                        />
                     </>
                 }
             </Main>

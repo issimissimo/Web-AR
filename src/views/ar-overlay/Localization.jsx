@@ -51,7 +51,7 @@ export default function Localization(props) {
             const matrix = Reticle.getHitMatrix()
             props.setReferenceMatrix(matrix)
         }
-        context.handleBlurredCover({ 
+        context.handleBlurredCover({
             visible: false,
             priority: 0,
         })
@@ -60,6 +60,22 @@ export default function Localization(props) {
     /*
      * STYLE
      */
+
+    const Container = styled(Motion.div)`
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1.5em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        margin: auto;
+        z-index: 9;
+    `
+
     const DoneContainer = styled(Motion.div)`
         width: 100%;
         height: 50vh;
@@ -83,7 +99,7 @@ export default function Localization(props) {
     `
 
     return (
-        <Centered>
+        <Container>
             {showInstructions() ? (
                 <Message
                     style={{ height: "auto" }}
@@ -123,6 +139,6 @@ export default function Localization(props) {
                     </Button>
                 </DoneContainer>
             )}
-        </Centered>
+        </Container>
     )
 }

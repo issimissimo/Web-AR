@@ -34,6 +34,10 @@ export default function basicSphere(props) {
         console.log("BASIC SPHERE SELECTED:", props.selected)
     })
 
+    createEffect(() => {
+        console.log("CIAAAAAAAAAAOOOOOOOOOO SONO IL CUUUBOOOO E SONO ENABLED = ", props.enabled)
+    })
+
 
     /*
     * SETUP SCENE

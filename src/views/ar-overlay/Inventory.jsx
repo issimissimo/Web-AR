@@ -1,4 +1,4 @@
-import { onMount, createSignal, createEffect, useContext, Show } from "solid-js"
+import { onMount, onCleanup, createSignal, createEffect, useContext, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import {
@@ -160,6 +160,17 @@ const Inventory = (props) => {
     //     console.log("SELECTED PLUGIN:", selectedPlugin())
     // })
 
+    onMount(() => {
+        setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name)
+        // console.log(PLUGINS_LIST)
+
+        console.log(props.marker)
+    })
+
+    onCleanup(() => {
+        console.warn("ATTENZIONE!!!! INVENTORY E' STATO TOLTO!!!!")
+    })
+
 
     createEffect(() => {
         console.log("SELECTED STATE:", state())
@@ -177,6 +188,8 @@ const Inventory = (props) => {
         display: flex;
         flex-direction: column;
         margin-top: 1rem;
+        pointer-events: ${(props) => (props.visible ? "auto" : "none")};
+        opacity: ${(props) => (props.visible ? 1 : 0)};
         /* background-color: green; */
     `
 
@@ -184,12 +197,7 @@ const Inventory = (props) => {
     //     margin-bottom: 2rem;
     // `
 
-    onMount(() => {
-        setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name)
-        // console.log(PLUGINS_LIST)
 
-        console.log(props.marker)
-    })
 
     const handleCategorySelected = (categoryName) => {
         setSelectedPlugin(null);
@@ -282,9 +290,9 @@ const Inventory = (props) => {
 
         props.setSelectedGameId(null) // importante! dobbiamo cancellare il DOM prima di procedere
 
-        console.log(
-            `Game selection change: ${previousSelectedId} -> ${newSelectedId}`
-        )
+        // console.log(
+        //     `Game selection change: ${previousSelectedId} -> ${newSelectedId}`
+        // )
 
         // IMPORTANTE: Aggiungi un piccolo delay per permettere al createEffect di pulire
         // il DOM prima che il nuovo componente tenti di montare la sua view
@@ -503,7 +511,8 @@ const Inventory = (props) => {
     //#region RENDER
 
     return (
-        <InventoryContainer id="InventoryContainer">
+        <InventoryContainer id="InventoryContainer"
+            visible={props.visible}>
 
             <Middle id="middle">
                 {/* LIST OF RUNNING GAMES */}
