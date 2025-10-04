@@ -16,7 +16,7 @@ import { styled } from "solid-styled-components"
 // Main components
 import InitialDetection from "./InitialDetection"
 import Localization from "./Localization"
-import Inventory from "./Inventory"
+import UI from "./UI"
 import Header from "./Header"
 import BlurredCover from "./BlurredCover"
 
@@ -745,7 +745,7 @@ export default function ArSession(props) {
                                     />)
                             )
                         }
-                        <Inventory
+                        <UI
                             visible={gamesEnabled()}
                             marker={props.marker}
                             addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}

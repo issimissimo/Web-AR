@@ -142,9 +142,9 @@ const CategoriesPicker = (props) => {
 
 
 
-//region INVENTORY
+//region UI
 
-const Inventory = (props) => {
+const UI = (props) => {
     const STATE = {
         NONE: "none",
         CURRENT: "current",
@@ -628,4 +628,4 @@ const Inventory = (props) => {
     )
 }
 
-export default Inventory
+export default UI
