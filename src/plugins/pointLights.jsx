@@ -129,20 +129,25 @@ export default function pointLights(props) {
     }))
 
 
+    // createEffect(() => {
+    //     if (currentLight()) {
+    //         currentLight().intensity = intensity() / 2;
+    //     }
+
+    // })
+
     createEffect(() => {
-        if (currentLight()) {
-            currentLight().intensity = intensity() / 2;
-        }
-
+        console.log("****************************")
+        console.log("props.selected:", props.selected)
+        console.log("currentLight:", currentLight())
+        console.log("****************************")
     })
-
-
 
 
     // region FUNCTIONS
 
 
-    function handleUndo () {
+    function handleUndo() {
         // sound
         game.onUndo();
         // deselect
@@ -152,10 +157,12 @@ export default function pointLights(props) {
         game.removePreviousFromScene();
         // remove last from data
         game.setGameData(game.gameData().slice(0, -1));
+
+        console.log("UNDO FINISHED:", game.gameData())
     };
 
 
-    async function handleSave () {
+    async function handleSave() {
         // deselect
         if (currentLight()) setCurrentLight(null);
         // save data
@@ -169,11 +176,7 @@ export default function pointLights(props) {
     function spawnLightOnTap() {
         const _light = createLight(Reticle.getHitMatrix(), color(), intensity());
         setCurrentLight(_light);
-        console.log("currentLight:", currentLight())
-
-        // setTimeout(() => {
-        //     game.forceUpdateDomElements();
-        // }, 50)
+        // console.log("currentLight:", currentLight())
     }
 
 
@@ -182,6 +185,7 @@ export default function pointLights(props) {
         const diffMatrix = game.getObjOffsetMatrix(props.referenceMatrix, currentLight());
         const newData = {
             intensity: currentLight().intensity,
+            color: currentLight().color,
             diffMatrix: diffMatrix
         };
         game.setGameData((prev) => [...prev, newData]);
@@ -233,9 +237,11 @@ export default function pointLights(props) {
         return newLight;
     }
 
-    function handleChangeComplete (color) {
+    function handleChangeComplete(color) {
         console.log(color.hex)
         // setColor(color.rgb)
+        const newColor = new THREE.Color(color.hex);
+        currentLight().color = newColor;
     }
 
 

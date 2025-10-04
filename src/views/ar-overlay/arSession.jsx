@@ -489,7 +489,7 @@ export default function ArSession(props) {
                 passive: true,
             })
         })
-        console.log("clickable DOM elements:", _clickableDomElements)
+        // console.log("clickable DOM elements:", _clickableDomElements)
     }
     function removeClickableDomElements() {
         _clickableDomElements.forEach((element) => {

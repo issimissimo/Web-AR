@@ -1,4 +1,4 @@
-import { onMount, onCleanup, createSignal, createEffect, useContext, Show } from "solid-js"
+import { onMount, onCleanup, createSignal, createEffect, useContext, Show, on } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import {
@@ -172,16 +172,31 @@ const Inventory = (props) => {
     })
 
 
-    createEffect(() => {
-        console.log("SELECTED STATE:", state())
-        if (state() === STATE.NEW) {
+    // createEffect(() => {
+    //     console.log("SELECTED STATE:", state())
+    //     if (state() === STATE.NEW) {
+    //         context.handleBlurredCover({ visible: true });
+    //     }
+    //     else {
+    //         // props.setSelectedGameId(null);
+    //         context.handleBlurredCover({ visible: false })
+    //     }
+    // })
+
+    createEffect(on(state, (newState) => {
+        console.log("SELECTED STATE:", newState)
+        if (newState === STATE.NEW) {
             context.handleBlurredCover({ visible: true });
         }
         else {
             // props.setSelectedGameId(null);
             context.handleBlurredCover({ visible: false })
+
+            if (newState == STATE.NONE) {
+                props.setSelectedGameId(null);
+            }
         }
-    })
+    }))
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -229,20 +244,6 @@ const Inventory = (props) => {
         return categorySpecs.icon
     }
 
-    // const getPluginAllowed = (pluginName) => {
-    //     const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName);
-
-    //     const totalAllowed = pluginSpecs.allowed
-    //     let nGames = 0
-    //     if (props.marker.games) {
-    //         props.marker.games.map((game) => {
-    //             if (game.name === pluginName) nGames++
-    //         })
-    //         return totalAllowed - nGames
-    //     }
-    //     return totalAllowed
-    // }
-
 
     const getPluginAllowed = (pluginName) => {
 
@@ -285,7 +286,6 @@ const Inventory = (props) => {
     // };
 
     const handleToggle = (id) => {
-        const previousSelectedId = props.selectedGameId
         const newSelectedId = id !== props.selectedGameId ? id : null
 
         props.setSelectedGameId(null) // importante! dobbiamo cancellare il DOM prima di procedere
