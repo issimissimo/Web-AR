@@ -83,6 +83,13 @@ const CategoryItem = (props) => {
 //region CATEGORY PICKER
 
 const CategoriesPicker = (props) => {
+
+    const _defaultCategoryName = "Modifica";
+
+    onMount(()=>{
+        props.onCategoryPicked(_defaultCategoryName)
+    })
+
     const CategoriesContainer = styled("div")`
         display: flex;
         justify-content: space-around;
@@ -94,16 +101,17 @@ const CategoriesPicker = (props) => {
             {props.visible && (
                 <>
                     <CategoryItem
-                        name={"installate"}
+                        name={_defaultCategoryName}
                         icon={"someicon"}
                         selected={props.state === props.STATE.CURRENT}
-                        onClick={() =>
+                        onClick={() => {
                             props.setState(
                                 props.state === props.STATE.CURRENT
                                     ? props.STATE.NONE
                                     : props.STATE.CURRENT
                             )
-                        }
+                            props.onCategoryPicked(_defaultCategoryName)
+                        }}
                     />
                     {PLUGINS_CATEGORIES.map((category) => (
                         <CategoryItem
@@ -148,9 +156,13 @@ const UI = (props) => {
     const [selectedPlugin, setSelectedPlugin] = createSignal(null)
     const context = useContext(Context)
 
+
+
     // Start with the 1st category
     onMount(() => {
-        setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name)
+        setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
+
+        console.log("CIAO, SONO LA UI, E IL CURERENTCATEGORYNAME E':", currentCategoryName());
     })
 
     // Manage the blurred cover
@@ -170,8 +182,10 @@ const UI = (props) => {
                     visible: false,
                     priority: 0,
                 })
-                if (newState == STATE.NONE) {
-                    props.setSelectedGameId(null)
+                if (newState === STATE.NONE) {
+                    console.log("now setting CurrentCategoryName to NULL!!")
+                    props.setSelectedGameId(null);
+                    props.setHeaderText(null);
                 }
             }
         })
@@ -184,13 +198,18 @@ const UI = (props) => {
         margin-top: 1rem;
         pointer-events: ${(props) => (props.visible ? "auto" : "none")};
         opacity: ${(props) => (props.visible ? 1 : 0)};
-        /* background-color: green; */
     `
 
 
     const handleCategorySelected = (categoryName) => {
+        console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        console.log("handleCategorySelected")
         setSelectedPlugin(null)
-        setCurrentCategoryName(() => categoryName)
+        setCurrentCategoryName(categoryName)
+
+        if (state() !== STATE.NONE) {
+            props.setHeaderText(categoryName);
+        }
     }
 
     const getPluginTitle = (pluginName) => {
@@ -297,31 +316,19 @@ const UI = (props) => {
     }
 
     const Middle = styled("div")`
-        /* display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        align-items: flex-start; */
         position: relative;
         display: flex;
         flex-direction: column;
-
-        /* background-color: #1100ff; */
         flex: 1;
     `
 
     const GameUIContainer = styled("div")`
-        /* display: flex;
-        flex-wrap: wrap;    
-        gap: 1rem;
-        align-items: flex-start; */
         visibility: ${(props) => (props.visible ? "visible" : "hidden")};
         pointer-events: ${(props) => (props.visible ? "auto" : "none")};
         opacity: ${(props) => (props.visible ? 1 : 0)};
         display: flex;
         flex-direction: column;
         position: relative;
-
-        /* background-color: #d16eb02d; */
         flex: 1;
         margin-bottom: 2rem;
     `
@@ -330,8 +337,6 @@ const UI = (props) => {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
-        /* align-items: flex-start; */
-        /* background-color: #ffee0039; */
     `
 
     const NewPanelContainer = styled("div")`
@@ -340,36 +345,23 @@ const UI = (props) => {
         left: 0;
         right: 0;
         bottom: 2rem;
-        /* display: flex;
-    flex-direction: column; */
         flex: 1;
         display: flex;
         flex-direction: column;
-        /* background-color: #00ff8839; */
-        /* margin-bottom: 2rem; */
     `
 
     const PluginListContainer = styled("div")`
-        /* position: absolute; */
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        /* display: flex;
-        align-items: center;
-        justify-content: center; */
-        /* background-color: #ff00006e; */
-        /* height: 60px; */
         overflow-y: auto;
         width: 100%;
-        /* height: 50%; */
     `
 
     const Bottom = styled("div")`
         display: flex;
         align-items: center;
         justify-content: center;
-        /* background-color: red; */
-        /* height: 60px; */
     `
 
     // region TOGGLE BUTTON
@@ -381,12 +373,10 @@ const UI = (props) => {
         align-items: center;
         width: fit-content;
         height: fit-content;
-        /* width: ${(props) => props.width || "100%"}; */
         flex-shrink: 0;
         padding: 0.4rem;
         padding-left: 1rem;
         padding-right: 1rem;
-        /* margin-bottom: 1rem; */
         font-size: small;
         font-weight: 400;
         font-family: inherit;

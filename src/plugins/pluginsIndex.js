@@ -71,7 +71,7 @@ export const PLUGINS_LIST = [
         fileName: "envMapBasic",
         title: "Luce HDR",
         description: "Scegli un'immagine in formato High Dynamic Range (HDR) tra quelle disponibili per aggiungere realismo",
-        icon: null,
+        icon: "/icons/HDR.svg",
         category: 'Luci',
         allowed: 1,
         localized: false,

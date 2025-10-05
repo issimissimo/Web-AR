@@ -55,7 +55,9 @@ const Header = (props) => {
 
     return (
         <HeaderContainer>
-            <Title>
+            <Title
+                color={"var(--color-secondary)"}
+            >
                 {props.children}
             </Title>
             <div>

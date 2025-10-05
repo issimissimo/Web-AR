@@ -733,6 +733,7 @@ export default function ArSession(props) {
                             setSelectedGameId={(id) =>
                                 setSelectedGameId(id)
                             }
+                            setHeaderText={(text) => setHeaderText(text)}
                         />
                     </>
                 }
