@@ -2,7 +2,7 @@ import { createSignal, onMount } from 'solid-js';
 import { useFirebase } from '@hooks/useFirebase';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
-import { generateQRCodeForForMarker } from '@hooks/useQRCode';
+import { generateQRCodeForMarker, downloadQRCode } from '@hooks/useQRCode';
 
 import Header from './Header';
 
@@ -85,8 +85,6 @@ const EditMarker = (props) => {
   })
 
   const firebase = useFirebase();
-
-  // const [saved, setSaved] = createSignal(props.marker.id ? true : false);
   const [id, setId] = createSignal(props.marker.id ?? null);
   const [name, setName] = createSignal(props.marker.name ?? null);
   const [games, setGames] = createSignal(props.marker.games ?? []);
@@ -213,7 +211,8 @@ const EditMarker = (props) => {
   * download Qr Code
   */
   const handleDownloadQrCode = () => {
-    console.log("download qr code") // TODO - download
+    console.log("download qr code");
+    downloadQRCode(props.marker.name);
   }
 
 
@@ -348,7 +347,7 @@ const EditMarker = (props) => {
 
           // create qr code
           console.log("genero QR Code....")
-          generateQRCodeForForMarker(props.userId, id());
+          generateQRCodeForMarker(props.userId, id());
         }
       }
     })
@@ -387,7 +386,7 @@ const EditMarker = (props) => {
               Non posso darti un QR Code per questo ambiente perchè non hai ancora aggiunto nulla in AR.<br></br> Entra in AR e aggiungi qualcosa!
             </Message>
             :
-            // TODO - here the QR Code (and the "Download button")
+
             <FitHeight>
               <QrCodeContainer
 

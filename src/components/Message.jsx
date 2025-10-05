@@ -61,7 +61,7 @@ const Message = (props) => {
         {props.children}
       </MessageBLock>
 
-      {props.showReadMore !== false && (
+      {props.showReadMore === true && (
         <ButtonSecondary onClick={handleGoToInstructions}>
           Scopri di più
           <Fa icon={faChevronRight} size="1x" translateX={0.8} class="icon" />
