@@ -161,40 +161,11 @@ export default function testRobot(props) {
         align-items: center;
         justify-content: center;
         box-sizing: border-box;
-        padding: 2em;
+        /* padding: 2em; */
     `
 
-    /*
-     * RENDER (Will be shown ONLY after initialization completed)
-     */
-    // return (
-    //     <>
-    //         {props.enabled &&
-    //             (showInstructions() ? (
-    //                 <Container>
-    //                     <Message
-    //                         style={{ height: "auto" }}
-    //                         svgIcon={"icons/tap.svg"}
-    //                         showReadMore={false}
-    //                         showDoneButton={true}
-    //                         onDone={handleCloseInstructions}
-    //                     >
-    //                         Fai TAP sullo schermo per posizionare il robot Comau
-    //                         RACER 3 su un piano. <br></br> Evita i piani troppo
-    //                         riflettenti o uniformi.
-    //                     </Message>
-    //                 </Container>
-    //             ) : (
-    //                 <Toolbar
-    //                     buttons={["undo"]}
-    //                     onUndo={handleUndo}
-    //                     undoActive={spawned()}
-    //                 />
-    //             ))}
-    //     </>
-    // )
-
-
+    
+    //region RENDER
     const renderView = () => {
         return (
             <>

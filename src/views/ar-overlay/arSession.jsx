@@ -51,6 +51,7 @@ export default function ArSession(props) {
     const [gamesInitialized, setGamesInitialized] = createSignal(false)
     const [gamesEnabled, setGamesEnabled] = createSignal(false)
     const [selectedGameId, setSelectedGameId] = createSignal(null)
+    const [headerText, setHeaderText] = createSignal("");
 
     // Blurred cover
     const [blurVisible, setBlurVisible] = createSignal(false)
@@ -682,7 +683,10 @@ export default function ArSession(props) {
                 />
 
                 {/* HEADER */}
-                <Header onClickBack={handleGoBack} />
+                <Header
+                    onClickBack={handleGoBack}>
+                    {headerText()}
+                </Header>
 
                 {
                     <>

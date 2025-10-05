@@ -3,6 +3,7 @@ import { styled } from 'solid-styled-components';
 import ButtonCircle from '../../components/ButtonCircle';
 import Fa from 'solid-fa';
 import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { Title } from '@components/smallElements'
 
 
 
@@ -26,22 +27,47 @@ const RightButtonContainer = styled('div')`
   `;
 
 
-const Header = (props) => {
+// const Header = (props) => {
 
-    // const [showUser, setShowUser] = createSignal(props.showUser ?? true);
+//     return (
+//         <HeaderContainer>
+//             <Title>
+//                 {props.children}
+//             </Title>
+//             <div>
+//                 {
+//                     <LeftButtonContainer >
+//                         <ButtonCircle
+//                             onClick={props.onClickBack}
+//                             border={false}
+//                         >
+//                             <Fa icon={faClose} size="1x" class="icon" />
+//                         </ButtonCircle>
+//                     </LeftButtonContainer>
+//                 }
+
+//             </div>
+//         </HeaderContainer>
+//     )
+// }
+
+const Header = (props) => {
 
     return (
         <HeaderContainer>
+            <Title>
+                {props.children}
+            </Title>
             <div>
                 {
-                    <LeftButtonContainer >
+                    <RightButtonContainer >
                         <ButtonCircle
                             onClick={props.onClickBack}
                             border={false}
                         >
                             <Fa icon={faClose} size="1x" class="icon" />
                         </ButtonCircle>
-                    </LeftButtonContainer>
+                    </RightButtonContainer>
                 }
 
             </div>

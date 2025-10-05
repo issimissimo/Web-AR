@@ -10,7 +10,7 @@ export const PLUGINS_CATEGORIES = [
         icon: "/icons/Category_luci.svg"
     },
     {
-        name: "3D",
+        name: "Oggetti",
         icon: "/icons/Category_3D.svg"
     },
     {
@@ -70,7 +70,7 @@ export const PLUGINS_LIST = [
     {
         fileName: "envMapBasic",
         title: "Luce HDR",
-        description: "Inserisci un'immagine HDRI 360 come luce ambientale, senza localizzazione",
+        description: "Scegli un'immagine in formato High Dynamic Range (HDR) tra quelle disponibili per aggiungere realismo",
         icon: null,
         category: 'Luci',
         allowed: 1,
@@ -84,7 +84,7 @@ export const PLUGINS_LIST = [
         title: 'Piano background di test',
         description: 'Da eliminare, solo di test',
         icon: null,
-        category: '3D',
+        category: 'Oggetti',
         allowed: 1,
         localized: false,
         interactable: false,
@@ -96,7 +96,7 @@ export const PLUGINS_LIST = [
         title: 'Cubo base',
         description: 'Da eliminare, solo di test',
         icon: null,
-        category: '3D',
+        category: 'Oggetti',
         allowed: 1,
         localized: false,
         interactable: false,
@@ -108,7 +108,7 @@ export const PLUGINS_LIST = [
         title: 'Sfera base',
         description: 'Da eliminare, solo di test',
         icon: null,
-        category: '3D',
+        category: 'Oggetti',
         allowed: 1,
         localized: false,
         interactable: false,
@@ -132,7 +132,7 @@ export const PLUGINS_LIST = [
         title: 'Fiori che crescono',
         description: 'Posiziona sulle superfici dei fiori che crescono',
         icon: null,
-        category: '3D',
+        category: 'Oggetti',
         allowed: 1,
         localized: false,
         interactable: true,

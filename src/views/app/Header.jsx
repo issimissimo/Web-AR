@@ -37,7 +37,7 @@ const Header = (props) => {
     return (
         <HeaderContainer>
 
-            <div style="">
+            <div>
                 {
                     showBack() &&
                     <LeftButtonContainer >

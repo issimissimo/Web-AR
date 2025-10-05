@@ -111,7 +111,7 @@ const CategoriesPicker = (props) => {
                             icon={category.icon}
                             selected={
                                 props.state === props.STATE.NEW &&
-                                props.currentCategoryName === category.name
+                                    props.currentCategoryName === category.name
                                     ? true
                                     : false
                             }
@@ -157,14 +157,19 @@ const UI = (props) => {
     createEffect(
         on(state, (newState) => {
             console.log("SELECTED STATE:", newState)
-            if (newState === STATE.NEW) {
-                context.handleBlurredCover({ visible: true })
-            } else {
+
+            // If no games are created, OR we are adding,
+            // show the blurred background
+            if (newState === STATE.NEW || props.marker.games.length === 0) {
                 context.handleBlurredCover({
-                    visible: props.marker.games.length === 0,
+                    visible: true,
                     priority: 999,
                 })
-
+            } else {
+                context.handleBlurredCover({
+                    visible: false,
+                    priority: 0,
+                })
                 if (newState == STATE.NONE) {
                     props.setSelectedGameId(null)
                 }
@@ -390,8 +395,8 @@ const UI = (props) => {
             props.isOn
                 ? "var(--color-secondary)"
                 : props.theme === "dark"
-                ? "var(--color-dark-transparent)"
-                : "var(--color-background-transparent)"};
+                    ? "var(--color-dark-transparent)"
+                    : "var(--color-background-transparent)"};
         border: none;
         pointer-events: ${(props) => (props.enabled ? "auto" : "none")};
         opacity: ${(props) => (props.enabled ? 1 : 0.5)};
@@ -510,7 +515,7 @@ const UI = (props) => {
                             {PLUGINS_LIST.map(
                                 (plugin) =>
                                     plugin.category ===
-                                        currentCategoryName() && (
+                                    currentCategoryName() && (
                                         <ToggleButton
                                             enabled={getPluginAllowed(
                                                 plugin.fileName
@@ -521,8 +526,8 @@ const UI = (props) => {
                                             isOn={
                                                 selectedPlugin()
                                                     ? selectedPlugin()
-                                                          .fileName ===
-                                                      plugin.fileName
+                                                        .fileName ===
+                                                    plugin.fileName
                                                     : false
                                             }
                                         >
