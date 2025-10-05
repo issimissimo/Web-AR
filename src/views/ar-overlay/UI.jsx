@@ -1,31 +1,26 @@
-import { onMount, onCleanup, createSignal, createEffect, useContext, Show, on } from "solid-js"
+import {
+    onMount,
+    onCleanup,
+    createSignal,
+    createEffect,
+    useContext,
+    Show,
+    on,
+} from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
-import {
-    Container,
-    FitHeight,
-    FitHeightScrollable,
-} from "@components/smallElements"
 import Button from "@components/button"
-import ButtonSecondary from "@components/ButtonSecondary"
 import Message from "@components/Message"
-import ButtonCircle from "@components/ButtonCircle"
 import SvgIcon from "@components/SvgIcon"
 import { Context } from "@views/ar-overlay/arSession"
 import Fa from "solid-fa"
 import {
     faPlus,
-    faXmark,
-    faLocationCrosshairs,
-    faSadTear,
-    faCheck,
-    faTrash,
     faLocationDot,
-    faHandPointUp
+    faHandPointUp,
 } from "@fortawesome/free-solid-svg-icons"
 
 import { PLUGINS_CATEGORIES, PLUGINS_LIST } from "@plugins/pluginsIndex"
-
 
 //region CATEGORY ITEM
 
@@ -88,7 +83,6 @@ const CategoryItem = (props) => {
 //region CATEGORY PICKER
 
 const CategoriesPicker = (props) => {
-
     const CategoriesContainer = styled("div")`
         display: flex;
         justify-content: space-around;
@@ -117,7 +111,7 @@ const CategoriesPicker = (props) => {
                             icon={category.icon}
                             selected={
                                 props.state === props.STATE.NEW &&
-                                    props.currentCategoryName === category.name
+                                props.currentCategoryName === category.name
                                     ? true
                                     : false
                             }
@@ -140,8 +134,6 @@ const CategoriesPicker = (props) => {
     )
 }
 
-
-
 //region UI
 
 const UI = (props) => {
@@ -156,47 +148,29 @@ const UI = (props) => {
     const [selectedPlugin, setSelectedPlugin] = createSignal(null)
     const context = useContext(Context)
 
-    // createEffect(() => {
-    //     console.log("SELECTED PLUGIN:", selectedPlugin())
-    // })
-
+    // Start with the 1st category
     onMount(() => {
         setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name)
-        // console.log(PLUGINS_LIST)
-
-        console.log(props.marker)
     })
 
-    onCleanup(() => {
-        console.warn("ATTENZIONE!!!! INVENTORY E' STATO TOLTO!!!!")
-    })
+    // Manage the blurred cover
+    createEffect(
+        on(state, (newState) => {
+            console.log("SELECTED STATE:", newState)
+            if (newState === STATE.NEW) {
+                context.handleBlurredCover({ visible: true })
+            } else {
+                context.handleBlurredCover({
+                    visible: props.marker.games.length === 0,
+                    priority: 999,
+                })
 
-
-    // createEffect(() => {
-    //     console.log("SELECTED STATE:", state())
-    //     if (state() === STATE.NEW) {
-    //         context.handleBlurredCover({ visible: true });
-    //     }
-    //     else {
-    //         // props.setSelectedGameId(null);
-    //         context.handleBlurredCover({ visible: false })
-    //     }
-    // })
-
-    createEffect(on(state, (newState) => {
-        console.log("SELECTED STATE:", newState)
-        if (newState === STATE.NEW) {
-            context.handleBlurredCover({ visible: true });
-        }
-        else {
-            // props.setSelectedGameId(null);
-            context.handleBlurredCover({ visible: false })
-
-            if (newState == STATE.NONE) {
-                props.setSelectedGameId(null);
+                if (newState == STATE.NONE) {
+                    props.setSelectedGameId(null)
+                }
             }
-        }
-    }))
+        })
+    )
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -208,14 +182,9 @@ const UI = (props) => {
         /* background-color: green; */
     `
 
-    // const InventoryItemsContainer = styled(FitHeightScrollable)`
-    //     margin-bottom: 2rem;
-    // `
-
-
 
     const handleCategorySelected = (categoryName) => {
-        setSelectedPlugin(null);
+        setSelectedPlugin(null)
         setCurrentCategoryName(() => categoryName)
     }
 
@@ -244,28 +213,28 @@ const UI = (props) => {
         return categorySpecs.icon
     }
 
-
     const getPluginAllowed = (pluginName) => {
-
         // Check if some of the installed games
         // is "interactable", so that means that
         // no other "interactable" plugins are allowed
-        let isSomeoneInteractable = false;
+        let isSomeoneInteractable = false
         for (let i = 0; i < props.marker.games.length; i++) {
-            const game = props.marker.games[i];
-            const currentGameSpecs = PLUGINS_LIST.find((g) => g.fileName === game.name);
+            const game = props.marker.games[i]
+            const currentGameSpecs = PLUGINS_LIST.find(
+                (g) => g.fileName === game.name
+            )
             if (currentGameSpecs.interactable) {
-                isSomeoneInteractable = true;
-                break;
+                isSomeoneInteractable = true
+                break
             }
         }
-        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName);
+        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
         if (pluginSpecs.interactable && isSomeoneInteractable) {
-            return false;
+            return false
         }
 
         // Now check for the total allowed
-        // number 
+        // number
         const totalAllowed = pluginSpecs.allowed
         let nGames = 0
         if (props.marker.games) {
@@ -275,7 +244,6 @@ const UI = (props) => {
             return totalAllowed - nGames
         }
         return totalAllowed
-
     }
 
     /**
@@ -304,20 +272,23 @@ const UI = (props) => {
 
     const handleSelectNewPlugin = (newPlugin) => {
         if (selectedPlugin()) {
-            if (!newPlugin || newPlugin.fileName === selectedPlugin().fileName) {
-                setSelectedPlugin(null);
-                return;
+            if (
+                !newPlugin ||
+                newPlugin.fileName === selectedPlugin().fileName
+            ) {
+                setSelectedPlugin(null)
+                return
             }
         }
-        setSelectedPlugin(newPlugin);
+        setSelectedPlugin(newPlugin)
     }
 
     // Add a new plugin to this marker!!
     const handleAddNewPlugin = () => {
-        props.addNewPluginToMarker(selectedPlugin().fileName);
-        setSelectedPlugin(null);
+        props.addNewPluginToMarker(selectedPlugin().fileName)
+        setSelectedPlugin(null)
         // change view to CURRENT
-        setState(STATE.CURRENT);
+        setState(STATE.CURRENT)
     }
 
     const Middle = styled("div")`
@@ -333,7 +304,7 @@ const UI = (props) => {
         flex: 1;
     `
 
-    const GameUI = styled("div")`
+    const GameUIContainer = styled("div")`
         /* display: flex;
         flex-wrap: wrap;    
         gap: 1rem;
@@ -388,8 +359,6 @@ const UI = (props) => {
         /* height: 50%; */
     `
 
-
-
     const Bottom = styled("div")`
         display: flex;
         align-items: center;
@@ -421,9 +390,8 @@ const UI = (props) => {
             props.isOn
                 ? "var(--color-secondary)"
                 : props.theme === "dark"
-                    ? 'var(--color-dark-transparent)'
-                    : 'var(--color-background-transparent)'
-        };
+                ? "var(--color-dark-transparent)"
+                : "var(--color-background-transparent)"};
         border: none;
         pointer-events: ${(props) => (props.enabled ? "auto" : "none")};
         opacity: ${(props) => (props.enabled ? 1 : 0.5)};
@@ -455,26 +423,17 @@ const UI = (props) => {
         )
     }
 
-
-
     //region PLUGIN DETAILS
 
     const PluginDetailsContainer = styled("div")`
-        /* position: absolute; */
         flex: 1;
         width: 100%;
-        /* display: flex;
-        align-items: center;
-        justify-content: center; */
-        /* background-color: #3700ff37; */
         top: 50%;
         bottom: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        /* gap: 1rem; */
-        /* height: 60px; */
     `
 
     const PluginDetails = () => {
@@ -483,7 +442,7 @@ const UI = (props) => {
                 <SvgIcon
                     translateY={-0.5}
                     src={getPluginIcon(selectedPlugin().fileName)}
-                    color={'var(--color-secondary)'}
+                    color={"var(--color-secondary)"}
                     size={40}
                 />
                 <Message
@@ -507,13 +466,10 @@ const UI = (props) => {
         )
     }
 
-
     //#region RENDER
 
     return (
-        <InventoryContainer id="InventoryContainer"
-            visible={props.visible}>
-
+        <InventoryContainer id="InventoryContainer" visible={props.visible}>
             <Middle id="middle">
                 {/* LIST OF RUNNING GAMES */}
                 <Show
@@ -530,16 +486,10 @@ const UI = (props) => {
                                 enabled={game.enabled}
                             >
                                 {getPluginLocalized(game.name) && (
-                                    <Fa
-                                        icon={faLocationDot}
-                                        size="1x"
-                                    />
+                                    <Fa icon={faLocationDot} size="1x" />
                                 )}
                                 {getPluginInteractable(game.name) && (
-                                    <Fa
-                                        icon={faHandPointUp}
-                                        size="1x"
-                                    />
+                                    <Fa icon={faHandPointUp} size="1x" />
                                 )}
                                 <SvgIcon
                                     src={getPluginIcon(game.name)}
@@ -560,7 +510,7 @@ const UI = (props) => {
                             {PLUGINS_LIST.map(
                                 (plugin) =>
                                     plugin.category ===
-                                    currentCategoryName() && (
+                                        currentCategoryName() && (
                                         <ToggleButton
                                             enabled={getPluginAllowed(
                                                 plugin.fileName
@@ -568,7 +518,13 @@ const UI = (props) => {
                                             onToggle={() =>
                                                 handleSelectNewPlugin(plugin)
                                             }
-                                            isOn={selectedPlugin() ? selectedPlugin().fileName === plugin.fileName : false}
+                                            isOn={
+                                                selectedPlugin()
+                                                    ? selectedPlugin()
+                                                          .fileName ===
+                                                      plugin.fileName
+                                                    : false
+                                            }
                                         >
                                             {plugin.localized && (
                                                 <Fa
@@ -599,14 +555,41 @@ const UI = (props) => {
                         <Show when={selectedPlugin()}>
                             <PluginDetails />
                         </Show>
-
                     </NewPanelContainer>
                 </Show>
 
                 {/* UI OF THE GAMES !!! DON'T TOUCH! N.B. We can't use Show here
                 because the dome element is observed and must be present*/}
-                <GameUI id="plugins-ui"
-                    visible={state() === STATE.CURRENT} />
+                <GameUIContainer
+                    id="plugins-ui"
+                    visible={state() === STATE.CURRENT}
+                >
+                    <Show when={props.marker.games.length === 0}>
+                        <Message>
+                            <div>
+                                Aggiungi dei componenti scegliendoli dalle
+                                categorie elencate in basso.<br></br> <br></br>
+                                <Fa
+                                    icon={faLocationDot}
+                                    color={"var(--color-secondary)"}
+                                    size="1x"
+                                />{" "}
+                                Alcuni componenti richiedono la localizzazione
+                                rispetto a un marker posizionato nell'ambiente
+                                in cui ti trovi.
+                                <br></br> <br></br>
+                                <Fa
+                                    icon={faHandPointUp}
+                                    color={"var(--color-secondary)"}
+                                    size="1x"
+                                />{" "}
+                                Alcuni componenti richiedono l'interazione
+                                dell'utente, e ne puoi aggiungere solo uno.
+                                <br></br> <br></br>
+                            </div>
+                        </Message>
+                    </Show>
+                </GameUIContainer>
             </Middle>
 
             {/* CATEGORY PICKER */}

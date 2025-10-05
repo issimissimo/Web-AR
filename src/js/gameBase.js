@@ -29,15 +29,19 @@ export function useGame(gameName, gameId, config = {}) {
     let _initialized = false
     let _hasMountedView = false
 
-    let audioTap
-    let audioUndo
+    let sounds = {
+        tap: null,
+        undo: null,
+        click: null
+    }
+
+    // let audioTap
+    // let audioUndo
 
     onMount(async () => {
-        audioTap = await new LoadAudio("sounds/tap.ogg", SceneManager.listener)
-        audioUndo = await new LoadAudio(
-            "sounds/undo.ogg",
-            SceneManager.listener
-        )
+        sounds.tap = await new LoadAudio("sounds/tap.ogg", SceneManager.listener)
+        sounds.undo = await new LoadAudio("sounds/undo.ogg", SceneManager.listener)
+        sounds.click = await new LoadAudio("sounds/smallClick.ogg", SceneManager.listener)
         context.onLoaded(game)
 
         // Wait for the #plugins-ui container to exist. The container may be
@@ -94,7 +98,7 @@ export function useGame(gameName, gameId, config = {}) {
             if (_disposer) {
                 try {
                     _disposer()
-                } catch (e) {}
+                } catch (e) { }
                 _disposer = null
                 // console.log(`${gameName}: disposed mounted view`)
             }
@@ -162,7 +166,7 @@ export function useGame(gameName, gameId, config = {}) {
 
     // Define base functions
     const _onTapBase = () => {
-        audioTap.play()
+        sounds.tap.play()
     }
 
     const _renderLoopBase = () => {
@@ -174,7 +178,11 @@ export function useGame(gameName, gameId, config = {}) {
     }
 
     const onUndo = () => {
-        audioUndo.play()
+        sounds.undo.play()
+    }
+
+    const onClick = () => {
+        sounds.click.play()
     }
 
     // Define overridable / super functions

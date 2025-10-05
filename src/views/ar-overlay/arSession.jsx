@@ -706,30 +706,6 @@ export default function ArSession(props) {
                             }}
                         </For>
 
-                        {/* {gamesInitialized() &&
-
-                            (!initDetectionCompleted() ? (
-
-                                <InitialDetection />
-                            ) : localizationState() ===
-                                LOCALIZATION_STATE.REQUIRED ? (
-                                <Localization
-                                    planeFound={props.planeFound}
-                                    setReferenceMatrix={(matrix) =>
-                                        handleLocalizationCompleted(matrix)
-                                    }
-                                />
-                            ) : (
-                                <Inventory
-                                    visible={true}
-                                    marker={props.marker}
-                                    addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
-                                    selectedGameId={selectedGameId()}
-                                    setSelectedGameId={(id) =>
-                                        setSelectedGameId(id)
-                                    }
-                                />
-                            ))} */}
                         {gamesInitialized() &&
 
                             (!initDetectionCompleted()
