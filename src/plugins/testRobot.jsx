@@ -1,4 +1,4 @@
-import { onMount, createSignal, createEffect, on } from "solid-js"
+import { onMount, createSignal, createEffect, on, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 
 import { useGame } from "@js/gameBase"
@@ -164,7 +164,7 @@ export default function testRobot(props) {
         /* padding: 2em; */
     `
 
-    
+
     //region RENDER
     const renderView = () => {
         return (
@@ -175,7 +175,6 @@ export default function testRobot(props) {
                             <Message
                                 style={{ height: "auto" }}
                                 svgIcon={"icons/tap.svg"}
-                                showReadMore={false}
                                 showDoneButton={true}
                                 onDone={handleCloseInstructions}
                             >
@@ -185,20 +184,11 @@ export default function testRobot(props) {
                             </Message>
                         </Container>
                     ) : (
-
-                        game.appMode == "save"
-                            ?
-                            props.selected && <Toolbar id="toolbar"
-                                buttons={["undo"]}
-                                onUndo={handleUndo}
-                                undoActive={spawned()}
-                            />
-                            :
-                            <Toolbar id="toolbar"
-                                buttons={["undo"]}
-                                onUndo={handleUndo}
-                                undoActive={spawned()}
-                            />
+                        <Toolbar id="toolbar"
+                            buttons={["undo"]}
+                            onUndo={handleUndo}
+                            undoActive={spawned()}
+                        />
                     ))}
             </>
         )

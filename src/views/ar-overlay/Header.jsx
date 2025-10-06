@@ -27,30 +27,6 @@ const RightButtonContainer = styled('div')`
   `;
 
 
-// const Header = (props) => {
-
-//     return (
-//         <HeaderContainer>
-//             <Title>
-//                 {props.children}
-//             </Title>
-//             <div>
-//                 {
-//                     <LeftButtonContainer >
-//                         <ButtonCircle
-//                             onClick={props.onClickBack}
-//                             border={false}
-//                         >
-//                             <Fa icon={faClose} size="1x" class="icon" />
-//                         </ButtonCircle>
-//                     </LeftButtonContainer>
-//                 }
-
-//             </div>
-//         </HeaderContainer>
-//     )
-// }
-
 const Header = (props) => {
 
     return (

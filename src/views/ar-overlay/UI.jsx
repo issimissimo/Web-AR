@@ -86,7 +86,7 @@ const CategoriesPicker = (props) => {
 
     const _defaultCategoryName = "Modifica";
 
-    onMount(()=>{
+    onMount(() => {
         props.onCategoryPicked(_defaultCategoryName)
     })
 
@@ -151,7 +151,7 @@ const UI = (props) => {
         NEW: "new",
     }
 
-    const [state, setState] = createSignal(STATE.CURRENT)
+    const [state, setState] = createSignal(STATE.NONE)
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null)
     const [selectedPlugin, setSelectedPlugin] = createSignal(null)
     const context = useContext(Context)
@@ -160,7 +160,10 @@ const UI = (props) => {
 
     // Start with the 1st category
     onMount(() => {
-        setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
+        // setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
+        if (context.appMode === "save") {
+            setState(STATE.CURRENT);
+        }
     })
 
     // Manage the blurred cover
@@ -474,17 +477,17 @@ const UI = (props) => {
                                 isOn={game.id === props.selectedGameId}
                                 enabled={game.enabled}
                             >
+                                <SvgIcon
+                                    src={getPluginIcon(game.name)}
+                                    size={16}
+                                />
+                                {getPluginTitle(game.name)}
                                 {getPluginLocalized(game.name) && (
                                     <Fa icon={faLocationDot} size="1x" />
                                 )}
                                 {getPluginInteractable(game.name) && (
                                     <Fa icon={faHandPointUp} size="1x" />
                                 )}
-                                <SvgIcon
-                                    src={getPluginIcon(game.name)}
-                                    size={16}
-                                />
-                                {getPluginTitle(game.name)}
                             </ToggleButton>
                         ))}
                     </CurrentItemsContainer>
@@ -515,6 +518,13 @@ const UI = (props) => {
                                                     : false
                                             }
                                         >
+                                            <SvgIcon
+                                                src={getPluginIcon(
+                                                    plugin.fileName
+                                                )}
+                                                size={16}
+                                            />
+                                            {plugin.title}
                                             {plugin.localized && (
                                                 <Fa
                                                     icon={faLocationDot}
@@ -528,13 +538,6 @@ const UI = (props) => {
                                                     size="1x"
                                                 />
                                             )}
-                                            <SvgIcon
-                                                src={getPluginIcon(
-                                                    plugin.fileName
-                                                )}
-                                                size={16}
-                                            />
-                                            {plugin.title}
                                         </ToggleButton>
                                     )
                             )}
@@ -551,7 +554,7 @@ const UI = (props) => {
                 because the dome element is observed and must be present*/}
                 <GameUIContainer
                     id="plugins-ui"
-                    visible={state() === STATE.CURRENT}
+                    visible={state() !== STATE.NEW}
                 >
                     <Show when={props.marker.games.length === 0}>
                         <Message>

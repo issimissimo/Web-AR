@@ -6,7 +6,7 @@ import { generateQRCodeForMarker, downloadQRCode } from '@hooks/useQRCode';
 
 import Header from './Header';
 
-import { Container, FitHeight, FitHeightScrollable, Title } from '@components/smallElements'
+import { Container, FitHeight, FitHeightScrollable, Title, Centered } from '@components/smallElements'
 import InputField from '@components/inputField';
 import Button from '@components/button';
 import ButtonSecondary from '@components/ButtonSecondary';
@@ -16,7 +16,7 @@ import Message from '@components/Message';
 import { PLUGINS_LIST } from '@plugins/pluginsIndex';
 
 import Fa from 'solid-fa';
-import { faSave, faQrcode, faPuzzlePiece, faTrash, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faQrcode, faPuzzlePiece, faTrash, faDownload, faLink } from "@fortawesome/free-solid-svg-icons";
 
 
 const VIEW_MODE = {
@@ -216,6 +216,20 @@ const EditMarker = (props) => {
   }
 
 
+  const copyLinkToClipboard = () => {
+    // var copyText = document.getElementById("myInput");
+
+    // // Select the text field
+    // copyText.select();
+    // copyText.setSelectionRange(0, 99999); // For mobile devices
+
+    const path = `${window.location.href}?userId=${props.userId}&markerId=${props.marker.id}`;
+    console.log(path)
+    // // Copy the text inside the text field
+    navigator.clipboard.writeText(path);
+  }
+
+
   const Navigation = () => {
     return (
       <NavigationContainer
@@ -244,7 +258,7 @@ const EditMarker = (props) => {
             animate={{ scale: currentViewMode() === VIEW_MODE.QRCODE ? 1.1 : 0.9 }}
             transition={{ duration: 0.3, easing: "ease-in-out" }}
           >
-            <Fa icon={faQrcode} size="1.4x" class="icon" />
+            <Fa icon={faLink} size="1.4x" class="icon" />
             <BorderBottomBar
               animate={{ scaleX: currentViewMode() === VIEW_MODE.QRCODE ? 1 : 0 }}
               transition={{ duration: 0.3, easing: "ease-in-out" }}
@@ -333,6 +347,7 @@ const EditMarker = (props) => {
     )
   }
 
+  //region DYNAMIC VIEW
 
   const dynamicView = () => {
     onMount(() => {
@@ -389,17 +404,26 @@ const EditMarker = (props) => {
 
             <FitHeight>
               <QrCodeContainer
-
                 animate={{ opacity: [0, 1] }}
                 transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
               >
                 <QrCodeImg id="qr-code" />
               </QrCodeContainer>
-              <Message>
-                Stampa il QR Code e fissalo su una superficie, per poter essere successivamente scansionato.
-              </Message>
+              <Centered id="CENTER" style={{ 'justify-content': 'center' }}>
+                <Message style={{ height: "auto" }}>
+                  Scarica e stampa il QR Code, o in alternativa condividi il link.
+                </Message>
+                <Button
+                  onClick={copyLinkToClipboard}
+                  small={true}
+                  active={true}
+                  // icon={faCheck}
+                  width={"65%"}
+                >
+                  Copia link negli appunti
+                </Button>
+              </Centered>
             </FitHeight>
-
         )
     }
   }
