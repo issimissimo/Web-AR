@@ -1,7 +1,8 @@
-import { onMount, createEffect } from 'solid-js';
+import { onMount, createEffect, on } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { MeshStandardMaterial, Mesh } from 'three';
 import * as THREE from "three";
+import useOnce from '@tools/SolidJS/useOnce';
 
 
 export default function basicCube(props) {
@@ -48,7 +49,6 @@ export default function basicCube(props) {
         /*
         * Don't forget to call "game.setInitialized()" at finish 
         */
-        // console.log("ADESSO CHIAMO SET INITIALIZED PER basicCube !!!!!")
         game.setInitialized()
     }
 
@@ -58,13 +58,18 @@ export default function basicCube(props) {
     */
     function loop() { }
 
-    createEffect(() => {
-        console.log("BASIC CUBE SELECTED:", props.selected)
-    })
 
-    createEffect(() => {
-        console.log("CIAAAAAAAAAAOOOOOOOOOO SONO IL CUUUBOOOO E SONO ENABLED = ", props.enabled)
-    })
+    // createEffect(on(() => props.enabled, (enabled) => {
+    //     if (enabled) {
+    //         console.log("IL CUBO E' ENABLED!!!!!!!!!!!!!")
+    //     }
+    // }))
+
+
+    useOnce(() => props.enabled, () => {
+            console.log("IL CUBO E' ENABLED!!!!!!!!!!!!!")
+    });
+
 
     const renderView = () => {
         return (
