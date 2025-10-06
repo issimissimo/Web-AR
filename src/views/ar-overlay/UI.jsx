@@ -161,14 +161,12 @@ const UI = (props) => {
     // Start with the 1st category
     onMount(() => {
         setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
-
-        console.log("CIAO, SONO LA UI, E IL CURERENTCATEGORYNAME E':", currentCategoryName());
     })
 
     // Manage the blurred cover
     createEffect(
         on(state, (newState) => {
-            console.log("SELECTED STATE:", newState)
+            // console.log("SELECTED STATE:", newState)
 
             // If no games are created, OR we are adding,
             // show the blurred background
@@ -183,7 +181,6 @@ const UI = (props) => {
                     priority: 0,
                 })
                 if (newState === STATE.NONE) {
-                    console.log("now setting CurrentCategoryName to NULL!!")
                     props.setSelectedGameId(null);
                     props.setHeaderText(null);
                 }
@@ -202,11 +199,8 @@ const UI = (props) => {
 
 
     const handleCategorySelected = (categoryName) => {
-        console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        console.log("handleCategorySelected")
         setSelectedPlugin(null)
         setCurrentCategoryName(categoryName)
-
         if (state() !== STATE.NONE) {
             props.setHeaderText(categoryName);
         }

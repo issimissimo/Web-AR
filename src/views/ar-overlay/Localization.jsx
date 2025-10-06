@@ -109,6 +109,7 @@ export default function Localization(props) {
                     showDoneButton={true}
                     onDone={handleCloseInstructions}
                 >
+                    La tua esperienza in AR richiede che ti localizzi!<br></br>
                     Mettiti di fronte al QR-Code e inquadralo, per localizzarti
                     nell'ambiente circostante<br></br>
                     Cerca di essere il più preciso possibile!<br></br>
