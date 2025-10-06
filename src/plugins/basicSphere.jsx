@@ -2,7 +2,7 @@ import { onMount, createEffect } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { MeshStandardMaterial, Mesh } from 'three';
 import * as THREE from "three";
-import useOnce from '@tools/SolidJS/useOnce';
+import useOnce from '@hooks/SolidJS/useOnce';
 
 
 export default function basicSphere(props) {
@@ -31,9 +31,9 @@ export default function basicSphere(props) {
     //     console.log("basicSphere __ selected:", props.selected)
     // })
 
-    createEffect(()=>{
-        console.log("BASIC SPHERE SELECTED:", props.selected)
-    })
+    // createEffect(()=>{
+    //     console.log("BASIC SPHERE SELECTED:", props.selected)
+    // })
 
             
     useOnce(() => props.enabled, () => {

@@ -2,7 +2,7 @@ import { onMount, createEffect, on } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { MeshStandardMaterial, Mesh } from 'three';
 import * as THREE from "three";
-import useOnce from '@tools/SolidJS/useOnce';
+import useOnce from '@hooks/SolidJS/useOnce';
 
 
 export default function basicCube(props) {

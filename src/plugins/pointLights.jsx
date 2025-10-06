@@ -7,6 +7,7 @@ import Reticle from "@js/reticle"
 import Toolbar from "@views/ar-overlay/Toolbar"
 import { config } from "@js/config"
 import * as THREE from "three"
+import useOnce from '@hooks/SolidJS/useOnce';
 // import HorizontalSlider from '@views/ar-overlay/HorizontalSlider';
 // import ColorPicker from '@views/ar-overlay/ColorPicker';
 // import Button from '@components/Button';
@@ -48,7 +49,7 @@ export default function pointLights(props) {
             }
         },
 
-        renderLoop: () => {},
+        renderLoop: () => { },
     })
 
     const hasUnsavedChanges = createMemo(
@@ -99,28 +100,43 @@ export default function pointLights(props) {
         })
     )
 
-    // react when this component is enabled
-    createEffect(
-        on(
-            () => props.enabled,
-            (enabled) => {
-                if (enabled) {
-                    console.log("POINTLIGHTS IS ENABLED!")
+    // // react when this component is enabled
+    // createEffect(
+    //     on(
+    //         () => props.enabled,
+    //         (enabled) => {
+    //             if (enabled) {
+    //                 console.log("POINTLIGHTS IS ENABLED!")
 
-                    // setup Reticle
-                    // as soon as this component is enabled
-                    if (game.appMode === "save") {
-                        Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET)
-                        Reticle.setEnabled(true)
-                        Reticle.setVisible(true)
-                    }
+    //                 // setup Reticle
+    //                 // as soon as this component is enabled
+    //                 if (game.appMode === "save") {
+    //                     Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET)
+    //                     Reticle.setEnabled(true)
+    //                     Reticle.setVisible(true)
+    //                 }
 
-                    // load all saved lights
-                    loadAllLights()
-                }
-            }
-        )
-    )
+    //                 // load all saved lights
+    //                 loadAllLights()
+    //             }
+    //         }
+    //     )
+    // )
+
+    useOnce(() => props.enabled, () => {
+        console.log("POINTLIGHTS IS ENABLED!")
+
+        // setup Reticle
+        // as soon as this component is enabled
+        if (game.appMode === "save") {
+            Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET)
+            Reticle.setEnabled(true)
+            Reticle.setVisible(true)
+        }
+
+        // load all saved lights
+        loadAllLights()
+    });
 
     // createEffect(() => {
     //     if (currentLight()) {
