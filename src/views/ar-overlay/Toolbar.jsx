@@ -1,11 +1,10 @@
-import { onMount, onCleanup, useContext } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import ButtonCircle from "@components/ButtonCircle"
 import SvgIcon from "@components/SvgIcon"
 import Fa from "solid-fa"
 import { faSave } from "@fortawesome/free-solid-svg-icons"
-import { Context } from "@views/ar-overlay/arSession"
+
 
 const ContainerToolbar = styled(Motion.div)`
     position: absolute;
@@ -22,16 +21,6 @@ const ContainerToolbar = styled(Motion.div)`
 `
 
 const Toolbar = (props) => {
-    const context = useContext(Context)
-
-    // onMount(() => {
-    //     context.forceUpdateDomElements()
-    // })
-
-    // onCleanup(() => {
-    //     context.forceUpdateDomElements()
-    // })
-
     return (
         <ContainerToolbar
             visible={props.visible ?? true}

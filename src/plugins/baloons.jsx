@@ -1,4 +1,4 @@
-import { onMount, createEffect, createSignal, createMemo } from 'solid-js';
+import { onMount, createEffect, createSignal, createMemo, Show } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { Color, Matrix4, Vector3, PositionalAudio, Euler } from 'three';
@@ -13,7 +13,7 @@ import * as THREE from 'three';
 import { config } from '@js/config';
 import { GLBFile } from '@tools/three/modelTools';
 import { LoadTexture } from '@tools/three/textureTools';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
+import useOnce from '@hooks/SolidJS/useOnce';
 
 
 
@@ -57,9 +57,32 @@ export default function Baloons(props) {
     const [currentTime, setCurrentTime] = createSignal(maxGameTime);
     const [playerState, setPlayerState] = createSignal(PLAYER_STATE.NONE);
 
-    // decrease timeout
-    createEffect(() => {
-        if (props.enabled && game.appMode === "load") {
+
+    // createEffect(() => {
+    //     if (props.enabled && game.appMode === "load") {
+    //         interval = setInterval(() => {
+    //             setCurrentTime((prev) => {
+    //                 if (prev > 0) {
+    //                     setRemainingTime(prev - 1000);
+    //                     return prev - 1000;
+    //                 }
+    //                 clearInterval(interval);
+    //                 return 0;
+    //             });
+    //         }, 1000);
+    //         return () => clearInterval(interval);
+
+    //     }
+    // });
+
+
+    useOnce(() => props.enabled, () => {
+
+        console.log("BALOONS ENABLED!")
+        setupScene();
+
+        // decrease timeout
+        if (game.appMode === "load") {
             interval = setInterval(() => {
                 setCurrentTime((prev) => {
                     if (prev > 0) {
@@ -71,16 +94,15 @@ export default function Baloons(props) {
                 });
             }, 1000);
             return () => clearInterval(interval);
-
         }
     });
 
-    // stop timeout if is winner or looser
-    createEffect(() => {
-        if (playerState() == PLAYER_STATE.WINNER || playerState() == PLAYER_STATE.LOOSER) {
-            clearInterval(interval);
-        }
-    })
+    // // stop timeout if is winner or looser
+    // createEffect(() => {
+    //     if (playerState() == PLAYER_STATE.WINNER || playerState() == PLAYER_STATE.LOOSER) {
+    //         clearInterval(interval);
+    //     }
+    // })
 
 
     /*
@@ -177,19 +199,17 @@ export default function Baloons(props) {
 
 
 
-    /*
-    * On localizationCompleted
-    */
-    createEffect(() => {
-        if (props.enabled) {
-            console.log("BALOONS ENABLED!")
-            setupScene();
-        }
-    })
 
-    createEffect(() => {
-        console.log("Current reference matrix:", props.referenceMatrix)
-    })
+    // createEffect(() => {
+    //     if (props.enabled) {
+    //         console.log("BALOONS ENABLED!")
+    //         setupScene();
+    //     }
+    // })
+
+    // createEffect(() => {
+    //     console.log("Current reference matrix:", props.referenceMatrix)
+    // })
 
 
 
@@ -623,6 +643,7 @@ export default function Baloons(props) {
     function endGameWinner() {
         setTimeout(() => {
             setPlayerState(PLAYER_STATE.WINNER);
+            clearInterval(interval);
             console.log("HAI VINTO!!!")
         }, 500);
 
@@ -632,6 +653,7 @@ export default function Baloons(props) {
     function endGameLooser() {
         setTimeout(() => {
             setPlayerState(PLAYER_STATE.LOOSER);
+            clearInterval(interval);
             console.log("HAI PERSO!!!")
         }, 500);
 
@@ -656,11 +678,11 @@ export default function Baloons(props) {
 
     const Info = styled('div')`
         display: flex;
-        /* width: 100%; */
         box-sizing: border-box;
         align-items: center;
         gap: 2rem;
         justify-content: center;
+        margin-top: 2rem;
       `;
 
 
@@ -671,7 +693,6 @@ export default function Baloons(props) {
     const AuthorUI = () => {
         return (
             <>
-                {/* <button onClick={() => spawnModelOnTap()}>SPAWN!</button> */}
                 <Info>
                     <Info style={{ gap: '0.5rem' }}>
                         <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
@@ -696,8 +717,6 @@ export default function Baloons(props) {
     const UserUI = () => {
         return (
             <Container>
-                {/* <button onClick={() => launchArrow()}>ARROW</button> */}
-
                 {(() => {
                     switch (playerState()) {
                         case PLAYER_STATE.WINNER:
@@ -729,23 +748,19 @@ export default function Baloons(props) {
 
 
 
+    const renderView = () => {
+        return (
+            <Show when={props.enabled}>
+                <Show when={game.appMode === "save" && props.selected}>
+                    <AuthorUI />
+                </Show>
+                <Show when={game.appMode === "load"}>
+                    <UserUI />
+                </Show>
+            </Show>
+        )
+    }
 
-    //#region [RETURN]
-
-    return (
-        <>
-            {
-                props.enabled && (
-                    (() => {
-                        switch (game.appMode) {
-                            case "save":
-                                return <AuthorUI />;
-                            case "load":
-                                return <UserUI />;
-                        }
-                    })()
-                )
-            }
-        </>
-    );
+    // Delegate mounting to the shared game hook
+    game.mountView(renderView)
 }
