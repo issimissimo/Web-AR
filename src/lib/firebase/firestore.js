@@ -100,7 +100,7 @@ export const fetchMarker = async (userId, markerId) => {
 };
 
 
-export const addMarker = async (userId, name) => {
+export const addMarker = async (userId, name, coverTitle) => {
     try {
         const markersRef = collection(firestore, `users/${userId}/markers`);
         const newMarkerRef = await addDoc(markersRef,
@@ -109,7 +109,7 @@ export const addMarker = async (userId, name) => {
                 created: serverTimestamp(),
                 views: 0,
                 like: 0,
-                coverTitle: null,
+                coverTitle: coverTitle,
             });
         return newMarkerRef.id;
     } catch (error) {

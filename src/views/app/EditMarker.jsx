@@ -80,13 +80,10 @@ const QrCodeImg = styled('img')`
 
 const EditMarker = (props) => {
 
-  onMount(() => {
-    console.log("ON MOUNT EDIT MARKER")
-  })
-
   const firebase = useFirebase();
   const [id, setId] = createSignal(props.marker.id ?? null);
   const [name, setName] = createSignal(props.marker.name ?? null);
+  const [coverTitle, setCoverTitle] = createSignal(null);
   const [games, setGames] = createSignal(props.marker.games ?? []);
   const [currentViewMode, setCurrentViewMode] = createSignal(VIEW_MODE.GAMES);
 
@@ -128,7 +125,7 @@ const EditMarker = (props) => {
   const handleSaveMarker = async () => {
 
     // create new marker on Firestore
-    const newMarkerId = await firebase.firestore.addMarker(props.userId, name());
+    const newMarkerId = await firebase.firestore.addMarker(props.userId, name(), coverTitle());
 
     // update current marker (app.jsx)
     props.onNewMarkerCreated(newMarkerId, name());
@@ -444,15 +441,6 @@ const EditMarker = (props) => {
         <span style={{ color: 'var(--color-white)' }}>ambiente</span>
       </Header>
 
-      {/* TITLE */}
-      {/* <Title
-        animate={{ opacity: [0, 1] }}
-        transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
-      >
-        <span style={{ color: 'var(--color-secondary)' }}>{id() ? 'Modifica' : 'Nuovo'} </span>
-        <span style={{ color: 'var(--color-white)' }}>ambiente AR </span>
-      </Title> */}
-
 
       <FitHeightScrollable
         style={{ "padding-top": "3rem" }}
@@ -464,7 +452,7 @@ const EditMarker = (props) => {
         <InputField
           type="none"
           name="none"
-          label="Nome Ambiente"
+          label="Nome"
           value={name()}
           onInput={e => setName(e.target.value)}
           onBlur={handleUpdateMarker()}
@@ -502,11 +490,19 @@ const EditMarker = (props) => {
             :
 
             <FitHeight>
-              <Message>
+              {/* <Message>
                 Dai un nome al tuo ambiente in AR che si riferisca al luogo in cui lo creerai, ad esempio 'salotto',
                 o alla scena in AR che implementarai, ad esempio 'ping pong da tavolo'.<br></br><br></br>
                 Il nome è totalmente arbitrario, ma ti auiterà a ricordare a cosa si riferisce.
-              </Message>
+              </Message> */}
+              <InputField
+                label="Testo di benvenuto"
+                multiline={true}
+                rows={4}
+                resize="vertical"
+                value={coverTitle()}
+                onInput={(e) => setCoverTitle(e.target.value)}
+              />
               <Button
                 animate={{ opacity: [0, 1] }}
                 transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}

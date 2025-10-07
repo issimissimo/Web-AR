@@ -1,4 +1,3 @@
-
 import { createSignal, Show } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import { Motion } from 'solid-motionone';
@@ -9,9 +8,9 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 // --- Styled Components ---
 const InputFieldContainer = styled('div')`
   position: relative;
-  height: 2.75rem;
+  min-height: 2.75rem;
   display: flex;
-  align-items: center;
+  align-items: ${props => props['data-multiline'] ? 'flex-start' : 'center'};
 `;
 
 const InputWrapper = styled('div')`
@@ -20,12 +19,11 @@ const InputWrapper = styled('div')`
   width: 100%;
 `;
 
-const Input = styled('input')`
+const baseInputStyles = `
   width: 100%;
   padding: 0.9rem 1rem;
   border: none;
   border-radius: 90px;
-  border-color: ${props => props['data-error'] ? 'var(--color-primary)' : '#adb5bd;'};
   transition: all 0.3s ease;
   background: var(--color-dark-transparent);
   box-sizing: border-box;
@@ -34,19 +32,16 @@ const Input = styled('input')`
   position: relative;
   z-index: 1;
   font-size: 1rem;
+  font-family: inherit;
 
   &:focus {
     outline: none;
-    border-color: ${props => props['data-error'] ? 'var(--color-primary)' : 'var(--color-primary)'};
+    border-color: var(--color-primary);
     box-shadow: none;
   }
 
   &::placeholder {
     color: #adb5bd;
-  }
-
-  &[type="password"] {
-    padding-right: 3rem;
   }
 
   &:-webkit-autofill,
@@ -61,12 +56,47 @@ const Input = styled('input')`
   }
 `;
 
+const Input = styled('input')`
+  ${baseInputStyles}
+  border-color: ${props => props['data-error'] ? 'var(--color-primary)' : '#adb5bd'};
+
+  &[type="password"] {
+    padding-right: 3rem;
+  }
+`;
+
+const TextArea = styled('textarea')`
+  ${baseInputStyles}
+  border-color: ${props => props['data-error'] ? 'var(--color-primary)' : '#adb5bd'};
+  border-radius: 20px;
+  min-height: ${props => props['data-rows'] ? `${props['data-rows'] * 1.5 + 1.8}rem` : '6rem'};
+  resize: ${props => props['data-resize'] || 'vertical'};
+  padding-top: 0.9rem;
+  line-height: 1.5;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-grey);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+  }
+`;
+
 const Label = styled('div')`
   position: absolute;
   left: 0;
   bottom: 0;
   top: 0;
-  /* padding-left: 1.5rem; */
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -79,8 +109,8 @@ const Label = styled('div')`
 const FloatingLabel = styled(Motion.div)`
   position: absolute;
   left: 1.5rem;
-  top: 0;
-  height: 100%;
+  top: ${props => props['data-multiline'] ? '0.9rem' : '0'};
+  height: ${props => props['data-multiline'] ? 'auto' : '100%'};
   width: 200px;
   display: flex;
   align-items: center;
@@ -122,16 +152,18 @@ const EyeButton = styled('button')`
   }
 `;
 
-// --- FloatingInput Component ---
+// --- InputField Component ---
 const InputField = (props) => {
   const [isFocused, setIsFocused] = createSignal(false);
   const [showPassword, setShowPassword] = createSignal(false);
   const inputType = () => props.type === 'password' ? (showPassword() ? 'text' : 'password') : props.type;
+  const isMultiline = () => props.multiline || false;
 
   return (
     <InputWrapper style={props.style}>
-      <InputFieldContainer>
+      <InputFieldContainer data-multiline={isMultiline()}>
         <FloatingLabel
+          data-multiline={isMultiline()}
           animate={{
             x: isFocused() || props.value ? -20 : 0,
             y: isFocused() || props.value ? -35 : 0,
@@ -142,27 +174,54 @@ const InputField = (props) => {
         >
           <Label>{props.label}</Label>
         </FloatingLabel>
-        <Input
-          class="glass"
-          type={inputType()}
-          name={props.name}
-          value={props.value}
-          onInput={props.onInput}
-          onFocus={e => {
-            setIsFocused(true);
-            props.onFocus && props.onFocus(e);
-          }}
-          onBlur={() => {
-            props.onBlur;
-            setIsFocused(false)
-          }}
-          autoComplete={props.autoComplete}
-          required={props.required}
-          placeholder={props.placeholder}
-          data-error={props['data-error']}
-        />
+        
+        <Show
+          when={isMultiline()}
+          fallback={
+            <Input
+              class="glass"
+              type={inputType()}
+              name={props.name}
+              value={props.value}
+              onInput={props.onInput}
+              onFocus={e => {
+                setIsFocused(true);
+                props.onFocus && props.onFocus(e);
+              }}
+              onBlur={() => {
+                props.onBlur;
+                setIsFocused(false)
+              }}
+              autoComplete={props.autoComplete}
+              required={props.required}
+              placeholder={props.placeholder}
+              data-error={props['data-error']}
+            />
+          }
+        >
+          <TextArea
+            class="glass"
+            name={props.name}
+            value={props.value}
+            onInput={props.onInput}
+            onFocus={e => {
+              setIsFocused(true);
+              props.onFocus && props.onFocus(e);
+            }}
+            onBlur={() => {
+              props.onBlur;
+              setIsFocused(false)
+            }}
+            required={props.required}
+            placeholder={props.placeholder}
+            data-error={props['data-error']}
+            data-rows={props.rows}
+            data-resize={props.resize}
+          />
+        </Show>
+
         {/* Eye icon for password */}
-        {props.type === 'password' && (
+        {props.type === 'password' && !isMultiline() && (
           <EyeButton type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword() ? 'Nascondi password' : 'Mostra password'}>
             <Fa icon={showPassword() ? faEyeSlash : faEye} color='var(--color-grey)' />
           </EyeButton>
