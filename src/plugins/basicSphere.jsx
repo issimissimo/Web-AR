@@ -24,20 +24,17 @@ export default function basicSphere(props) {
     * On mount
     */
     onMount(() => {
-        setupScene();
+
+        /*
+        * Don't forget to call "game.setInitialized()" at finish 
+        */
+        game.setInitialized()
+        
     });
-
-    // createEffect(() => {
-    //     console.log("basicSphere __ selected:", props.selected)
-    // })
-
-    // createEffect(()=>{
-    //     console.log("BASIC SPHERE SELECTED:", props.selected)
-    // })
 
             
     useOnce(() => props.enabled, () => {
-            console.log("LA SPHERE E' ENABLED!!!!!!!!!!!!!")
+            setupScene();
     });
 
 
@@ -53,14 +50,11 @@ export default function basicSphere(props) {
         sphereMaterial.roughness = 0.1;
         sphereMaterial.metalness = 1;
         sphere = new Mesh(sphereGeometry, sphereMaterial);
-        sphere.position.set(0, -0.5, -1);
+        sphere.position.set(0, 0, -1);
         game.addToScene(sphere);
 
 
-        /*
-        * Don't forget to call "game.setInitialized()" at finish 
-        */
-        game.setInitialized()
+        
     }
 
 

@@ -174,6 +174,7 @@ const UI = (props) => {
             // If no games are created, OR we are adding,
             // show the blurred background
             if (newState === STATE.NEW || props.marker.games.length === 0) {
+                Reticle.setEnabled(false);
                 context.handleBlurredCover({
                     visible: true,
                     priority: 999,
@@ -185,7 +186,7 @@ const UI = (props) => {
                 })
 
                 if (newState === STATE.CURRENT) {
-                    // select the last selected game!
+                    // select the last selected game
                     const id = lastSelectedGameId() ?? props.marker.games[0].id;
                     props.setSelectedGameId(id);
                 }
@@ -193,7 +194,6 @@ const UI = (props) => {
                 if (newState === STATE.NONE && context.appMode === "save") {
                     props.setSelectedGameId(null);
                     props.setHeaderText(null);
-                    console.log("ADESSO DEVO DISABILITARE IL RETICLE")
                     Reticle.setEnabled(false);
                 }
             }

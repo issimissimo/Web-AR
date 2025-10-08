@@ -48,9 +48,6 @@ let _initialized = false;
 
 let _backup = {};
 
-let _reticleStates = [];
-let _reticleTimeout = null;
-
 
 function _addPlaneForReticleSurface() {
     _geomLookAt = new PlaneGeometry(0.1, 0.1);
@@ -291,7 +288,7 @@ const Reticle = {
 
                     // Check if is the right surface...
                     _surfTypeDetected = _getReticleSurface();
-                    console.log(_surfTypeDetected)
+                    // console.log(_surfTypeDetected)
                     if (_surfTypeMode !== this.SURF_TYPE_MODE.ALL) {
                         if (_surfTypeDetected !== _surfTypeMode) {
 
@@ -482,86 +479,6 @@ const Reticle = {
         this.setVisible(_backup.visible);
         this.setup(_backup.meshType);
     },
-
-    // Variabili per gestire le chiamate multiple
-    // let _reticleStates =[];
-    // let _reticleTimeout = null;
-
-    setState(state = {}) {
-        // Sistema di gestione di chiamate multiple incoerenti da script diversi...
-        const newState = {
-            enabled: state.enabled,
-            surfType: state.surfType,
-            workingMode: state.workingMode,
-            visible: state.visible,
-            priority: state.priority ?? 0,
-            timestamp: Date.now(), // For debug/logging
-        };
-
-        _reticleStates.push(newState);
-
-        console.log("|||||||||||||||||||||||||| handleReticleState:", newState);
-
-        const stack = new Error().stack;
-        const caller = stack.split("\n")[2]?.trim(); // La seconda linea è il chiamante
-        console.log("handleReticleState chiamata da:", caller);
-
-        if (_reticleTimeout) {
-            console.warn("ANOTHER CALL TO handleReticleState IN QUEUE!");
-            clearTimeout(_reticleTimeout);
-        }
-
-        // Wait a little to check if some other state is arriving
-        _reticleTimeout = setTimeout(() => {
-            try {
-                if (_reticleStates.length === 0) {
-                    console.warn("handleReticleState: No states to process");
-                    return;
-                }
-
-                const highestState = _reticleStates.reduce(
-                    (max, current) => {
-                        return current.priority > max.priority ? current : max;
-                    }
-                );
-
-                // Just for debugging
-                if (_reticleStates.length > 1) {
-                    console.log(
-                        ` ***************************** Processed ${_reticleStates.length} reticle states, using priority ${highestState.priority}`
-                    );
-                    console.log("now setting state:", highestState);
-                    console.log(
-                        "********************************************************************"
-                    );
-                }
-
-                // Applica le funzioni solo se il valore è definito nello stato
-                if (highestState.enabled !== undefined) {
-                    setEnabled(highestState.enabled);
-                }
-
-                if (highestState.surfType !== undefined) {
-                    setSurfType(highestState.surfType);
-                }
-
-                if (highestState.workingMode !== undefined) {
-                    setWorkingMode(highestState.workingMode);
-                }
-
-                if (highestState.visible !== undefined) {
-                    setVisible(highestState.visible);
-                }
-
-            } catch (error) {
-                console.error("Error in handleReticleState:", error);
-            } finally {
-                // Reset
-                _reticleStates.length = 0;
-                _reticleTimeout = null;
-            }
-        }, 200);
-    }
 }
 
 export default Reticle;   

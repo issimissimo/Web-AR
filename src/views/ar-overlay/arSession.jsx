@@ -12,6 +12,7 @@ import { useFirebase } from "@hooks/useFirebase"
 import { config } from "@js/config"
 import { Matrix4 } from "three"
 import { styled } from "solid-styled-components"
+import useOnce from '@hooks/SolidJS/useOnce';
 
 // Main components
 import InitialDetection from "./InitialDetection"
@@ -99,11 +100,7 @@ export default function ArSession(props) {
         // let's force (not clear why I have to do that)
         setInitDetectionCompleted(false)
 
-        // If Debug on desktop we must set the background
-        // to black, so to see something...
-        const body = document.getElementsByTagName("body")[0]
         if (config.debugOnDesktop) {
-            body.style.backgroundColor = "black"
 
             // Skip init detection
             setInitDetectionCompleted(true)
@@ -113,6 +110,7 @@ export default function ArSession(props) {
         }
         // If not, we must set it to transparent for compatibility on iOS
         else {
+            const body = document.getElementsByTagName("body")[0]
             body.style.backgroundColor = "transparent"
         }
 
@@ -238,17 +236,17 @@ export default function ArSession(props) {
     //     console.log("ADESSO E' SELEZIONATO IL GAME con ID:", selectedGameId());
     // })
 
-    createEffect(on(selectedGameId, (gameId) => {
-        if (gameId) {
-            console.log("ADESSO E' SELEZIONATO IL GAME con ID:", gameId);
-        }
-    }));
+    // createEffect(on(selectedGameId, (gameId) => {
+    //     if (gameId) {
+    //         console.log("ADESSO E' SELEZIONATO IL GAME con ID:", gameId);
+    //     }
+    // }));
 
-    createEffect(() => {
-        console.log("*******************************")
-        console.log("gamesEnabled:", gamesEnabled())
-        console.log("*******************************")
-    })
+    // createEffect(() => {
+    //     console.log("*******************************")
+    //     console.log("gamesEnabled:", gamesEnabled())
+    //     console.log("*******************************")
+    // })
 
 
     createEffect(
@@ -287,17 +285,20 @@ export default function ArSession(props) {
      * we want to hide the "InitDetection" component
      * and set prop "enabled={true}" on the games
      */
-    createEffect(() => {
-        if (props.planeFound) {
+    useOnce(() => props.planeFound, () => {
             console.log(
                 "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
             )
             setInitDetectionCompleted(true);
-        }
-        else{
-            console.log("PLANE NOT FOUND....")
-        }
-    })
+    });
+    // createEffect(() => {
+    //     if (props.planeFound) {
+    //         console.log(
+    //             "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
+    //         )
+    //         setInitDetectionCompleted(true);
+    //     }
+    // })
 
     /** When init detection is completed
      * we want to hide the blurred cover.
@@ -616,21 +617,21 @@ export default function ArSession(props) {
                     }
                 )
 
-                // just for debugging
-                if (_blurredCoverStates.length > 1) {
-                    console.log(
-                        ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
-                    )
-                    console.log(
-                        "now setting - visible:",
-                        highestState.visible,
-                        "showHole:",
-                        highestState.showHole
-                    )
-                    console.log(
-                        "********************************************************************"
-                    )
-                }
+                // // just for debugging
+                // if (_blurredCoverStates.length > 1) {
+                //     console.log(
+                //         ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
+                //     )
+                //     console.log(
+                //         "now setting - visible:",
+                //         highestState.visible,
+                //         "showHole:",
+                //         highestState.showHole
+                //     )
+                //     console.log(
+                //         "********************************************************************"
+                //     )
+                // }
 
                 setBlurVisible(highestState.visible)
                 setBlurShowHole(highestState.showHole)
@@ -731,6 +732,7 @@ export default function ArSession(props) {
                         <UI
                             visible={gamesEnabled()}
                             marker={props.marker}
+                            gamesRunning={props.gamesRunning}
                             addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
                             selectedGameId={selectedGameId()}
                             setSelectedGameId={(id) =>

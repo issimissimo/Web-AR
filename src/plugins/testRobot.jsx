@@ -31,7 +31,6 @@ export default function testRobot(props) {
         if (shadows) shadows.dispose()
         if (audioRobot) audioRobot.stop()
         if (clippingReveal) clippingReveal.dispose()
-        // Reticle.setEnabled(true)
         robotGlb.resetAnimations();
 
         game.removePreviousFromScene();
@@ -50,14 +49,11 @@ export default function testRobot(props) {
                 !showInstructions() &&
                 !spawned()
             ) {
-                // Tap sound
-                game.super.onTap()
+                game.super.onTap() // audio
 
                 const hitMatrix = Reticle.getHitMatrix()
                 spawnModel(hitMatrix)
                 setSpawned(true)
-
-                // Reticle.setEnabled(false)
                 handleReticle();
             }
         },
@@ -81,9 +77,6 @@ export default function testRobot(props) {
      * On mount
      */
     onMount(async () => {
-        // Reticle.set(Reticle.MESH_TYPE.RINGS);
-
-        // Reticle.setVisible(false)
 
         const aoTexture = await new LoadTexture(
             "models/demo/Comau_RACER3/Comau_RACER3.jpg",
@@ -126,7 +119,6 @@ export default function testRobot(props) {
             Reticle.setEnabled(false);
         }
         else {
-            console.log("STO ABILITANDO RETICLE....")
             Reticle.setup(Reticle.MESH_TYPE.RINGS, {
                 size: 0.4,
                 ringNumber: 4,
@@ -162,7 +154,6 @@ export default function testRobot(props) {
                         enabled && game.gameDetails.interactable) ||
                     (game.appMode === "save" && selected)
                 ) {
-                    console.log("ADESSO DEVO SETTARE RETICLE PER ROBOT")
                     handleReticle();
                     handleBlurredCover();
                 }
@@ -180,7 +171,6 @@ export default function testRobot(props) {
         align-items: center;
         justify-content: center;
         box-sizing: border-box;
-        /* padding: 2em; */
     `
 
     const View = () => {
@@ -228,6 +218,9 @@ export default function testRobot(props) {
     // Delegate mounting to the shared game hook
     game.mountView(renderView)
 
+
+
+    
     //region FUNCTIONS
 
     function spawnModel(matrix) {

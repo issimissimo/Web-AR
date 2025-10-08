@@ -67,6 +67,9 @@ export default function Main() {
             console.log = function () { }
         }
 
+        // set body color
+        setBodyColor();
+
         // We need to copy the function outside
         // so to be able to use it for debug on desktop purpose
         globalGoToArSession = goToArSession
@@ -228,6 +231,12 @@ export default function Main() {
             : "none"
     }
 
+    const setBodyColor = () => {
+        const body = document.getElementsByTagName("body")[0];
+        const bgColor = getComputedStyle(body).getPropertyValue('--color-background');
+        body.style.backgroundColor = bgColor;
+    }
+
     /**
      * Navigation
      */
@@ -321,7 +330,8 @@ export default function Main() {
         }
 
         setGamesRunning(() => [])
-        setBackgroundVisible(true)
+        setBackgroundVisible(true);
+        setBodyColor();
     }
 
     //#region [return]
