@@ -291,6 +291,7 @@ const Reticle = {
 
                     // Check if is the right surface...
                     _surfTypeDetected = _getReticleSurface();
+                    console.log(_surfTypeDetected)
                     if (_surfTypeMode !== this.SURF_TYPE_MODE.ALL) {
                         if (_surfTypeDetected !== _surfTypeMode) {
 
@@ -428,6 +429,8 @@ const Reticle = {
                 _reticleMesh._shouldDisplay = false;
                 _circleMesh._shouldDisplay = true;
             }
+            // let's enable it, if it was not enabled;
+            this.setEnabled(true);
         }
         else {
             _reticleMesh._shouldDisplay = false;

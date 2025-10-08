@@ -1,19 +1,14 @@
 import { onMount, createSignal, createEffect, on, Show } from "solid-js"
 import { styled } from "solid-styled-components"
-
 import { useGame } from "@js/gameBase"
 import Reticle from "@js/reticle"
 import SceneManager from "@js/sceneManager"
-
 import Message from "@components/Message"
-
 import { Vector3, Euler } from "three"
-import { GLBFile } from '@tools/three/modelTools';
+import { GLBFile } from "@tools/three/modelTools"
 import { LoadTexture } from "@tools/three/textureTools"
 import { LoadPositionalAudio } from "@tools/three/audioTools"
-import {
-    setMaterialsShadows,
-} from "@tools/three/materialTools"
+import { setMaterialsShadows } from "@tools/three/materialTools"
 import ContactShadowsXR from "@tools/three/ContactShadowsXR"
 import ClippingReveal from "@tools/three/ClippingReveal"
 import Toolbar from "@views/ar-overlay/Toolbar"
@@ -22,27 +17,26 @@ export default function testRobot(props) {
     const [showInstructions, setShowInstructions] = createSignal(true)
     const [spawned, setSpawned] = createSignal(false)
 
-    let loadedModel, shadows, audioRobot, clippingReveal, robotGlb;
+    let loadedModel, shadows, audioRobot, clippingReveal, robotGlb
 
     const handleCloseInstructions = () => {
-        setShowInstructions(() => false)
-        Reticle.setVisible(true)
-        game.handleBlurredCover({ visible: false })
+        setShowInstructions(false);
+        handleReticle();
+        handleBlurredCover();
     }
 
     const handleUndo = () => {
-
         game.onUndo() // audio
 
         if (shadows) shadows.dispose()
         if (audioRobot) audioRobot.stop()
         if (clippingReveal) clippingReveal.dispose()
-        Reticle.setEnabled(true)
-
+        // Reticle.setEnabled(true)
         robotGlb.resetAnimations();
 
-        game.removePreviousFromScene()
-        setSpawned(false)
+        game.removePreviousFromScene();
+        setSpawned(false);
+        handleReticle();
     }
 
     /*
@@ -63,14 +57,14 @@ export default function testRobot(props) {
                 spawnModel(hitMatrix)
                 setSpawned(true)
 
-                Reticle.setEnabled(false)
+                // Reticle.setEnabled(false)
+                handleReticle();
             }
         },
 
         renderLoop: () => {
             if (props.enabled && spawned()) {
-
-                robotGlb.animate();
+                robotGlb.animate()
 
                 if (shadows) shadows.update()
                 if (clippingReveal) clippingReveal.update()
@@ -83,15 +77,13 @@ export default function testRobot(props) {
         },
     })
 
-
-
     /*
      * On mount
      */
     onMount(async () => {
         // Reticle.set(Reticle.MESH_TYPE.RINGS);
 
-        Reticle.setVisible(false)
+        // Reticle.setVisible(false)
 
         const aoTexture = await new LoadTexture(
             "models/demo/Comau_RACER3/Comau_RACER3.jpg",
@@ -100,13 +92,15 @@ export default function testRobot(props) {
             }
         )
 
-        robotGlb = await new GLBFile("models/demo/Comau_RACER3/Comau_RACER3.glb", {
-            aoMap: aoTexture,
-            aoMapIntensity: 1.4,
-        });
+        robotGlb = await new GLBFile(
+            "models/demo/Comau_RACER3/Comau_RACER3.glb",
+            {
+                aoMap: aoTexture,
+                aoMapIntensity: 1.4,
+            }
+        )
 
-        loadedModel = robotGlb.model;
-
+        loadedModel = robotGlb.model
 
         audioRobot = await new LoadPositionalAudio(
             "models/demo/Comau_RACER3/Comau_RACER3.ogg",
@@ -124,66 +118,60 @@ export default function testRobot(props) {
     })
 
 
-    createEffect(on(() => props.enabled, (enabled) => {
-        if (enabled) {
-            console.log("***** testRobot is enabled *****")
 
-            Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
+    //region RETICLE AND BLURRED COVER
 
-            // blur background for instructions
-            game.handleBlurredCover({ visible: true, priority: 999 })
+    const handleReticle = () => {
+        if (showInstructions() || spawned()) {
+            Reticle.setEnabled(false);
         }
-    }))
-
-
-    createEffect(on(
-        () => [props.enabled, props.selected],
-        ([enabled, selected]) => {
-            // Il tuo codice che reagisce ai cambiamenti
-            console.log('enabled:', enabled, 'selected:', selected);
-
-
-            // if ((enabled && appMode === "load" && isInteractable) || 
-            //     (appMode === "save" && selected)) {
-            //     doSomething();
-            // }
-
-            if (game.appMode === 'save') {
-                if (selected) {
-                    console.log("ADESSO DEVO SETTARE RETICLE PER ROBOT")
-
-                    
-                }
-            }
-
-            if (game.appMode === 'load') {
-                if (enabled && game.gameDetails.interactable) {
-                    console.log("ADESSO DEVO SETTARE RETICLE PER ROBOT")
-                }
-            }
-        }
-    ));
-
-
-    function handleReticle(visible) {
-        if (visible) {
-            Reticle.setState({
-                enabled: true,
-                visible: true,
-                priority: 999
+        else {
+            console.log("STO ABILITANDO RETICLE....")
+            Reticle.setup(Reticle.MESH_TYPE.RINGS, {
+                size: 0.4,
+                ringNumber: 4,
+                ringThickness: 0.2,
+                color: 0xf472b6,
             });
+            Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
+            Reticle.setVisible(true)
         }
-    }
+    };
 
-    function handleBackground(visible) {
+    const handleBlurredCover = () => {
+        if (showInstructions()) {
+            game.handleBlurredCover({
+                visible: true,
+                showHole: false,
+                priority: 999,
+            })
+        }
+        else {
+            game.handleBlurredCover({
+                visible: false,
+            })
+        }
+    };
 
-    }
+    createEffect(
+        on(
+            () => [props.enabled, props.selected],
+            ([enabled, selected]) => {
+                if (
+                    (game.appMode === "load" &&
+                        enabled && game.gameDetails.interactable) ||
+                    (game.appMode === "save" && selected)
+                ) {
+                    console.log("ADESSO DEVO SETTARE RETICLE PER ROBOT")
+                    handleReticle();
+                    handleBlurredCover();
+                }
+            }
+        )
+    )
 
+    //region RENDER
 
-
-    /*
-     * STYLE
-     */
     const Container = styled("div")`
         width: 100%;
         height: 100%;
@@ -195,13 +183,13 @@ export default function testRobot(props) {
         /* padding: 2em; */
     `
 
-    //region RENDER
-
     const View = () => {
         return (
-            <Show when={showInstructions()}
+            <Show
+                when={showInstructions()}
                 fallback={
-                    <Toolbar id="toolbar"
+                    <Toolbar
+                        id="toolbar"
                         buttons={["undo"]}
                         onUndo={handleUndo}
                         undoActive={spawned()}
@@ -222,7 +210,7 @@ export default function testRobot(props) {
                 </Container>
             </Show>
         )
-    };
+    }
 
     const renderView = () => {
         return (
@@ -235,16 +223,10 @@ export default function testRobot(props) {
                 </Show>
             </Show>
         )
-    };
-
-
+    }
 
     // Delegate mounting to the shared game hook
-    game.mountView(renderView);
-
-
-
-
+    game.mountView(renderView)
 
     //region FUNCTIONS
 

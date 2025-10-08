@@ -21,6 +21,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 
 import { PLUGINS_CATEGORIES, PLUGINS_LIST } from "@plugins/pluginsIndex"
+import Reticle from "@js/reticle"
+
 
 //region CATEGORY ITEM
 
@@ -154,11 +156,9 @@ const UI = (props) => {
     const [state, setState] = createSignal(STATE.NONE)
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null)
     const [selectedPlugin, setSelectedPlugin] = createSignal(null)
+    const [lastSelectedGameId, setLastSelectedGameId] = createSignal(null);
     const context = useContext(Context)
 
-
-
-    // Start with the 1st category
     onMount(() => {
         // setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
         if (context.appMode === "save") {
@@ -166,7 +166,7 @@ const UI = (props) => {
         }
     })
 
-    // Manage the blurred cover
+    // Manage state changes
     createEffect(
         on(state, (newState) => {
             // console.log("SELECTED STATE:", newState)
@@ -178,20 +178,29 @@ const UI = (props) => {
                     visible: true,
                     priority: 999,
                 })
-            } else {
+            }
+            else {
                 context.handleBlurredCover({
                     visible: false,
-                    priority: 0,
                 })
-                if (newState === STATE.NONE) {
+
+                if (newState === STATE.CURRENT) {
+                    // select the last selected game!
+                    const id = lastSelectedGameId() ?? props.marker.games[0].id;
+                    props.setSelectedGameId(id);
+                }
+
+                if (newState === STATE.NONE && context.appMode === "save") {
                     props.setSelectedGameId(null);
                     props.setHeaderText(null);
-
                     console.log("ADESSO DEVO DISABILITARE IL RETICLE")
+                    Reticle.setEnabled(false);
                 }
             }
         })
-    )
+    );
+
+   
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -270,29 +279,26 @@ const UI = (props) => {
     }
 
     /**
-     * Set the selected game id!
+     * Select game id
      */
-    // const handleToggle = (id) => {
-    //     props.setSelectedGameId(id !== props.selectedGameId ? id : null);
-    // };
-
     const handleToggle = (id) => {
-        const newSelectedId = id !== props.selectedGameId ? id : null
+
+        // Keep selected
+        if (id === props.selectedGameId) return;
 
         props.setSelectedGameId(null) // importante! dobbiamo cancellare il DOM prima di procedere
-
-        // console.log(
-        //     `Game selection change: ${previousSelectedId} -> ${newSelectedId}`
-        // )
 
         // IMPORTANTE: Aggiungi un piccolo delay per permettere al createEffect di pulire
         // il DOM prima che il nuovo componente tenti di montare la sua view
         setTimeout(() => {
-            props.setSelectedGameId(newSelectedId)
-            console.log(`Game selection changed: ${newSelectedId}`)
+            props.setSelectedGameId(id);
+            setLastSelectedGameId(id);
         }, 10)
     }
 
+    /**
+     * Select new plugin
+     */
     const handleSelectNewPlugin = (newPlugin) => {
         if (selectedPlugin()) {
             if (
@@ -305,6 +311,7 @@ const UI = (props) => {
         }
         setSelectedPlugin(newPlugin)
     }
+
 
     // Add a new plugin to this marker!!
     const handleAddNewPlugin = () => {

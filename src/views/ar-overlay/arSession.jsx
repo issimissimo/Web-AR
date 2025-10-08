@@ -294,6 +294,9 @@ export default function ArSession(props) {
             )
             setInitDetectionCompleted(true);
         }
+        else{
+            console.log("PLANE NOT FOUND....")
+        }
     })
 
     /** When init detection is completed

@@ -11,6 +11,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import ButtonCircle from "@components/ButtonCircle"
 import Fa from "solid-fa"
+import Reticle from "@js/reticle"
+
 
 export default function envMapBasic(props) {
     const [index, setIndex] = createSignal(0)
@@ -23,11 +25,11 @@ export default function envMapBasic(props) {
      * Put here derived functions from Game
      */
     const { game } = useGame("envMapBasic", props.id, {
-        onTap: () => {},
+        onTap: () => { },
 
-        renderLoop: () => {},
+        renderLoop: () => { },
 
-        close: () => {},
+        close: () => { },
     })
 
     /*
@@ -122,9 +124,30 @@ export default function envMapBasic(props) {
         return await res.json() // array di nomi file
     }
 
-    /*
-     * STYLE
-     */
+    //region RETICLE AND BLURRED COVER
+
+    createEffect(
+        on(
+            () => [props.enabled, props.selected],
+            ([enabled, selected]) => {
+                if (
+                    (game.appMode === "load" &&
+                        enabled && game.gameDetails.interactable) ||
+                    (game.appMode === "save" && selected)
+                ) {
+                    console.log("ADESSO DEVO SETTARE RETICLE PER ENVMAP")
+                    Reticle.setEnabled(false);
+                    game.handleBlurredCover({
+                        visible: false,
+                    })
+                }
+            }
+        )
+    )
+
+
+    // region RENDER
+
     const Container = styled("div")`
         width: 100%;
         height: 100%;
@@ -148,10 +171,6 @@ export default function envMapBasic(props) {
         padding-bottom: 0.5rem;
         border-radius: 90px;
     `
-
-    /*
-     * RENDER
-     */
 
     const renderView = () => {
         return (
