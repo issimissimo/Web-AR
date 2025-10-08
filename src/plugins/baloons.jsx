@@ -1,4 +1,4 @@
-import { onMount, createEffect, createSignal, createMemo, Show } from 'solid-js';
+import { onMount, createEffect, createSignal, createMemo, Show, on } from 'solid-js';
 import { useGame } from '@js/gameBase';
 import { styled } from 'solid-styled-components';
 import { Color, Matrix4, Vector3, PositionalAudio, Euler } from 'three';
@@ -14,6 +14,7 @@ import { config } from '@js/config';
 import { GLBFile } from '@tools/three/modelTools';
 import { LoadTexture } from '@tools/three/textureTools';
 import useOnce from '@hooks/SolidJS/useOnce';
+import Message from "@components/Message"
 
 
 
@@ -49,6 +50,7 @@ let balloonGlb;
 
 export default function Baloons(props) {
     const [lastSavedGameData, setLastSavedGameData] = createSignal([]);
+    const [showInstructions, setShowInstructions] = createSignal(false)
 
     // GAME variables
     const [arrowsLeft, setArrowsLeft] = createSignal(10);
@@ -81,21 +83,43 @@ export default function Baloons(props) {
         console.log("BALOONS ENABLED!")
         setupScene();
 
-        // decrease timeout
-        if (game.appMode === "load") {
-            interval = setInterval(() => {
-                setCurrentTime((prev) => {
-                    if (prev > 0) {
-                        setRemainingTime(prev - 1000);
-                        return prev - 1000;
-                    }
-                    clearInterval(interval);
-                    return 0;
-                });
-            }, 1000);
-            return () => clearInterval(interval);
-        }
+        // // decrease timeout
+        // if (game.appMode === "load") {
+        //     interval = setInterval(() => {
+        //         setCurrentTime((prev) => {
+        //             if (prev > 0) {
+        //                 setRemainingTime(prev - 1000);
+        //                 return prev - 1000;
+        //             }
+        //             clearInterval(interval);
+        //             return 0;
+        //         });
+        //     }, 1000);
+        //     return () => clearInterval(interval);
+        // }
     });
+
+
+    function startGame() {
+
+        // decrease timeout
+
+        interval = setInterval(() => {
+            setCurrentTime((prev) => {
+                if (prev > 0) {
+                    setRemainingTime(prev - 1000);
+                    return prev - 1000;
+                }
+                clearInterval(interval);
+                return 0;
+            });
+        }, 1000);
+
+
+        setPlayerState(PLAYER_STATE.RUNNING);
+    }
+
+
 
     // // stop timeout if is winner or looser
     // createEffect(() => {
@@ -129,7 +153,9 @@ export default function Baloons(props) {
 
                 switch (game.appMode) {
                     case "save":
-                        spawnModelOnTap();
+                        if (props.selected) {
+                            spawnModelOnTap();
+                        }
                         break;
 
                     case "load":
@@ -190,27 +216,14 @@ export default function Baloons(props) {
         // reset
         setLastSavedGameData([...game.gameData()]);
 
+        // hide Reticle
+        Reticle.setVisible(false);
+
         /*
         * Don't forget to call "game.setInitialized()" at finish 
         */
         game.setInitialized()
     });
-
-
-
-
-
-    // createEffect(() => {
-    //     if (props.enabled) {
-    //         console.log("BALOONS ENABLED!")
-    //         setupScene();
-    //     }
-    // })
-
-    // createEffect(() => {
-    //     console.log("Current reference matrix:", props.referenceMatrix)
-    // })
-
 
 
 
@@ -242,18 +255,32 @@ export default function Baloons(props) {
     };
 
 
+    //TODO - move everything here (from setup scene)
+    createEffect(on(() => props.enabled, (enabled) => {
+
+    }))
+
+
     /*
     * SETUP SCENE
     */
     function setupScene() {
         switch (game.appMode) {
             case "save":
+                if (game.gameData().length === 0) {
+                    setShowInstructions(true);
+                    game.handleBlurredCover({ visible: true, showHole: false, priority: 999 })
+                }
+
                 Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
                 Reticle.setEnabled(true);
                 Reticle.setVisible(true);
                 break;
 
             case "load":
+                setShowInstructions(true);
+                game.handleBlurredCover({ visible: true, showHole: false, priority: 999 })
+
                 if (config.debugOnDesktop) {
                     Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
                     Reticle.setEnabled(true);
@@ -262,7 +289,7 @@ export default function Baloons(props) {
                 else {
                     Reticle.setEnabled(false);
                 }
-                setPlayerState(PLAYER_STATE.RUNNING)
+                // setPlayerState(PLAYER_STATE.RUNNING)
                 break;
         }
         // wait a little before to spawn loaded models
@@ -297,10 +324,6 @@ export default function Baloons(props) {
 
 
 
-
-    /*
-    * STYLE
-    */
 
 
     //#region [Load models]
@@ -661,7 +684,11 @@ export default function Baloons(props) {
 
 
 
-
+    const handleCloseInstructions = () => {
+        setShowInstructions(() => false)
+        Reticle.setVisible(true)
+        game.handleBlurredCover({ visible: false })
+    }
 
 
 
@@ -674,6 +701,18 @@ export default function Baloons(props) {
     /*
     * RENDER
     */
+
+    const MessageContainer = styled("div")`
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        /* padding: 2em; */
+    `
+
 
 
     const Info = styled('div')`
@@ -690,23 +729,77 @@ export default function Baloons(props) {
     //#region [Author UI]
 
 
+    // const AuthorUI = () => {
+    //     return (
+    //         showInstructions() ?
+    //             (<Container>
+    //                 <Message
+    //                     style={{ height: "auto" }}
+    //                     svgIcon={"icons/tap.svg"}
+    //                     showDoneButton={true}
+    //                     onDone={handleCloseInstructions}
+    //                 >
+    //                     Fai TAP sullo schermo per posizionare i palloncini
+    //                     nello spazio intorno a te. L'utente dovrà poi farli
+    //                     scoppiare in un tempo prestabilito.
+    //                 </Message>
+    //             </Container>)
+
+    //             :
+
+    //             (<>
+    //                 <Info>
+    //                     <Info style={{ gap: '0.5rem' }}>
+    //                         <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
+    //                         {game.gameData().length}
+    //                     </Info>
+    //                 </Info>
+    //                 <Toolbar
+    //                     buttons={["undo", "save"]}
+    //                     onUndo={handleUndo}
+    //                     onSave={handleSave}
+    //                     undoActive={game.gameData().length > 0}
+    //                     saveActive={hasUnsavedChanges()}
+    //                 />
+    //             </>)
+    //     )
+    // }
+
     const AuthorUI = () => {
         return (
-            <>
-                <Info>
-                    <Info style={{ gap: '0.5rem' }}>
-                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
-                        {game.gameData().length}
-                    </Info>
-                </Info>
-                <Toolbar
-                    buttons={["undo", "save"]}
-                    onUndo={handleUndo}
-                    onSave={handleSave}
-                    undoActive={game.gameData().length > 0}
-                    saveActive={hasUnsavedChanges()}
-                />
-            </>
+            <Show
+                when={showInstructions()}
+                fallback={
+                    <>
+                        <Info>
+                            <Info style={{ gap: '0.5rem' }}>
+                                <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
+                                {game.gameData().length}
+                            </Info>
+                        </Info>
+                        <Toolbar
+                            buttons={["undo", "save"]}
+                            onUndo={handleUndo}
+                            onSave={handleSave}
+                            undoActive={game.gameData().length > 0}
+                            saveActive={hasUnsavedChanges()}
+                        />
+                    </>
+                }
+            >
+                <MessageContainer>
+                    <Message
+                        style={{ height: "auto" }}
+                        svgIcon={"icons/tap.svg"}
+                        showDoneButton={true}
+                        onDone={handleCloseInstructions}
+                    >
+                        Fai TAP sullo schermo per posizionare i palloncini
+                        nello spazio intorno a te. L'utente dovrà poi farli
+                        scoppiare in un tempo prestabilito.
+                    </Message>
+                </MessageContainer>
+            </Show>
         )
     }
 
@@ -716,35 +809,87 @@ export default function Baloons(props) {
 
     const UserUI = () => {
         return (
-            <Container>
-                {(() => {
-                    switch (playerState()) {
-                        case PLAYER_STATE.WINNER:
-                            return <div>HAI VINTO!</div>;
-                        case PLAYER_STATE.LOOSER:
-                            return <div>HAI PERSO!</div>;
-                        default:
-                            return (
-                                <Info>
-                                    <Info style={{ gap: '0.5rem' }}>
-                                        <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
-                                        {arrowsLeft()}
-                                    </Info>
-                                    <Info style={{ gap: '0.5rem' }}>
-                                        <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={25} />
-                                        {explodedBalloons()} / {game.gameData().length}
-                                    </Info>
-                                    <Info style={{ gap: '0.5rem' }}>
-                                        <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={20} />
-                                        {remainingTime() / 1000}
-                                    </Info>
-                                </Info>
-                            );
-                    }
-                })()}
-            </Container>
+            <Show
+                when={showInstructions()}
+                fallback={
+                    <Container>
+                        {(() => {
+                            switch (playerState()) {
+                                case PLAYER_STATE.WINNER:
+                                    return <div>HAI VINTO!</div>;
+                                case PLAYER_STATE.LOOSER:
+                                    return <div>HAI PERSO!</div>;
+                                default:
+                                    return (
+                                        <Info>
+                                            <Info style={{ gap: '0.5rem' }}>
+                                                <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
+                                                {arrowsLeft()}
+                                            </Info>
+                                            <Info style={{ gap: '0.5rem' }}>
+                                                <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={25} />
+                                                {explodedBalloons()} / {game.gameData().length}
+                                            </Info>
+                                            <Info style={{ gap: '0.5rem' }}>
+                                                <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={20} />
+                                                {remainingTime() / 1000}
+                                            </Info>
+                                        </Info>
+                                    );
+                            }
+                        })()}
+                    </Container>
+                }
+            >
+                <MessageContainer>
+                    <Message
+                        style={{ height: "auto" }}
+                        svgIcon={"icons/tap.svg"}
+                        showDoneButton={true}
+                        onDone={() => {
+                            handleCloseInstructions();
+                            startGame();
+                        }}
+                    >
+                        Fai TAP sullo schermo per lanciare le freccette
+                        e fare scoppiare tutti i palloncini entro il tempo massimo.
+                    </Message>
+                </MessageContainer>
+            </Show>
         )
     }
+
+    // const UserUI = () => {
+    //     return (
+    //         <Container>
+    //             {(() => {
+    //                 switch (playerState()) {
+    //                     case PLAYER_STATE.WINNER:
+    //                         return <div>HAI VINTO!</div>;
+    //                     case PLAYER_STATE.LOOSER:
+    //                         return <div>HAI PERSO!</div>;
+    //                     default:
+    //                         return (
+    //                             <Info>
+    //                                 <Info style={{ gap: '0.5rem' }}>
+    //                                     <SvgIcon src={'icons/dart.svg'} color={'var(--color-secondary)'} size={25} />
+    //                                     {arrowsLeft()}
+    //                                 </Info>
+    //                                 <Info style={{ gap: '0.5rem' }}>
+    //                                     <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} sizeY={25} />
+    //                                     {explodedBalloons()} / {game.gameData().length}
+    //                                 </Info>
+    //                                 <Info style={{ gap: '0.5rem' }}>
+    //                                     <SvgIcon src={'icons/time.svg'} color={'var(--color-secondary)'} size={20} />
+    //                                     {remainingTime() / 1000}
+    //                                 </Info>
+    //                             </Info>
+    //                         );
+    //                 }
+    //             })()}
+    //         </Container>
+    //     )
+    // }
 
 
 

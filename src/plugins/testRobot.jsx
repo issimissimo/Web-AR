@@ -22,21 +22,17 @@ export default function testRobot(props) {
     const [showInstructions, setShowInstructions] = createSignal(true)
     const [spawned, setSpawned] = createSignal(false)
 
-    let loadedModel, shadows, audioRobot, clippingReveal
-    let robotGlb;
-
+    let loadedModel, shadows, audioRobot, clippingReveal, robotGlb;
 
     const handleCloseInstructions = () => {
         setShowInstructions(() => false)
         Reticle.setVisible(true)
-        // game.blurBackground(false);
         game.handleBlurredCover({ visible: false })
-        // game.forceUpdateDomElements()
     }
 
     const handleUndo = () => {
-        // super
-        game.onUndo()
+
+        game.onUndo() // audio
 
         if (shadows) shadows.dispose()
         if (audioRobot) audioRobot.stop()
@@ -87,9 +83,7 @@ export default function testRobot(props) {
         },
     })
 
-    /*
-     * DATA
-     */
+
 
     /*
      * On mount
@@ -123,24 +117,15 @@ export default function testRobot(props) {
             }
         )
 
-        // // blur background for instructions
-        // game.handleBlurredCover({ visible: true, priority: 999 })
-
         /*
          * Don't forget to call "game.setInitialized()" at finish
          */
         game.setInitialized()
     })
 
-    // createEffect(async () => {
-    //     if (props.enabled) {
-    //         console.log("***** testRobot is enabled *****")
-    //         Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
-    //     }
-    // })
 
     createEffect(on(() => props.enabled, (enabled) => {
-        if (props.enabled) {
+        if (enabled) {
             console.log("***** testRobot is enabled *****")
 
             Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
@@ -149,6 +134,52 @@ export default function testRobot(props) {
             game.handleBlurredCover({ visible: true, priority: 999 })
         }
     }))
+
+
+    createEffect(on(
+        () => [props.enabled, props.selected],
+        ([enabled, selected]) => {
+            // Il tuo codice che reagisce ai cambiamenti
+            console.log('enabled:', enabled, 'selected:', selected);
+
+
+            // if ((enabled && appMode === "load" && isInteractable) || 
+            //     (appMode === "save" && selected)) {
+            //     doSomething();
+            // }
+
+            if (game.appMode === 'save') {
+                if (selected) {
+                    console.log("ADESSO DEVO SETTARE RETICLE PER ROBOT")
+
+                    
+                }
+            }
+
+            if (game.appMode === 'load') {
+                if (enabled && game.gameDetails.interactable) {
+                    console.log("ADESSO DEVO SETTARE RETICLE PER ROBOT")
+                }
+            }
+        }
+    ));
+
+
+    function handleReticle(visible) {
+        if (visible) {
+            Reticle.setState({
+                enabled: true,
+                visible: true,
+                priority: 999
+            });
+        }
+    }
+
+    function handleBackground(visible) {
+
+    }
+
+
 
     /*
      * STYLE
@@ -164,35 +195,49 @@ export default function testRobot(props) {
         /* padding: 2em; */
     `
 
-
     //region RENDER
+
+    const View = () => {
+        return (
+            <Show when={showInstructions()}
+                fallback={
+                    <Toolbar id="toolbar"
+                        buttons={["undo"]}
+                        onUndo={handleUndo}
+                        undoActive={spawned()}
+                    />
+                }
+            >
+                <Container>
+                    <Message
+                        style={{ height: "auto" }}
+                        svgIcon={"icons/tap.svg"}
+                        showDoneButton={true}
+                        onDone={handleCloseInstructions}
+                    >
+                        Fai TAP sullo schermo per posizionare il robot Comau
+                        RACER 3 su un piano. <br></br> Evita i piani troppo
+                        riflettenti o uniformi.
+                    </Message>
+                </Container>
+            </Show>
+        )
+    };
+
     const renderView = () => {
         return (
-            <>
-                {props.enabled &&
-                    (showInstructions() ? (
-                        <Container>
-                            <Message
-                                style={{ height: "auto" }}
-                                svgIcon={"icons/tap.svg"}
-                                showDoneButton={true}
-                                onDone={handleCloseInstructions}
-                            >
-                                Fai TAP sullo schermo per posizionare il robot Comau
-                                RACER 3 su un piano. <br></br> Evita i piani troppo
-                                riflettenti o uniformi.
-                            </Message>
-                        </Container>
-                    ) : (
-                        <Toolbar id="toolbar"
-                            buttons={["undo"]}
-                            onUndo={handleUndo}
-                            undoActive={spawned()}
-                        />
-                    ))}
-            </>
+            <Show when={props.enabled}>
+                <Show when={game.appMode === "save" && props.selected}>
+                    <View />
+                </Show>
+                <Show when={game.appMode === "load"}>
+                    <View />
+                </Show>
+            </Show>
         )
-    }
+    };
+
+
 
     // Delegate mounting to the shared game hook
     game.mountView(renderView);
@@ -201,7 +246,7 @@ export default function testRobot(props) {
 
 
 
-    //#region [functions]
+    //region FUNCTIONS
 
     function spawnModel(matrix) {
         const position = new Vector3()

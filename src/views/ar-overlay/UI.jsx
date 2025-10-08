@@ -186,6 +186,8 @@ const UI = (props) => {
                 if (newState === STATE.NONE) {
                     props.setSelectedGameId(null);
                     props.setHeaderText(null);
+
+                    console.log("ADESSO DEVO DISABILITARE IL RETICLE")
                 }
             }
         })
