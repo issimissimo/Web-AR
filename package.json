@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^7.0.0",
+    "@lottiefiles/dotlottie-solid": "^0.5.5",
     "firebase": "^11.8.1",
     "howler": "^2.2.4",
     "qrcode": "^1.5.3",

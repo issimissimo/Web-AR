@@ -24,6 +24,15 @@ import {
 
 import { saveData, loadData, useRealtimeData, deleteData } from '../lib/firebase/realtimeDb';
 
+import {
+    uploadFileWithProgress,
+    getFileURL,
+    deleteFile,
+    getFileMetadata,
+    listFiles,
+    deleteAllFilesInDirectory,
+} from '../lib/firebase/storage';
+
 export const useFirebase = () => {
     const { user, loading: authLoading } = useAuthState();
 
@@ -65,6 +74,15 @@ export const useFirebase = () => {
             loadData,
             useRealtimeData,
             deleteData
+        },
+
+        storage: {
+            uploadFileWithProgress,
+            getFileURL,
+            deleteFile,
+            getFileMetadata,
+            listFiles,
+            deleteAllFilesInDirectory,
         }
     };
 };
