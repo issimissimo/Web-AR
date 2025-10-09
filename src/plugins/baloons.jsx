@@ -60,64 +60,9 @@ export default function Baloons(props) {
     const [playerState, setPlayerState] = createSignal(PLAYER_STATE.NONE);
 
 
-    // createEffect(() => {
-    //     if (props.enabled && game.appMode === "load") {
-    //         interval = setInterval(() => {
-    //             setCurrentTime((prev) => {
-    //                 if (prev > 0) {
-    //                     setRemainingTime(prev - 1000);
-    //                     return prev - 1000;
-    //                 }
-    //                 clearInterval(interval);
-    //                 return 0;
-    //             });
-    //         }, 1000);
-    //         return () => clearInterval(interval);
-
-    //     }
-    // });
 
 
-    useOnce(() => props.enabled, () => {
 
-        console.log("BALOONS ENABLED!")
-        setupScene();
-
-        // // decrease timeout
-        // if (game.appMode === "load") {
-        //     interval = setInterval(() => {
-        //         setCurrentTime((prev) => {
-        //             if (prev > 0) {
-        //                 setRemainingTime(prev - 1000);
-        //                 return prev - 1000;
-        //             }
-        //             clearInterval(interval);
-        //             return 0;
-        //         });
-        //     }, 1000);
-        //     return () => clearInterval(interval);
-        // }
-    });
-
-
-    function startGame() {
-
-        // decrease timeout
-
-        interval = setInterval(() => {
-            setCurrentTime((prev) => {
-                if (prev > 0) {
-                    setRemainingTime(prev - 1000);
-                    return prev - 1000;
-                }
-                clearInterval(interval);
-                return 0;
-            });
-        }, 1000);
-
-
-        setPlayerState(PLAYER_STATE.RUNNING);
-    }
 
 
 
@@ -146,14 +91,13 @@ export default function Baloons(props) {
     const { game } = useGame("baloons", props.id, {
 
         onTap: () => {
-
+            console.log("TAAPPP-1")
             if (props.enabled) {
-
-                console.log("TAPPPP....")
-
+                console.log("TAAPPP-2")
                 switch (game.appMode) {
                     case "save":
                         if (props.selected) {
+                            console.log("TAAPPP-3")
                             spawnModelOnTap();
                         }
                         break;
@@ -216,8 +160,6 @@ export default function Baloons(props) {
         // reset
         setLastSavedGameData([...game.gameData()]);
 
-        // hide Reticle
-        Reticle.setVisible(false);
 
         /*
         * Don't forget to call "game.setInitialized()" at finish 
@@ -226,6 +168,63 @@ export default function Baloons(props) {
     });
 
 
+    /*
+    * On ENABLED
+    */
+    useOnce(() => props.enabled, () => {
+
+        console.log("BALOONS ENABLED!")
+
+        if (
+            (game.appMode === "load") ||
+            (game.appMode === "save" && game.gameData().length === 0)
+        ) {
+            setShowInstructions(true);
+        }
+        else {
+            start();
+        }
+
+        handleBlurredCover();
+        handleReticle();
+    });
+
+
+
+    function start() {
+
+        // wait a little before to spawn loaded models
+        setTimeout(() => {
+            if (game.gameData().length > 0)
+                spawnAllModels();
+        }, 250)
+
+
+        // Start the game!
+        if (game.appMode === "load") {
+            // decrease timeout
+            interval = setInterval(() => {
+                setCurrentTime((prev) => {
+                    if (prev > 0) {
+                        setRemainingTime(prev - 1000);
+                        return prev - 1000;
+                    }
+                    clearInterval(interval);
+                    return 0;
+                });
+            }, 1000);
+
+            setPlayerState(PLAYER_STATE.RUNNING);
+        }
+    }
+
+
+    const handleCloseInstructions = () => {
+        setShowInstructions(() => false)
+        handleReticle();
+        handleBlurredCover();
+        start();
+    }
 
 
 
@@ -255,49 +254,6 @@ export default function Baloons(props) {
     };
 
 
-    //TODO - move everything here (from setup scene)
-    createEffect(on(() => props.enabled, (enabled) => {
-
-    }))
-
-
-    /*
-    * SETUP SCENE
-    */
-    function setupScene() {
-        switch (game.appMode) {
-            case "save":
-                if (game.gameData().length === 0) {
-                    setShowInstructions(true);
-                    game.handleBlurredCover({ visible: true, showHole: false, priority: 999 })
-                }
-
-                Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
-                Reticle.setEnabled(true);
-                Reticle.setVisible(true);
-                break;
-
-            case "load":
-                setShowInstructions(true);
-                game.handleBlurredCover({ visible: true, showHole: false, priority: 999 })
-
-                if (config.debugOnDesktop) {
-                    Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET);
-                    Reticle.setEnabled(true);
-                    Reticle.setVisible(true);
-                }
-                else {
-                    Reticle.setEnabled(false);
-                }
-                // setPlayerState(PLAYER_STATE.RUNNING)
-                break;
-        }
-        // wait a little before to spawn loaded models
-        setTimeout(() => {
-            if (game.gameData().length > 0)
-                loadAllModels();
-        }, 250)
-    }
 
     //#region [LOOP]
     /*
@@ -330,7 +286,7 @@ export default function Baloons(props) {
     /*
     * Spawn loaded models
     */
-    function loadAllModels() {
+    function spawnAllModels() {
         const gameData = game.gameData();
         let currentIndex = 0;
 
@@ -386,7 +342,7 @@ export default function Baloons(props) {
                     loadNextBatch()
                 }, 200)
             } else {
-                console.log("Tutti i modelli caricati!");
+                console.log("Tutti i modelli spawnati!");
 
                 // Init GAME!!!
                 if (game.appMode == "load") {
@@ -449,18 +405,6 @@ export default function Baloons(props) {
     }
 
 
-
-    //#region [Game Logics]
-
-    // function loadEnv() {
-    //     const rgbeLoader = new RGBELoader();
-    //     const fileUrl = "images/hdr/empty_warehouse_1k.hdr";
-    //     rgbeLoader.load(fileUrl, (envMap) => {
-    //         envMap.mapping = THREE.EquirectangularReflectionMapping;
-    //         SceneManager.scene.environment = envMap;
-    //         SceneManager.scene.environmentIntensity = 1.2;
-    //     });
-    // }
 
 
 
@@ -684,17 +628,53 @@ export default function Baloons(props) {
 
 
 
-    const handleCloseInstructions = () => {
-        setShowInstructions(() => false)
-        Reticle.setVisible(true)
-        game.handleBlurredCover({ visible: false })
-    }
 
 
 
 
 
 
+    //region RETICLE AND BLURRED COVER
+
+    const handleReticle = () => {
+        if (showInstructions() || game.appMode === "load") {
+            Reticle.setEnabled(false);
+        }
+        else {
+            Reticle.setWorkingMode(Reticle.WORKING_MODE.TARGET)
+            Reticle.setVisible(true);
+        }
+    };
+
+    const handleBlurredCover = () => {
+        if (showInstructions()) {
+            game.handleBlurredCover({
+                visible: true,
+                showHole: false,
+                priority: 999,
+            })
+        }
+        else {
+            game.handleBlurredCover({
+                visible: false,
+            })
+        }
+    };
+
+    createEffect(
+        on(
+            () => [props.enabled, props.selected],
+            ([enabled, selected]) => {
+                if (
+                    (game.appMode === "load" && enabled && game.gameDetails.interactable) ||
+                    (game.appMode === "save" && selected)
+                ) {
+                    handleReticle();
+                    handleBlurredCover();
+                }
+            }
+        )
+    )
 
 
 
@@ -729,41 +709,7 @@ export default function Baloons(props) {
     //#region [Author UI]
 
 
-    // const AuthorUI = () => {
-    //     return (
-    //         showInstructions() ?
-    //             (<Container>
-    //                 <Message
-    //                     style={{ height: "auto" }}
-    //                     svgIcon={"icons/tap.svg"}
-    //                     showDoneButton={true}
-    //                     onDone={handleCloseInstructions}
-    //                 >
-    //                     Fai TAP sullo schermo per posizionare i palloncini
-    //                     nello spazio intorno a te. L'utente dovrà poi farli
-    //                     scoppiare in un tempo prestabilito.
-    //                 </Message>
-    //             </Container>)
 
-    //             :
-
-    //             (<>
-    //                 <Info>
-    //                     <Info style={{ gap: '0.5rem' }}>
-    //                         <SvgIcon src={'icons/balloon.svg'} color={'var(--color-secondary)'} size={25} />
-    //                         {game.gameData().length}
-    //                     </Info>
-    //                 </Info>
-    //                 <Toolbar
-    //                     buttons={["undo", "save"]}
-    //                     onUndo={handleUndo}
-    //                     onSave={handleSave}
-    //                     undoActive={game.gameData().length > 0}
-    //                     saveActive={hasUnsavedChanges()}
-    //                 />
-    //             </>)
-    //     )
-    // }
 
     const AuthorUI = () => {
         return (
@@ -848,7 +794,7 @@ export default function Baloons(props) {
                         showDoneButton={true}
                         onDone={() => {
                             handleCloseInstructions();
-                            startGame();
+                            start();
                         }}
                     >
                         Fai TAP sullo schermo per lanciare le freccette

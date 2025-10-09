@@ -174,6 +174,7 @@ const UI = (props) => {
             // If no games are created, OR we are adding,
             // show the blurred background
             if (newState === STATE.NEW || props.marker.games.length === 0) {
+                props.setSelectedGameId(null);
                 Reticle.setEnabled(false);
                 context.handleBlurredCover({
                     visible: true,

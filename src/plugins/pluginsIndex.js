@@ -1,3 +1,11 @@
+import pointLightIcon from '/icons/pointLight.svg';
+import hdrIcon from '/icons/HDR.svg';
+import categoryLuciIcon from '/icons/Category_luci.svg';
+import category3DIcon from '/icons/Category_3D.svg';
+import categoryGiochiIcon from '/icons/Category_giochi.svg';
+import categoryCustomIcon from '/icons/Category_custom.svg';
+
+
 /*
 * ===== PLUGINS CATEGORIES =====
 * This list should be NEVER modified!
@@ -7,19 +15,19 @@
 export const PLUGINS_CATEGORIES = [
     {
         name: "Luci",
-        icon: "/icons/Category_luci.svg"
+        icon: categoryLuciIcon
     },
     {
         name: "Oggetti",
-        icon: "/icons/Category_3D.svg"
+        icon: category3DIcon
     },
     {
         name: "Giochi",
-        icon: "/icons/Category_giochi.svg"
+        icon: categoryGiochiIcon
     },
     {
         name: "Custom",
-        icon: "/icons/Category_custom.svg"
+        icon: categoryCustomIcon
     },
 ]
 
@@ -30,12 +38,14 @@ export const PLUGINS_CATEGORIES = [
 * This list MUST be modified when you add (or delete) plugins
 */
 
+
+
 export const PLUGINS_LIST = [
     {
         fileName: "pointLights",
         title: "Luci puntiformi",
         description: "Inserisci luci puntiformi",
-        icon: "/icons/pointLight.svg",
+        icon: pointLightIcon,
         category: 'Luci',
         allowed: 1,
         localized: true,
@@ -48,7 +58,7 @@ export const PLUGINS_LIST = [
         fileName: "envMapBasic",
         title: "Luce HDR",
         description: "Scegli un'immagine in formato High Dynamic Range (HDR) tra quelle disponibili per aggiungere realismo",
-        icon: "/icons/HDR.svg",
+        icon: hdrIcon,
         category: 'Luci',
         allowed: 1,
         localized: false,
