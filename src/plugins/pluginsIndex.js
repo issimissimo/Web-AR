@@ -40,6 +40,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: true,
         interactable: false,
+        editable: true,
         tags: [],
         requirements: {}
     },
@@ -52,6 +53,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: false,
         interactable: false,
+        editable: true,
         tags: [],
         requirements: {}
     },
@@ -64,6 +66,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: false,
         interactable: false,
+        editable: false,
         tags: [],
         requirements: {}
     },
@@ -76,6 +79,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: false,
         interactable: false,
+        editable: false,
         tags: [],
         requirements: {}
     },
@@ -88,6 +92,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: false,
         interactable: false,
+        editable: false,
         tags: [],
         requirements: {}
     },
@@ -100,6 +105,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: true,
         interactable: true,
+        editable: true,
         tags: [],
         requirements: {}
     },
@@ -124,6 +130,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: false,
         interactable: true,
+        editable: false,
         tags: [],
         requirements: {}
     },
@@ -136,6 +143,7 @@ export const PLUGINS_LIST = [
         allowed: 1,
         localized: true,
         interactable: false,
+        editable: false,
         tags: [],
         requirements: {}
     },

@@ -12,7 +12,7 @@ export default function basicSphere(props) {
     */
     const { game } = useGame("basicSphere", props.id, {
 
-        onTap: () => {console.log("TAP SFERA BASE")
+        onTap: () => { if (props.selected) console.log("TAP SFERA BASE")
         },
 
         renderLoop: () => loop()

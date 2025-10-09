@@ -33,7 +33,7 @@ export default function InitialDetection() {
                 svgIcon={'icons/phone.svg'}
                 showReadMore={false}
             >
-                Muovi un pò il telefono intorno per farmi rilevare le superfici
+                Muovi un pò il telefono intorno a te
             </Message>
         </Container>
     )

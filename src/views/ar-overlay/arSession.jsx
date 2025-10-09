@@ -591,14 +591,14 @@ export default function ArSession(props) {
         }
         _blurredCoverStates.push(newState)
 
-        console.log("|||||||||||||||||||||||||| handleBlurredCover:", newState)
+        // console.log("|||||||||||||||||||||||||| handleBlurredCover:", newState)
 
         const stack = new Error().stack
         const caller = stack.split("\n")[2]?.trim() // La seconda linea è il chiamante
-        console.log("handleBlurredCover chiamata da:", caller)
+        // console.log("handleBlurredCover chiamata da:", caller)
 
         if (_blurredCoverTimeout) {
-            console.warn("ANOTHER CALL TO handleBlurredCover IN QUEUE!")
+            // console.warn("ANOTHER CALL TO handleBlurredCover IN QUEUE!")
             clearTimeout(_blurredCoverTimeout)
         }
 

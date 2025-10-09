@@ -54,9 +54,13 @@ export default function pointLights(props) {
 
     // region LIFECYCLE
 
-    createEffect(()=>{
-        console.log("CURRENT LIGHT:", currentLight())
-    })
+    // createEffect(() => {
+    //     console.log("CURRENT LIGHT:", currentLight())
+    // })
+
+    createEffect(on(currentLight, (light) => {
+        console.log("CURRENT LIGHT:", light)
+    }))
 
     /*
      * On mount
@@ -81,11 +85,18 @@ export default function pointLights(props) {
     })
 
     /*
-     * Toggle the helpers visibility
+     * Toggle the helpers visibility and the current light
      */
-    createEffect(() => {
-        game.setAssetVisibleByName("helper", props.selected)
-    })
+    // createEffect(() => {
+    //     game.setAssetVisibleByName("helper", props.selected)
+    // })
+
+    createEffect(on(() => props.selected, (selected) => {
+        game.setAssetVisibleByName("helper", selected);
+        if (!selected && currentLight()) {
+            setCurrentLight(null);
+        }
+    }))
 
     /*
      * Load all saved lights
@@ -159,7 +170,7 @@ export default function pointLights(props) {
         console.log("light stored:", game.gameData())
     }
 
-    
+
     // Create the light and its helper
     function createLight(matrix, color, intensity) {
         const newLight = new THREE.PointLight(color, intensity)

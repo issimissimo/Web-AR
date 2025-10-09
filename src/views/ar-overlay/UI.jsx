@@ -186,9 +186,16 @@ const UI = (props) => {
                 })
 
                 if (newState === STATE.CURRENT) {
-                    // select the last selected game
-                    const id = lastSelectedGameId() ?? props.marker.games[0].id;
-                    props.setSelectedGameId(id);
+                    // select the 1st editable game
+                    // or the last selected game
+                    const id = lastSelectedGameId() ?? getFirstEditableGameId();
+
+                    if (id) {
+                        props.setSelectedGameId(id);
+                    }
+                    // else {
+                    //     setState(STATE.NONE);
+                    // }
                 }
 
                 if (newState === STATE.NONE && context.appMode === "save") {
@@ -200,7 +207,7 @@ const UI = (props) => {
         })
     );
 
-   
+
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -220,6 +227,16 @@ const UI = (props) => {
         }
     }
 
+    const getFirstEditableGameId = () => {
+        for (let i = 0; i < props.marker.games.length; i++) {
+            const game = props.marker.games[i];
+            if (game.enabled && getGameSelectable(game.name)) {
+                return game.id;
+            }
+        }
+        return null;
+    }
+
     const getPluginTitle = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
         return pluginSpecs.title
@@ -233,6 +250,11 @@ const UI = (props) => {
     const getPluginInteractable = (pluginName) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
         return pluginSpecs.interactable
+    }
+
+    const getPluginEditable = (pluginName) => {
+        const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
+        return pluginSpecs.editable
     }
 
     const getPluginIcon = (pluginName) => {
@@ -276,6 +298,10 @@ const UI = (props) => {
             return totalAllowed - nGames
         }
         return totalAllowed
+    }
+
+    const getGameSelectable = (gameName) => {
+        return getPluginInteractable(gameName) || getPluginEditable(gameName);
     }
 
     /**
@@ -480,24 +506,26 @@ const UI = (props) => {
                 >
                     <CurrentItemsContainer>
                         {props.marker.games.map((game) => (
-                            <ToggleButton
-                                id={game.id}
-                                onToggle={(id) => handleToggle(id)}
-                                isOn={game.id === props.selectedGameId}
-                                enabled={game.enabled}
-                            >
-                                <SvgIcon
-                                    src={getPluginIcon(game.name)}
-                                    size={16}
-                                />
-                                {getPluginTitle(game.name)}
-                                {getPluginLocalized(game.name) && (
-                                    <Fa icon={faLocationDot} size="1x" />
-                                )}
-                                {getPluginInteractable(game.name) && (
-                                    <Fa icon={faHandPointUp} size="1x" />
-                                )}
-                            </ToggleButton>
+                            game.enabled && (
+                                <ToggleButton
+                                    id={game.id}
+                                    onToggle={(id) => handleToggle(id)}
+                                    isOn={game.id === props.selectedGameId}
+                                    enabled={getGameSelectable(game.name)}
+                                >
+                                    <SvgIcon
+                                        src={getPluginIcon(game.name)}
+                                        size={16}
+                                    />
+                                    {getPluginTitle(game.name)}
+                                    {getPluginLocalized(game.name) && (
+                                        <Fa icon={faLocationDot} size="1x" />
+                                    )}
+                                    {getPluginInteractable(game.name) && (
+                                        <Fa icon={faHandPointUp} size="1x" />
+                                    )}
+                                </ToggleButton>
+                            )
                         ))}
                     </CurrentItemsContainer>
                 </Show>
