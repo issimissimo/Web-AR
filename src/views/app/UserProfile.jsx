@@ -36,6 +36,7 @@ const FileItem = (props) => {
         padding: 0.3rem;
         margin-bottom: 1rem;
         border-radius: 20px;
+        background: var(--color-dark-transparent);
     `
 
     const FileName = styled("p")`
@@ -62,14 +63,15 @@ const UploadButton = (props) => {
     const StyledLabel = styled("label")`
         position: relative;
         padding: 0.4rem;
-        font-size: 0.9rem;
+        font-size: 1rem;
         font-weight: 700;
         font-family: inherit;
         border-radius: 90px;
-        background: var(--color-primary);
-        color: var(--color-background);
+        background: var(--color-primary-dark);
+        color: white;
         text-align: center;
-        pointer-events: ${props => props.active ? 'auto' : 'none'};
+        font-family: "SebinoSoftMedium";
+        /* pointer-events: ${props => props.active ? 'auto' : 'none'}; */
     `
 
     const Icon = () => <Fa icon={faUpload} size="1x" translateX={1} class="icon" />
@@ -198,7 +200,7 @@ const UserProfile = (props) => {
     `
 
     return (
-        <Container>
+        <Container id="Container">
             {/* HEADER */}
             <Header showUser={false} showBack={true} onClickBack={props.onBack}>
                 <span style={{ color: "var(--color-secondary)" }}>I tuoi </span>
@@ -206,8 +208,8 @@ const UserProfile = (props) => {
             </Header>
 
             {props.user ? (
-                <FitHeight>
-                    <FitHeightScrollable style={{ "margin-top": "2rem", "margin-bottom": "1rem" }}>
+                <FitHeightScrollable id="FitHeight">
+                    <FitHeightScrollable id="FitHeightScrollable"  style={{ "margin-top": "2rem", "margin-bottom": "1rem" }}>
                         <Fa icon={faUser} size="2x" class="icon" />
                         <EmailContainer>
                             <Email>{props.user.email}</Email>
@@ -241,7 +243,7 @@ const UserProfile = (props) => {
                             accept=".glb, .gltf, .GLB, .GLTF"
                         />
                     </UploadButton>
-                </FitHeight>
+                </FitHeightScrollable>
             ) : (
                 <div />
             )}
