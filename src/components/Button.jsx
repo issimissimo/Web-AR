@@ -10,8 +10,8 @@ const StyledButton = styled(Motion.button)`
   width: ${props => props.width || "100%"};
   flex-shrink: 0;
   padding: ${props => props.small ? "0.4rem" : "0.7rem"};
-  font-size: ${props => props.small ? "small" : "1rem"};
-  font-weight: 500;
+  font-size: ${props => props.small ? "small" : "0.9rem"};
+  font-weight: 600;
   font-family: inherit;
   border-radius: 90px;
   background: ${props => props.background ? props.background : 'var(--color-background)'};

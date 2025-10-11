@@ -17,24 +17,14 @@ import {
     faUpload,
 } from "@fortawesome/free-solid-svg-icons"
 
-const EmailContainer = styled("div")`
-    width: 100%;
-    display: flex;
-    justify-content: center;
-`
-
-const Email = styled("p")`
-    font-size: 1rem;
-`
-
 //region FILE ITEM
 const FileItem = (props) => {
     const firebase = useFirebase()
 
     const handleDeleteFile = async () => {
         console.log("cancello:", props.filePath)
-        await firebase.storage.deleteFile(props.filePath);
-        props.onFileDeleted;
+        await firebase.storage.deleteFile(props.filePath)
+        props.onFileDeleted
     }
 
     const FileItemContainer = styled(Motion.div)`
@@ -67,10 +57,42 @@ const FileItem = (props) => {
     )
 }
 
+//region LABEL
+const UploadButton = (props) => {
+    const StyledLabel = styled("label")`
+        position: relative;
+        padding: 0.4rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        font-family: inherit;
+        border-radius: 90px;
+        background: var(--color-primary);
+        color: var(--color-background);
+        text-align: center;
+        pointer-events: ${props => props.active ? 'auto' : 'none'};
+    `
+
+    const Icon = () => <Fa icon={faUpload} size="1x" translateX={1} class="icon" />
+
+    return (
+        <StyledLabel>
+            {props.children}
+            {props.showIcon && <Icon />}
+        </StyledLabel>
+    )
+}
+
 //region USER PROFILE
 const UserProfile = (props) => {
     const firebase = useFirebase()
+
     const [uploadedFiles, setUploadedFiles] = createSignal([])
+    const [selectedFile, setSelectedFile] = createSignal(null)
+    const [uploading, setUploading] = createSignal(false)
+    const [progress, setProgress] = createSignal(0)
+    const [uploadedURL, setUploadedURL] = createSignal(null)
+    const [error, setError] = createSignal(null)
+
     const path = `users/${props.user.uid}/uploads`
 
     onMount(() => {
@@ -86,10 +108,94 @@ const UserProfile = (props) => {
         }
     }
 
+    const handleFileSelect = (event) => {
+        const file = event.target.files[0]
+        if (file) {
+            setSelectedFile(file)
+            setUploadedURL(null)
+            setError(null)
+            console.log(
+                "File selezionato:",
+                file.name,
+                "Dimensione:",
+                file.size,
+                "Tipo:",
+                file.type
+            )
+            handleUpload()
+        }
+    }
+
+    const handleUpload = async () => {
+        const file = selectedFile()
+        if (!file) {
+            setError("Nessun file selezionato")
+            return
+        }
+
+        // const user = auth.user()
+        // if (!user) {
+        //     setError("Utente non autenticato")
+        //     return
+        // }
+
+        setUploading(true)
+        setError(null)
+        setProgress(0)
+
+        try {
+            // Crea un percorso unico usando timestamp
+            const timestamp = Date.now()
+            const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_") // Sanitizza il nome
+            const path = `users/${props.user.uid}/uploads/${fileName}`
+
+            console.log("Inizio upload su percorso:", path)
+
+            // Upload con monitoraggio progresso
+            const url = await firebase.storage.uploadFileWithProgress(
+                path,
+                file,
+                (prog) => {
+                    setProgress(Math.round(prog))
+                    console.log(`Progresso upload: ${Math.round(prog)}%`)
+                }
+                // {
+                //     contentType: file.type,
+                //     customMetadata: {
+                //         uploadedBy: props.user.uid,
+                //         uploadedAt: new Date().toISOString(),
+                //         originalName: file.name,
+                //     },
+                // }
+            )
+
+            setUploadedURL(url)
+            console.log("Upload completato! URL:", url)
+        } catch (err) {
+            console.error("Errore durante l'upload:", err)
+            setError(err.message || "Errore durante l'upload")
+        } finally {
+            setUploading(false)
+            refreshFileList()
+        }
+    }
+
     const handleLogout = async () => {
         await firebase.auth.logout()
         props.onLogout()
     }
+
+    //region RENDER
+
+    const EmailContainer = styled("div")`
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    `
+
+    const Email = styled("p")`
+        font-size: 1rem;
+    `
 
     return (
         <Container>
@@ -126,9 +232,15 @@ const UserProfile = (props) => {
                         ))}
                     </FitHeightScrollable>
 
-                    <Button active={true} border={false} icon={faUpload} onClick={handleLogout}>
-                        Carica file
-                    </Button>
+                    <UploadButton showIcon={!uploading()}>
+                        {uploading() ? progress() + "%" : "Carica nuovo file"}
+                        <input
+                            type="file"
+                            onChange={handleFileSelect}
+                            style={{ display: "none" }}
+                            accept=".glb, .gltf, .GLB, .GLTF"
+                        />
+                    </UploadButton>
                 </FitHeight>
             ) : (
                 <div />
