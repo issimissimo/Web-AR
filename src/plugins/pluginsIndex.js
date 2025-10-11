@@ -145,6 +145,19 @@ export const PLUGINS_LIST = [
         requirements: {}
     },
     {
+        fileName: "placeCustomModel",
+        title: 'Modello custom',
+        description: 'Posiziona su una superficie un modello caricato da dispositivo',
+        icon: null,
+        category: 'Oggetti',
+        allowed: 1,
+        localized: false,
+        interactable: true,
+        editable: true,
+        tags: [],
+        requirements: {}
+    },
+    {
         fileName: "fakeLocalization",
         title: 'Fake per localizzazione',
         description: 'Elimina appena possibile',

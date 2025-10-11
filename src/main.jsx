@@ -19,6 +19,8 @@ import ArSession from "@views/ar-overlay/arSession"
 import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
 
+import StorageTest from "./StorageTest"
+
 /*
  * This function is called by the "Enter AR" button
  * only when we have debugOnDesktop=true in the configuration file
@@ -64,11 +66,11 @@ export default function Main() {
     onMount(() => {
         if (config.production) {
             // disable log
-            console.log = function () { }
+            console.log = function () {}
         }
 
         // set body color
-        setBodyColor();
+        setBodyColor()
 
         // We need to copy the function outside
         // so to be able to use it for debug on desktop purpose
@@ -76,40 +78,35 @@ export default function Main() {
 
         // Auth
         if ("xr" in navigator) {
-            navigator.xr
-                .isSessionSupported("immersive-ar")
-                .then((supported) => {
-                    if (!supported && !config.debugOnDesktop) {
-                        goToArNotSupported()
-                        setLoading(false)
-                    } else {
-                        // Search for URL query string
-                        const urlParams = new URLSearchParams(
-                            window.location.search
-                        )
-                        const hasQueryParams =
-                            urlParams.has("userId") && urlParams.has("markerId")
+            navigator.xr.isSessionSupported("immersive-ar").then((supported) => {
+                if (!supported && !config.debugOnDesktop) {
+                    goToArNotSupported()
+                    setLoading(false)
+                } else {
+                    // Search for URL query string
+                    const urlParams = new URLSearchParams(window.location.search)
+                    const hasQueryParams = urlParams.has("userId") && urlParams.has("markerId")
 
-                        // Access as anonymous
-                        if (hasQueryParams || config.debugLoadMode) {
-                            setCurrentAppMode(() => AppMode.LOAD)
-                            accessAnonymous(urlParams)
+                    // Access as anonymous
+                    if (hasQueryParams || config.debugLoadMode) {
+                        setCurrentAppMode(() => AppMode.LOAD)
+                        accessAnonymous(urlParams)
+                    } else {
+                        // Login or register
+                        setCurrentAppMode(() => AppMode.SAVE)
+                        if (!firebase.auth.authLoading()) {
+                            checkAuthStatus()
                         } else {
-                            // Login or register
-                            setCurrentAppMode(() => AppMode.SAVE)
-                            if (!firebase.auth.authLoading()) {
-                                checkAuthStatus()
-                            } else {
-                                const timer = setInterval(() => {
-                                    if (!firebase.auth.authLoading()) {
-                                        clearInterval(timer)
-                                        checkAuthStatus()
-                                    }
-                                }, 100)
-                            }
+                            const timer = setInterval(() => {
+                                if (!firebase.auth.authLoading()) {
+                                    clearInterval(timer)
+                                    checkAuthStatus()
+                                }
+                            }, 100)
                         }
                     }
-                })
+                }
+            })
         } else {
             goToArNotSupported()
             setLoading(false)
@@ -132,12 +129,8 @@ export default function Main() {
             await firebase.auth.loginAnonymous()
         }
 
-        setUserId(() =>
-            config.debugLoadMode ? config.debugUserId : params.get("userId")
-        )
-        const markerId = config.debugLoadMode
-            ? config.debugMarkerId
-            : params.get("markerId")
+        setUserId(() => (config.debugLoadMode ? config.debugUserId : params.get("userId")))
+        const markerId = config.debugLoadMode ? config.debugMarkerId : params.get("markerId")
         const data = await firebase.firestore.fetchMarker(userId(), markerId)
 
         setupMarker({ id: markerId, data: data }, () => goToAnonymous())
@@ -149,9 +142,7 @@ export default function Main() {
     const checkAuthStatus = async () => {
         if (firebase.auth.user()) {
             if (firebase.auth.user().isAnonymous) {
-                console.log(
-                    "You previously logged as anonymous, so you need to login again"
-                )
+                console.log("You previously logged as anonymous, so you need to login again")
                 goToLogin()
             } else {
                 if (config.production) {
@@ -175,34 +166,30 @@ export default function Main() {
         // from firestore for this marker
         if (marker.id && !marker.data.games) {
             console.log("no marker.data.games provided, now loading them from firestore!")
-            marker.data.games = await firebase.firestore.fetchGames(
-                userId(),
-                marker.id
-            )
+            marker.data.games = await firebase.firestore.fetchGames(userId(), marker.id)
         }
 
         // reorder games by timestamp
         // (last at the end)
-        let sortedGames;
+        let sortedGames
         if (marker?.data?.games) {
             console.log("riordino....")
             sortedGames = marker.data.games.sort((a, b) => {
                 // Controllo rapido dell'esistenza di created.seconds
-                const aSeconds = a?.created?.seconds;
-                const bSeconds = b?.created?.seconds;
+                const aSeconds = a?.created?.seconds
+                const bSeconds = b?.created?.seconds
 
                 // Se uno dei due non ha il timestamp valido
-                if (typeof aSeconds !== 'number' || typeof bSeconds !== 'number') {
+                if (typeof aSeconds !== "number" || typeof bSeconds !== "number") {
                     // Gli elementi senza timestamp vanno alla fine
-                    if (typeof aSeconds !== 'number' && typeof bSeconds === 'number') return 1;
-                    if (typeof aSeconds === 'number' && typeof bSeconds !== 'number') return -1;
-                    return 0;
+                    if (typeof aSeconds !== "number" && typeof bSeconds === "number") return 1
+                    if (typeof aSeconds === "number" && typeof bSeconds !== "number") return -1
+                    return 0
                 }
-                return aSeconds - bSeconds;
-            });
-            marker.data.games = sortedGames;
+                return aSeconds - bSeconds
+            })
+            marker.data.games = sortedGames
         }
-
 
         const newMarker = {
             id: marker.id ?? null,
@@ -226,15 +213,13 @@ export default function Main() {
      * Toggle background visibility
      */
     const setBackgroundVisible = (value) => {
-        document.getElementById("backgroundContainer").style.display = value
-            ? "flex"
-            : "none"
+        document.getElementById("backgroundContainer").style.display = value ? "flex" : "none"
     }
 
     const setBodyColor = () => {
-        const body = document.getElementsByTagName("body")[0];
-        const bgColor = getComputedStyle(body).getPropertyValue('--color-background');
-        body.style.backgroundColor = bgColor;
+        const body = document.getElementsByTagName("body")[0]
+        const bgColor = getComputedStyle(body).getPropertyValue("--color-background")
+        body.style.backgroundColor = bgColor
     }
 
     /**
@@ -275,7 +260,7 @@ export default function Main() {
         if (SceneManager.initialized()) {
             // Update Reticle
             if (frame && Reticle.initialized()) {
-                Reticle.update(frame, (surfType) => { })
+                Reticle.update(frame, (surfType) => {})
                 if (Reticle.enabled()) {
                     setPlaneFound(Reticle.isHitting())
                 }
@@ -330,8 +315,8 @@ export default function Main() {
         }
 
         setGamesRunning(() => [])
-        setBackgroundVisible(true);
-        setBodyColor();
+        setBackgroundVisible(true)
+        setBodyColor()
     }
 
     //#region [return]
@@ -347,20 +332,10 @@ export default function Main() {
                 )
 
             case VIEWS.REGISTER:
-                return (
-                    <Register
-                        onSuccess={goToMarkerList}
-                        onGoToLogin={goToLogin}
-                    />
-                )
+                return <Register onSuccess={goToMarkerList} onGoToLogin={goToLogin} />
 
             case VIEWS.LOGIN:
-                return (
-                    <Login
-                        onSuccess={goToMarkerList}
-                        onGoToRegister={goToRegister}
-                    />
-                )
+                return <Login onSuccess={goToMarkerList} onGoToRegister={goToRegister} />
 
             case VIEWS.MARKER_LIST:
                 return (
@@ -378,10 +353,7 @@ export default function Main() {
                                 like: marker.like,
                                 views: marker.views,
                             }
-                            setupMarker(
-                                { id: marker.id, data: markerData },
-                                () => goToEditMarker()
-                            )
+                            setupMarker({ id: marker.id, data: markerData }, () => goToEditMarker())
                         }}
                         goToUserProfile={goToUserProfile()}
                     />
@@ -432,9 +404,7 @@ export default function Main() {
                             planeFound={planeFound()}
                             gamesRunning={gamesRunning()}
                             resetGamesRunning={setGamesRunning(() => [])}
-                            addGame={(el) =>
-                                setGamesRunning((prev) => [...prev, el])
-                            }
+                            addGame={(el) => setGamesRunning((prev) => [...prev, el])}
                             onNewGameSaved={() => {
                                 const markerData = {
                                     name: currentMarker().name,
