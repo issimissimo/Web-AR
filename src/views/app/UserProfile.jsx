@@ -15,6 +15,7 @@ import {
     faArrowRightFromBracket,
     faTrash,
     faUpload,
+    faFile,
 } from "@fortawesome/free-solid-svg-icons"
 
 //region FILE ITEM
@@ -40,20 +41,25 @@ const FileItem = (props) => {
     `
 
     const FileName = styled("p")`
-        font-size: small;
-        padding-left: 1rem;
         margin: 0;
-        /* color: ${(props) =>
-            props.enabled ? "var(--color-white)" : "var(--color-grey-dark)"}; */
+        color: rgb(184, 184, 184);
         flex: 1;
+    `
+    const FileSize = styled("p")`
+        font-size: small;
+        margin: 0;
+        padding-right: 1rem;
+        color: grey;
     `
 
     return (
         <FileItemContainer class="glass">
-            <ButtonSecondary onClick={() => handleDeleteFile(props.fileName)}>
+            <ButtonSecondary onClick={() => handleDeleteFile(props.file.name)}>
                 <Fa icon={faTrash} size="1x" class="icon" />
             </ButtonSecondary>
-            <FileName>{props.fileName}</FileName>
+            <FileName>{props.file.name}</FileName>
+            <FileSize>{(props.file.size / 1048576).toFixed(2)+"Mb"}</FileSize>
+            
         </FileItemContainer>
     )
 }
@@ -71,7 +77,7 @@ const UploadButton = (props) => {
         color: white;
         text-align: center;
         font-family: "SebinoSoftMedium";
-        /* pointer-events: ${props => props.active ? 'auto' : 'none'}; */
+        /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
     `
 
     const Icon = () => <Fa icon={faUpload} size="1x" translateX={1} class="icon" />
@@ -199,6 +205,13 @@ const UserProfile = (props) => {
         font-size: 1rem;
     `
 
+    const FileItemsContainer = styled("div")`
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    `
+
     return (
         <Container id="Container">
             {/* HEADER */}
@@ -209,8 +222,11 @@ const UserProfile = (props) => {
 
             {props.user ? (
                 <FitHeightScrollable id="FitHeight">
-                    <FitHeightScrollable id="FitHeightScrollable"  style={{ "margin-top": "2rem", "margin-bottom": "1rem" }}>
-                        <Fa icon={faUser} size="2x" class="icon" />
+                    <FitHeightScrollable
+                        id="FitHeightScrollable"
+                        style={{ "margin-top": "2rem", "margin-bottom": "1rem" }}
+                    >
+                        <Fa icon={faUser} size="2x" class="icon" color={"var(--color-secondary)"} />
                         <EmailContainer>
                             <Email>{props.user.email}</Email>
                         </EmailContainer>
@@ -223,15 +239,25 @@ const UserProfile = (props) => {
                             Logout
                         </Button>
 
-                        <Title>File caricati</Title>
-
-                        {uploadedFiles()?.map((file) => (
-                            <FileItem
-                                fileName={file.name}
-                                filePath={path + "/" + file.name}
-                                onFileDeleted={refreshFileList()}
+                        {/* <Title>File caricati</Title> */}
+                        <FileItemsContainer>
+                            <Fa
+                                icon={faFile}
+                                size="2x"
+                                class="icon"
+                                color={"var(--color-secondary)"}
                             />
-                        ))}
+                            <div style={{ height: "1rem" }}></div>
+
+                            {uploadedFiles()?.map((file) => (
+                                <FileItem
+                                    file={file}
+                                    fileName={file.name}
+                                    filePath={path + "/" + file.name}
+                                    onFileDeleted={refreshFileList()}
+                                />
+                            ))}
+                        </FileItemsContainer>
                     </FitHeightScrollable>
 
                     <UploadButton showIcon={!uploading()}>

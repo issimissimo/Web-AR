@@ -15,17 +15,32 @@ import Toolbar from "@views/ar-overlay/Toolbar"
 import Button from "@components/Button"
 import { useFirebase } from "@hooks/useFirebase"
 
+const STATE = {
+    FILE_LIST: "fileList",
+    INSTRUCTIONS: "instructions",
+    GAME: "game",
+}
+
 export default function placeCustomModel(props) {
+    const firebase = useFirebase()
     const { storage, auth } = useFirebase()
-    const [showInstructions, setShowInstructions] = createSignal(true)
+    const [state, setState] = createSignal(STATE.INSTRUCTIONS)
+    // const [showInstructions, setShowInstructions] = createSignal(false)
     // const [modelLoaded, setModelLoaded] = createSignal(false)
     const [spawned, setSpawned] = createSignal(false)
-    const [selectedFile, setSelectedFile] = createSignal(null)
+
+    const [listVisible, setListVisible] = createSignal(false)
+
+    let fileList = []
 
     let shadows, clippingReveal, model, uploadUrl
 
+    // const user = auth.user();
+    // console.log("USER:", user)
+    // const path = `users/${user.uid}/uploads`
+
     const handleCloseInstructions = () => {
-        setShowInstructions(false)
+        setState(STATE.GAME)
         handleReticle()
         handleBlurredCover()
     }
@@ -46,7 +61,7 @@ export default function placeCustomModel(props) {
      */
     const { game } = useGame("placeCustomModel", props.id, {
         onTap: () => {
-            if (Reticle.visible() && Reticle.isHitting() && !showInstructions() && !spawned()) {
+            if (state() === STATE.GAME && Reticle.visible() && Reticle.isHitting() && !spawned()) {
                 game.super.onTap() // audio
                 const hitMatrix = Reticle.getHitMatrix()
                 spawnModel(hitMatrix)
@@ -72,15 +87,33 @@ export default function placeCustomModel(props) {
      * On mount
      */
     onMount(async () => {
-        // robotGlb = await new GLBFile(
-        //     "models/demo/Comau_RACER3/Comau_RACER3.glb",
-        //     {
-        //         aoMap: aoTexture,
-        //         aoMapIntensity: 1.4,
-        //     }
-        // )
+        // load data
+        await game.loadGameData()
 
-        // loadedModel = robotGlb.model
+        // set default data if no data are saved
+        if (!game.gameData()) {
+            console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
+            if (game.appMode === "save") {
+                setState(STATE.FILE_LIST)
+            }
+        } else {
+            const data = game.gameData()
+            console.log("DATA:", data)
+            console.log(">>>>>>>>>>>>> CARICO:", data.fileUrl)
+            // const glbFile = await new GLBFile(data.fileUrl)
+            // model = glbFile.model
+            // if (game.appMode === "save") {
+            //     setState(STATE.GAME)
+            // }
+        }
+
+        // load file list
+        if (game.appMode === "save") {
+            const user = firebase.auth.user()
+            const path = `users/${user.uid}/uploads`
+            fileList = await firebase.storage.listFiles(path)
+            console.log(fileList)
+        }
 
         /*
          * Don't forget to call "game.setInitialized()" at finish
@@ -88,107 +121,16 @@ export default function placeCustomModel(props) {
         game.setInitialized()
     })
 
-    // const handleFileSelect = (event) => {
-    //     const file = event.target.files[0]
-    //     if (file) {
-    //         setSelectedFile(file)
-    //         setUploadedURL(null)
-    //         setError(null)
-    //         console.log(
-    //             "File selezionato:",
-    //             file.name,
-    //             "Dimensione:",
-    //             file.size,
-    //             "Tipo:",
-    //             file.type
-    //         )
-    //     }
-    // }
-
     const loadModel = async (url) => {
         const glbFile = await new GLBFile(url)
         model = glbFile.model
-        handleCloseInstructions();
+        handleCloseInstructions()
     }
-
-    const handleFileSelect = (event) => {
-        const file = event.target.files[0]
-        if (file) {
-            setSelectedFile(file)
-            const reader = new FileReader()
-            reader.onload = function (e) {
-                const url = URL.createObjectURL(file)
-                console.log(url)
-                loadModel(url)
-            }
-            reader.readAsDataURL(file)
-        }
-    }
-
-    const handleUploadFile = async () => {
-        const file = selectedFile()
-        if (!file) {
-            console.error("Nessun file selezionato")
-            return
-        }
-
-        const user = auth.user()
-        if (!user) {
-            console.error("Utente non autenticato")
-            return
-        }
-
-        // setUploading(true)
-        // setError(null)
-        // setProgress(0)
-
-        try {
-            // Crea un percorso unico usando timestamp
-            const timestamp = Date.now()
-            const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_") // Sanitizza il nome
-            const path = `users/${user.uid}/uploads/${timestamp}_${fileName}`
-
-            console.log("Inizio upload su percorso:", path)
-
-            // Upload con monitoraggio progresso
-            uploadUrl = await storage.uploadFileWithProgress(
-                path,
-                file,
-                (prog) => {
-                    // setProgress(Math.round(prog))
-                    console.log(`Progresso upload: ${Math.round(prog)}%`)
-                },
-                {
-                    contentType: file.type,
-                    customMetadata: {
-                        uploadedBy: user.uid,
-                        uploadedAt: new Date().toISOString(),
-                        originalName: file.name,
-                    },
-                }
-            )
-
-            // setUploadedURL(url)
-            console.log("Upload completato! URL:", uploadUrl)
-        } catch (err) {
-            console.error("Errore durante l'upload:", err)
-            // setError(err.message || "Errore durante l'upload")
-        } finally {
-            // setUploading(false)
-
-            game.setGameData({
-                fileUrl: uploadUrl
-            })
-
-            game.saveGameData()
-        }
-    }
-
 
     //region RETICLE AND BLURRED COVER
 
     const handleReticle = () => {
-        if (showInstructions() || spawned()) {
+        if (state() === STATE.GAME || spawned()) {
             Reticle.setEnabled(false)
         } else {
             Reticle.setup(Reticle.MESH_TYPE.RINGS, {
@@ -203,7 +145,7 @@ export default function placeCustomModel(props) {
     }
 
     const handleBlurredCover = () => {
-        if (showInstructions()) {
+        if (state() === STATE.INSTRUCTIONS) {
             game.handleBlurredCover({
                 visible: true,
                 showHole: false,
@@ -279,58 +221,93 @@ export default function placeCustomModel(props) {
         box-sizing: border-box;
     `
 
+    const Instructions = () => {
+        return (
+            <Message
+                style={{ height: "auto" }}
+                svgIcon={"icons/tap.svg"}
+                showDoneButton={true}
+                onDone={handleCloseInstructions}
+            >
+                Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano. <br></br>{" "}
+                Evita i piani troppo riflettenti o uniformi.
+            </Message>
+        )
+    }
+
+    const FileList = () => {
+        return (
+            <>
+                {fileList?.map((file) => (
+                    <Button
+                    // fileName={file.name}
+                    // filePath={path + "/" + file.name}
+                    // onFileDeleted={refreshFileList()}
+                    >
+                        {file.name}
+                    </Button>
+                ))}
+            </>
+        )
+    }
+
     const View = () => {
         return (
-            <Show
-                when={showInstructions()}
-                fallback={
+            <>
+                <Show when={state() === STATE.INSTRUCTIONS}>
+                    <Container>
+                        <Instructions />
+                    </Container>
+                </Show>
+
+                <Show when={state() === STATE.FILE_LIST}>
+                    <Container>
+                        <FileList />
+                    </Container>
+                </Show>
+
+                <Show when={state() === STATE.GAME}>
                     <Toolbar
-                        id="toolbar"
                         buttons={["undo", "save"]}
                         onUndo={handleUndo}
                         undoActive={spawned()}
                         onSave={handleUploadFile}
                         saveActive={selectedFile()}
                     />
-                }
-            >
-                <Container>
-                    <Message
-                        style={{ height: "auto" }}
-                        svgIcon={"icons/tap.svg"}
-                        showDoneButton={true}
-                        onDone={handleCloseInstructions}
-                    >
-                        Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano.{" "}
-                        <br></br> Evita i piani troppo riflettenti o uniformi.
-                    </Message>
-                    {/* <Button onClick={handleFileSelect}>
-                        Carica modello
-                    </Button> */}
-                    <label
-                        style={{
-                            display: "block",
-                            padding: "15px",
-                            "background-color": "#4CAF50",
-                            color: "white",
-                            "text-align": "center",
-                            "border-radius": "8px",
-                            cursor: "pointer",
-                            "font-weight": "bold",
-                        }}
-                    >
-                        {selectedFile() ? "📄 " + selectedFile().name : "📁 Seleziona File"}
-                        <input
-                            type="file"
-                            onChange={handleFileSelect}
-                            style={{ display: "none" }}
-                            accept=".glb, .gltf, .GLB, .GLTF"
-                        />
-                    </label>
-                </Container>
-            </Show>
+                </Show>
+            </>
         )
     }
+
+    // const View = () => {
+    //     return (
+    //         <Show
+    //             when={showInstructions()}
+    //             fallback={
+    //                 <Toolbar
+    //                     id="toolbar"
+    //                     buttons={["undo", "save"]}
+    //                     onUndo={handleUndo}
+    //                     undoActive={spawned()}
+    //                     onSave={handleUploadFile}
+    //                     saveActive={selectedFile()}
+    //                 />
+    //             }
+    //         >
+    //             <Container>
+    //                 <Message
+    //                     style={{ height: "auto" }}
+    //                     svgIcon={"icons/tap.svg"}
+    //                     showDoneButton={true}
+    //                     onDone={handleCloseInstructions}
+    //                 >
+    //                     Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano.{" "}
+    //                     <br></br> Evita i piani troppo riflettenti o uniformi.
+    //                 </Message>
+    //             </Container>
+    //         </Show>
+    //     )
+    // }
 
     const renderView = () => {
         return (
