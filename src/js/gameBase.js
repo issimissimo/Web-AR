@@ -25,6 +25,8 @@ export function useGame(gameName, gameId, config = {}) {
     let gameAssets = []
     const [gameData, setGameData] = createSignal(null)
     const [mountEl, setMountEl] = createSignal(null)
+    const realtimeDbPath = `${context.userId}/markers/${context.markerId}/games/${gameId}`
+
     let _disposer = null
     let _initialized = false
     let _hasMountedView = false
@@ -88,7 +90,6 @@ export function useGame(gameName, gameId, config = {}) {
             if (!el || _disposer) return
             try {
                 _disposer = render(viewFn, el)
-                // console.log(`${gameName}: mounted view into`, el)
             } catch (err) {
                 console.error(`${gameName}: error mounting view`, err)
             }
@@ -100,7 +101,6 @@ export function useGame(gameName, gameId, config = {}) {
                     _disposer()
                 } catch (e) { }
                 _disposer = null
-                // console.log(`${gameName}: disposed mounted view`)
             }
         })
     }
@@ -108,8 +108,7 @@ export function useGame(gameName, gameId, config = {}) {
     // Load game data from Realtime Database
     const loadGameData = async () => {
         try {
-            const path = `${context.userId}/markers/${context.markerId}/games/${gameId}`
-            const data = await firebase.realtimeDb.loadData(path)
+            const data = await firebase.realtimeDb.loadData(realtimeDbPath)
             setGameData(data)
         } catch (error) {
             console.error("Errore nel caricamento JSON:", error)
@@ -118,8 +117,7 @@ export function useGame(gameName, gameId, config = {}) {
 
     const saveGameData = async () => {
         try {
-            const path = `${context.userId}/markers/${context.markerId}/games/${gameId}`
-            await firebase.realtimeDb.saveData(path, gameData())
+            await firebase.realtimeDb.saveData(realtimeDbPath, gameData())
             console.log("Salvati dati in RealtimeDB con ID:", gameId)
         } catch (error) {
             console.log("Errore nel salvataggio JSON:", error)
@@ -217,6 +215,7 @@ export function useGame(gameName, gameId, config = {}) {
         setGameData,
         mountEl,
         mountView,
+        realtimeDbPath
     }
 
     return {

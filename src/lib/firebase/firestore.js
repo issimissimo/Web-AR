@@ -59,6 +59,7 @@ export const fetchUserData = async (userId) => {
  * @param {Object} user - Oggetto utente di Firebase
  */
 export const saveNewUserData = async (user) => {
+    console.log("saveNewUserData:", user)
     try {
         const userRef = doc(firestore, "users", user.uid);
 

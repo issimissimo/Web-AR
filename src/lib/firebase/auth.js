@@ -15,6 +15,7 @@ import { createSignal, onCleanup } from "solid-js";
 
 
 export const registerUser = async (credentials) => {
+    console.log("registerUser:", credentials)
     try {
         const userCredential = await createUserWithEmailAndPassword(
             auth,

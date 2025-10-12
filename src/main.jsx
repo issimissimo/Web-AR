@@ -235,6 +235,7 @@ export default function Main() {
         setCurrentView(VIEWS.LOGIN)
     }
     const goToMarkerList = () => {
+        console.log("goToMarkerList")
         setLoading(() => false)
         setUserId(() => firebase.auth.user().uid)
         setCurrentView(VIEWS.MARKER_LIST)
@@ -333,7 +334,7 @@ export default function Main() {
 
             case VIEWS.REGISTER:
                 return <Register onSuccess={goToMarkerList} onGoToLogin={goToLogin} />
-
+            
             case VIEWS.LOGIN:
                 return <Login onSuccess={goToMarkerList} onGoToRegister={goToRegister} />
 

@@ -23,6 +23,7 @@ const STATE = {
 
 export default function placeCustomModel(props) {
     const firebase = useFirebase()
+
     const { storage, auth } = useFirebase()
     const [state, setState] = createSignal(STATE.INSTRUCTIONS)
     // const [showInstructions, setShowInstructions] = createSignal(false)
@@ -112,6 +113,23 @@ export default function placeCustomModel(props) {
         game.setInitialized()
     })
 
+    /*
+     * REAL TIME
+     */
+    const { data } = firebase.realtimeDb.useRealtimeData(game.realtimeDbPath)
+    createEffect(
+        on(data, (newData) => {
+            // Fai quello che vuoi con i nuovi dati
+            if (props.enabled) {
+                console.log("||||||||||||||||||||||||||||||||||||||||")
+                console.log("Dati aggiornati in realtime:", newData)
+                console.log("||||||||||||||||||||||||||||||||||||||||")
+
+                loadModel(newData.filePath)
+            }
+        })
+    )
+
     const handleCloseInstructions = () => {
         setState(STATE.GAME)
     }
@@ -127,27 +145,41 @@ export default function placeCustomModel(props) {
         // handleReticle()
     }
 
-    const handleSaveData = () => {
+    // const handleSaveData = () => {
+    //     game.saveGameData()
+
+    //     // reset
+    //     setLastSavedGameData(game.gameData())
+    // }
+
+    const handleSaveData = (file) => {
+        const newData = {
+            fileName: file.name,
+            filePath: file.fullPath,
+            rotation: modelRotation(),
+        }
+        game.setGameData(newData)
+
         game.saveGameData()
 
-        // reset
-        setLastSavedGameData(game.gameData())
+        // // reset
+        // setLastSavedGameData(game.gameData())
     }
 
-    const hasUnsavedChanges = createMemo(
-        () => JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
-    )
+    // const hasUnsavedChanges = createMemo(
+    //     () => JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
+    // )
 
     const loadModel = async (path) => {
         setLoading(true)
         console.log("path:", path)
         // setFilePath(path)
 
-        const newData = {
-            filePath: path,
-            rotation: modelRotation(),
-        }
-        game.setGameData(newData)
+        // const newData = {
+        //     filePath: path,
+        //     rotation: modelRotation(),
+        // }
+        // game.setGameData(newData)
 
         let blobUrl = null
 
@@ -289,7 +321,7 @@ export default function placeCustomModel(props) {
         return (
             <>
                 {fileList?.map((file) => (
-                    <Button onClick={() => loadModel(file.fullPath)}>{file.name}</Button>
+                    <Button onClick={() => handleSaveData(file)}>{file.name}</Button>
                 ))}
             </>
         )
