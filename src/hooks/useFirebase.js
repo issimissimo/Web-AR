@@ -31,6 +31,8 @@ import {
     getFileMetadata,
     listFiles,
     deleteAllFilesInDirectory,
+    getFileBlob,
+    getFileBlobURL
 } from '../lib/firebase/storage';
 
 export const useFirebase = () => {
@@ -66,7 +68,7 @@ export const useFirebase = () => {
             addGame: (userId, markerId, name) => addGame(userId, markerId, name),
             updateGame: (userId, markerId, gameId, enabled) => updateGame(userId, markerId, gameId, enabled),
             deleteGame: (userId, markerId, gameId) => deleteGame(userId, markerId, gameId),
-            fetchGames: (userId, markerId) => fetchGames (userId, markerId)
+            fetchGames: (userId, markerId) => fetchGames(userId, markerId)
         },
 
         realtimeDb: {
@@ -83,6 +85,8 @@ export const useFirebase = () => {
             getFileMetadata,
             listFiles,
             deleteAllFilesInDirectory,
+            getFileBlob,
+            getFileBlobURL
         }
     };
 };

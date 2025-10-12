@@ -5,7 +5,8 @@ import {
     getDownloadURL,
     deleteObject,
     listAll,
-    getMetadata
+    getMetadata,
+    getBlob
 } from "firebase/storage";
 import { storage } from "./init";
 
@@ -176,5 +177,39 @@ export const deleteAllFilesInDirectory = async (path) => {
     } catch (error) {
         console.error("Errore nell'eliminazione dei file:", error);
         throw new Error(`Failed to delete files: ${error.message}`);
+    }
+};
+
+/**
+ * Scarica un file come Blob (utile per evitare problemi CORS con Three.js, ecc.)
+ * @param {string} path - Percorso del file nello storage
+ * @returns {Promise<Blob>} Blob del file
+ */
+export const getFileBlob = async (path) => {
+    try {
+        const storageRef = ref(storage, path);
+        const blob = await getBlob(storageRef);
+        console.log(`Blob scaricato per ${path}:`, blob);
+        return blob;
+    } catch (error) {
+        console.error("Errore nel download del blob:", error);
+        throw new Error(`Failed to get file blob: ${error.message}`);
+    }
+};
+
+/**
+ * Scarica un file come Blob e crea un Blob URL locale
+ * @param {string} path - Percorso del file nello storage
+ * @returns {Promise<string>} Blob URL (ricordati di chiamare URL.revokeObjectURL quando hai finito!)
+ */
+export const getFileBlobURL = async (path) => {
+    try {
+        const blob = await getFileBlob(path);
+        const blobUrl = URL.createObjectURL(blob);
+        console.log(`Blob URL creato per ${path}:`, blobUrl);
+        return blobUrl;
+    } catch (error) {
+        console.error("Errore nella creazione del Blob URL:", error);
+        throw new Error(`Failed to create blob URL: ${error.message}`);
     }
 };

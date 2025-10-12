@@ -1,4 +1,4 @@
-import { onMount, createSignal, createEffect, on, Show } from "solid-js"
+import { onMount, createSignal, createEffect, createMemo, on, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { useGame } from "@js/gameBase"
 import Reticle from "@js/reticle"
@@ -27,9 +27,12 @@ export default function placeCustomModel(props) {
     const [state, setState] = createSignal(STATE.INSTRUCTIONS)
     // const [showInstructions, setShowInstructions] = createSignal(false)
     // const [modelLoaded, setModelLoaded] = createSignal(false)
+    const [loading, setLoading] = createSignal(false)
     const [spawned, setSpawned] = createSignal(false)
 
-    const [listVisible, setListVisible] = createSignal(false)
+    const [modelRotation, setModelRotation] = createSignal(0)
+
+    const [lastSavedGameData, setLastSavedGameData] = createSignal({})
 
     let fileList = []
 
@@ -39,33 +42,17 @@ export default function placeCustomModel(props) {
     // console.log("USER:", user)
     // const path = `users/${user.uid}/uploads`
 
-    const handleCloseInstructions = () => {
-        setState(STATE.GAME)
-        handleReticle()
-        handleBlurredCover()
-    }
-
-    const handleUndo = () => {
-        // game.onUndo() // audio
-        // if (shadows) shadows.dispose()
-        // if (audioRobot) audioRobot.stop()
-        // if (clippingReveal) clippingReveal.dispose()
-        // model.resetAnimations()
-        // game.removePreviousFromScene()
-        // setSpawned(false)
-        // handleReticle()
-    }
-
     /*
      * Put here derived functions from Game
      */
     const { game } = useGame("placeCustomModel", props.id, {
         onTap: () => {
             if (state() === STATE.GAME && Reticle.visible() && Reticle.isHitting() && !spawned()) {
+                console.log("TAPPPPPP")
                 game.super.onTap() // audio
                 const hitMatrix = Reticle.getHitMatrix()
                 spawnModel(hitMatrix)
-                // handleReticle();
+                handleReticle()
             }
         },
 
@@ -99,12 +86,13 @@ export default function placeCustomModel(props) {
         } else {
             const data = game.gameData()
             console.log("DATA:", data)
-            console.log(">>>>>>>>>>>>> CARICO:", data.fileUrl)
+            console.log(">>>>>>>>>>>>> CARICO:", data.filePath)
             // const glbFile = await new GLBFile(data.fileUrl)
             // model = glbFile.model
             // if (game.appMode === "save") {
             //     setState(STATE.GAME)
             // }
+            await loadModel(data.filePath)
         }
 
         // load file list
@@ -115,16 +103,72 @@ export default function placeCustomModel(props) {
             console.log(fileList)
         }
 
+        // reset
+        setLastSavedGameData(game.gameData())
+
         /*
          * Don't forget to call "game.setInitialized()" at finish
          */
         game.setInitialized()
     })
 
-    const loadModel = async (url) => {
-        const glbFile = await new GLBFile(url)
-        model = glbFile.model
-        handleCloseInstructions()
+    const handleCloseInstructions = () => {
+        setState(STATE.GAME)
+    }
+
+    const handleUndo = () => {
+        // game.onUndo() // audio
+        // if (shadows) shadows.dispose()
+        // if (audioRobot) audioRobot.stop()
+        // if (clippingReveal) clippingReveal.dispose()
+        // model.resetAnimations()
+        // game.removePreviousFromScene()
+        // setSpawned(false)
+        // handleReticle()
+    }
+
+    const handleSaveData = () => {
+        game.saveGameData()
+
+        // reset
+        setLastSavedGameData(game.gameData())
+    }
+
+    const hasUnsavedChanges = createMemo(
+        () => JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
+    )
+
+    const loadModel = async (path) => {
+        setLoading(true)
+        console.log("path:", path)
+        // setFilePath(path)
+
+        const newData = {
+            filePath: path,
+            rotation: modelRotation(),
+        }
+        game.setGameData(newData)
+
+        let blobUrl = null
+
+        try {
+            const blob = await firebase.storage.getFileBlob(path)
+            blobUrl = URL.createObjectURL(blob)
+
+            const glbFile = await new GLBFile(blobUrl)
+            model = glbFile.model
+            console.log(model)
+
+            URL.revokeObjectURL(blobUrl)
+
+            if (game.appMode === "save") {
+                setState(STATE.GAME)
+            }
+            setLoading(false)
+        } catch (error) {
+            console.error("Errore:", error)
+            if (blobUrl) URL.revokeObjectURL(blobUrl)
+        }
     }
 
     //region RETICLE AND BLURRED COVER
@@ -173,6 +217,13 @@ export default function placeCustomModel(props) {
         )
     )
 
+    createEffect(
+        on(state, (currentState) => {
+            handleReticle()
+            handleBlurredCover()
+        })
+    )
+
     function spawnModel(matrix) {
         const position = new Vector3()
         position.setFromMatrixPosition(matrix)
@@ -205,7 +256,6 @@ export default function placeCustomModel(props) {
             autoStart: true,
             startDelay: 200,
             fadeOutDuration: 2,
-            onComplete: () => console.log("Reveal completed"),
         })
     }
 
@@ -239,13 +289,7 @@ export default function placeCustomModel(props) {
         return (
             <>
                 {fileList?.map((file) => (
-                    <Button
-                    // fileName={file.name}
-                    // filePath={path + "/" + file.name}
-                    // onFileDeleted={refreshFileList()}
-                    >
-                        {file.name}
-                    </Button>
+                    <Button onClick={() => loadModel(file.fullPath)}>{file.name}</Button>
                 ))}
             </>
         )
@@ -268,46 +312,16 @@ export default function placeCustomModel(props) {
 
                 <Show when={state() === STATE.GAME}>
                     <Toolbar
-                        buttons={["undo", "save"]}
+                        buttons={["undo", "list"]}
                         onUndo={handleUndo}
                         undoActive={spawned()}
-                        onSave={handleUploadFile}
-                        saveActive={selectedFile()}
+                        onList={setState(STATE.FILE_LIST)}
+                        highlightList={state() !== STATE.FILE_LIST}
                     />
                 </Show>
             </>
         )
     }
-
-    // const View = () => {
-    //     return (
-    //         <Show
-    //             when={showInstructions()}
-    //             fallback={
-    //                 <Toolbar
-    //                     id="toolbar"
-    //                     buttons={["undo", "save"]}
-    //                     onUndo={handleUndo}
-    //                     undoActive={spawned()}
-    //                     onSave={handleUploadFile}
-    //                     saveActive={selectedFile()}
-    //                 />
-    //             }
-    //         >
-    //             <Container>
-    //                 <Message
-    //                     style={{ height: "auto" }}
-    //                     svgIcon={"icons/tap.svg"}
-    //                     showDoneButton={true}
-    //                     onDone={handleCloseInstructions}
-    //                 >
-    //                     Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano.{" "}
-    //                     <br></br> Evita i piani troppo riflettenti o uniformi.
-    //                 </Message>
-    //             </Container>
-    //         </Show>
-    //     )
-    // }
 
     const renderView = () => {
         return (

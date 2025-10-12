@@ -3,7 +3,7 @@ import { Motion } from "solid-motionone"
 import ButtonCircle from "@components/ButtonCircle"
 import SvgIcon from "@components/SvgIcon"
 import Fa from "solid-fa"
-import { faSave } from "@fortawesome/free-solid-svg-icons"
+import { faSave, faListUl } from "@fortawesome/free-solid-svg-icons"
 
 
 const ContainerToolbar = styled(Motion.div)`
@@ -48,6 +48,17 @@ const Toolbar = (props) => {
                 highlight={true}
             >
                 <Fa icon={faSave} size="1.3x" class="icon" />
+            </ButtonCircle>
+            {/* List button */}
+            <ButtonCircle
+                data-interactive
+                active={props.listActive ?? true}
+                visible={props.buttons.includes("list")}
+                border={false}
+                onClick={props.onList}
+                highlight={props.highlightList}
+            >
+                <Fa icon={faListUl} size="1.3x" class="icon" />
             </ButtonCircle>
         </ContainerToolbar>
     )
