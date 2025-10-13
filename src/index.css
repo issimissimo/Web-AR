@@ -51,6 +51,7 @@ body {
   height: 100dvh;
   position: relative;
   color: var(--color-white);
+  background-color: var(--color-background);
 }
 
 

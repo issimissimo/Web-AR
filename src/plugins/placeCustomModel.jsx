@@ -26,7 +26,7 @@ export default function placeCustomModel(props) {
     const [state, setState] = createSignal(STATE.INSTRUCTIONS)
     const [loading, setLoading] = createSignal(false)
     const [spawned, setSpawned] = createSignal(false)
-
+    const [hitMatrix, setHitMatrix] = createSignal(null)
     const [modelRotation, setModelRotation] = createSignal(0)
 
     let fileList = []
@@ -41,18 +41,16 @@ export default function placeCustomModel(props) {
             if (state() === STATE.GAME && Reticle.visible() && Reticle.isHitting() && !spawned()) {
                 console.log("TAPPPPPP")
                 game.super.onTap() // audio
-                const hitMatrix = Reticle.getHitMatrix()
-                spawnModel(hitMatrix)
+                // const hitMatrix = Reticle.getHitMatrix()
+                setHitMatrix(Reticle.getHitMatrix())
+                spawnModel()
                 handleReticle()
             }
         },
 
         renderLoop: () => {
-            if (props.enabled && spawned()) {
-                // robotGlb.animate()
-                if (shadows) shadows.update()
-                if (clippingReveal) clippingReveal.update()
-            }
+            if (shadows) shadows.update()
+            if (clippingReveal) clippingReveal.update()
         },
 
         close: () => {
@@ -116,16 +114,20 @@ export default function placeCustomModel(props) {
         setState(STATE.GAME)
     }
 
-    const handleClearScene = () => {
+    const clearScene = () => {
         if (shadows) shadows.dispose()
         if (clippingReveal) clippingReveal.dispose()
+        shadows = null
+        clippingReveal = null
+        game.removePreviousFromScene()
     }
 
     const handleUndo = () => {
         game.onUndo() // audio
-        handleClearScene()
+        clearScene()
         // model.resetAnimations()
-        game.removePreviousFromScene()
+        // game.removePreviousFromScene()
+        setHitMatrix(null)
         setSpawned(false)
         handleReticle()
     }
@@ -142,25 +144,38 @@ export default function placeCustomModel(props) {
 
     const loadModel = async (path) => {
         setLoading(true)
-        let blobUrl = null
+
+        if (game.appMode === "save") {
+            setState(STATE.GAME)
+        }
+        // let blobUrl = null
 
         try {
-            const blob = await firebase.storage.getFileBlob(path)
-            blobUrl = URL.createObjectURL(blob)
+            // const blob = await firebase.storage.getFileBlob(path)
+            // blobUrl = URL.createObjectURL(blob)
 
-            const glbFile = await new GLBFile(blobUrl)
+            const fileUrl = await firebase.storage.getFileURL(path)
+
+            const glbFile = await new GLBFile(fileUrl)
             model = glbFile.model
-            console.log(model)
+            // console.log(model)
 
-            URL.revokeObjectURL(blobUrl)
+            // URL.revokeObjectURL(blobUrl)
 
-            if (game.appMode === "save") {
-                setState(STATE.GAME)
-            }
             setLoading(false)
+
+            // if we already have picked
+            // replace the spawned model
+            if (hitMatrix()) {
+                clearScene()
+
+                setTimeout(() => {
+                    spawnModel()
+                }, 200)
+            }
         } catch (error) {
             console.error("Errore:", error)
-            if (blobUrl) URL.revokeObjectURL(blobUrl)
+            // if (blobUrl) URL.revokeObjectURL(blobUrl)
         }
     }
 
@@ -217,14 +232,14 @@ export default function placeCustomModel(props) {
         })
     )
 
-    function spawnModel(matrix) {
+    function spawnModel() {
         const position = new Vector3()
-        position.setFromMatrixPosition(matrix)
+        position.setFromMatrixPosition(hitMatrix())
 
         console.log(position)
 
         const rotation = new Euler()
-        rotation.setFromRotationMatrix(matrix)
+        rotation.setFromRotationMatrix(hitMatrix())
 
         model.position.copy(position)
         model.rotation.copy(rotation)
@@ -234,10 +249,9 @@ export default function placeCustomModel(props) {
 
         setSpawned(true)
 
-        handleReticle();
+        handleReticle()
 
         console.log(model)
-        
 
         shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
             position: position,
@@ -311,6 +325,7 @@ export default function placeCustomModel(props) {
                 </Show>
 
                 <Show when={state() === STATE.GAME}>
+                    {loading() && <p>loading...</p>}
                     <Toolbar
                         buttons={["undo", "list"]}
                         onUndo={handleUndo}
