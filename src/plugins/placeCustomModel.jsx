@@ -1,4 +1,4 @@
-import { onMount, createSignal, createEffect, createMemo, on, Show } from "solid-js"
+import { onMount, createSignal, createEffect, on, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { useGame } from "@js/gameBase"
 import Reticle from "@js/reticle"
@@ -23,25 +23,15 @@ const STATE = {
 
 export default function placeCustomModel(props) {
     const firebase = useFirebase()
-
-    const { storage, auth } = useFirebase()
     const [state, setState] = createSignal(STATE.INSTRUCTIONS)
-    // const [showInstructions, setShowInstructions] = createSignal(false)
-    // const [modelLoaded, setModelLoaded] = createSignal(false)
     const [loading, setLoading] = createSignal(false)
     const [spawned, setSpawned] = createSignal(false)
 
     const [modelRotation, setModelRotation] = createSignal(0)
 
-    const [lastSavedGameData, setLastSavedGameData] = createSignal({})
-
     let fileList = []
 
-    let shadows, clippingReveal, model, uploadUrl
-
-    // const user = auth.user();
-    // console.log("USER:", user)
-    // const path = `users/${user.uid}/uploads`
+    let shadows, clippingReveal, model
 
     /*
      * Put here derived functions from Game
@@ -60,8 +50,8 @@ export default function placeCustomModel(props) {
         renderLoop: () => {
             if (props.enabled && spawned()) {
                 // robotGlb.animate()
-                // if (shadows) shadows.update()
-                // if (clippingReveal) clippingReveal.update()
+                if (shadows) shadows.update()
+                if (clippingReveal) clippingReveal.update()
             }
         },
 
@@ -75,37 +65,29 @@ export default function placeCustomModel(props) {
      * On mount
      */
     onMount(async () => {
+        // load the list of
+        // the available models
+        if (game.appMode === "save") {
+            const path = `users/${game.userId}/uploads`
+            fileList = await firebase.storage.listFiles(path)
+        }
+
         // load data
         await game.loadGameData()
 
-        // set default data if no data are saved
         if (!game.gameData()) {
             console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
             if (game.appMode === "save") {
                 setState(STATE.FILE_LIST)
             }
+            if (game.appMode === "load") {
+                console.warn("Non è stato impostato nessun modello qui!")
+            }
         } else {
+            // load the saved model
             const data = game.gameData()
-            console.log("DATA:", data)
-            console.log(">>>>>>>>>>>>> CARICO:", data.filePath)
-            // const glbFile = await new GLBFile(data.fileUrl)
-            // model = glbFile.model
-            // if (game.appMode === "save") {
-            //     setState(STATE.GAME)
-            // }
             await loadModel(data.filePath)
         }
-
-        // load file list
-        if (game.appMode === "save") {
-            const user = firebase.auth.user()
-            const path = `users/${user.uid}/uploads`
-            fileList = await firebase.storage.listFiles(path)
-            console.log(fileList)
-        }
-
-        // reset
-        setLastSavedGameData(game.gameData())
 
         /*
          * Don't forget to call "game.setInitialized()" at finish
@@ -134,23 +116,19 @@ export default function placeCustomModel(props) {
         setState(STATE.GAME)
     }
 
-    const handleUndo = () => {
-        // game.onUndo() // audio
-        // if (shadows) shadows.dispose()
-        // if (audioRobot) audioRobot.stop()
-        // if (clippingReveal) clippingReveal.dispose()
-        // model.resetAnimations()
-        // game.removePreviousFromScene()
-        // setSpawned(false)
-        // handleReticle()
+    const handleClearScene = () => {
+        if (shadows) shadows.dispose()
+        if (clippingReveal) clippingReveal.dispose()
     }
 
-    // const handleSaveData = () => {
-    //     game.saveGameData()
-
-    //     // reset
-    //     setLastSavedGameData(game.gameData())
-    // }
+    const handleUndo = () => {
+        game.onUndo() // audio
+        handleClearScene()
+        // model.resetAnimations()
+        game.removePreviousFromScene()
+        setSpawned(false)
+        handleReticle()
+    }
 
     const handleSaveData = (file) => {
         const newData = {
@@ -159,28 +137,11 @@ export default function placeCustomModel(props) {
             rotation: modelRotation(),
         }
         game.setGameData(newData)
-
         game.saveGameData()
-
-        // // reset
-        // setLastSavedGameData(game.gameData())
     }
-
-    // const hasUnsavedChanges = createMemo(
-    //     () => JSON.stringify(game.gameData()) !== JSON.stringify(lastSavedGameData())
-    // )
 
     const loadModel = async (path) => {
         setLoading(true)
-        console.log("path:", path)
-        // setFilePath(path)
-
-        // const newData = {
-        //     filePath: path,
-        //     rotation: modelRotation(),
-        // }
-        // game.setGameData(newData)
-
         let blobUrl = null
 
         try {
@@ -206,9 +167,7 @@ export default function placeCustomModel(props) {
     //region RETICLE AND BLURRED COVER
 
     const handleReticle = () => {
-        if (state() === STATE.GAME || spawned()) {
-            Reticle.setEnabled(false)
-        } else {
+        if (state() === STATE.GAME && !spawned()) {
             Reticle.setup(Reticle.MESH_TYPE.RINGS, {
                 size: 0.4,
                 ringNumber: 4,
@@ -217,6 +176,8 @@ export default function placeCustomModel(props) {
             })
             Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
             Reticle.setVisible(true)
+        } else {
+            Reticle.setEnabled(false)
         }
     }
 
@@ -260,6 +221,8 @@ export default function placeCustomModel(props) {
         const position = new Vector3()
         position.setFromMatrixPosition(matrix)
 
+        console.log(position)
+
         const rotation = new Euler()
         rotation.setFromRotationMatrix(matrix)
 
@@ -270,6 +233,11 @@ export default function placeCustomModel(props) {
         game.addToScene(model)
 
         setSpawned(true)
+
+        handleReticle();
+
+        console.log(model)
+        
 
         shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
             position: position,

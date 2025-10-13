@@ -1,6 +1,6 @@
 {
   "production": false,
-  "debugOnDesktop": true,
+  "debugOnDesktop": false,
   "debugLoadMode": false,
   "debugUserId": "ZCzf7sAVUrRKTEgp0Xp7iB8cB5w2",
   "debugMarkerId": "Y6e4eUP6Bsti7in1mIuZ"

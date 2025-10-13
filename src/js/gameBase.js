@@ -192,6 +192,7 @@ export function useGame(gameName, gameId, config = {}) {
     const game = {
         name: gameName,
         id: gameId,
+        userId: context.userId,
         APP_MODE: AppMode,
         appMode: context.appMode,
         setInitialized,
