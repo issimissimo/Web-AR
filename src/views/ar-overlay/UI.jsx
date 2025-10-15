@@ -86,7 +86,7 @@ const CategoriesPicker = (props) => {
                 <>
                     <CategoryItem
                         name={_defaultCategoryName}
-                        icon={"someicon"}
+                        icon={"icons/edit.svg"}
                         selected={props.state === props.STATE.CURRENT}
                         onClick={() => {
                             props.setState(

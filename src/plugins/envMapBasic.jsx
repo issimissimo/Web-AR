@@ -169,8 +169,8 @@ export default function envMapBasic(props) {
 
     const renderView = () => {
         return (
-            <>
-                <Container id="ENV MAP CONTAINER">
+            <Show when={props.selected}>
+                <Container>
                     <SliderContainer data-interactive>
                         <ButtonCircle onClick={prev} border={false} theme={"dark"}>
                             <Fa icon={faChevronLeft} size="1x" class="icon" />
@@ -185,74 +185,11 @@ export default function envMapBasic(props) {
                 </Container>
 
                 <Toolbar buttons={["save"]} onSave={handleSave} saveActive={hasUnsavedChanges()} />
-            </>
+            </Show>
         )
     }
 
-    // const renderView = () => {
-    //     return (
-    //         <Show when={props.selected}>
-    //             <Container>
-    //                 <SliderContainer data-interactive>
-    //                     <ButtonCircle onClick={prev} border={false} theme={"dark"}>
-    //                         <Fa icon={faChevronLeft} size="1x" class="icon" />
-    //                     </ButtonCircle>
-    //                     <FileNameContainer class="glass">
-    //                         {loading() ? "caricamento..." : files[index()]}
-    //                     </FileNameContainer>
-    //                     <ButtonCircle onClick={next} border={false} theme={"dark"}>
-    //                         <Fa icon={faChevronRight} size="1x" class="icon" />
-    //                     </ButtonCircle>
-    //                 </SliderContainer>
-    //             </Container>
-
-    //             <Toolbar buttons={["save"]} onSave={handleSave} saveActive={hasUnsavedChanges()} />
-    //         </Show>
-    //     )
-    // }
-
     
-
-    // const renderView = () => {
-    //     return (
-    //         <>
-    //             {props.selected && (
-    //                 <>
-    //                     <Container>
-    //                         <SliderContainer data-interactive>
-    //                             <ButtonCircle onClick={prev} border={false} theme={'dark'}>
-    //                                 <Fa
-    //                                     icon={faChevronLeft}
-    //                                     size="1x"
-    //                                     class="icon"
-    //                                 />
-    //                             </ButtonCircle>
-    //                             <FileNameContainer class="glass">
-    //                                 {loading()
-    //                                     ? "caricamento..."
-    //                                     : files[index()]}
-    //                             </FileNameContainer>
-    //                             <ButtonCircle onClick={next} border={false} theme={'dark'}>
-    //                                 <Fa
-    //                                     icon={faChevronRight}
-    //                                     size="1x"
-    //                                     class="icon"
-    //                                 />
-    //                             </ButtonCircle>
-    //                         </SliderContainer>
-    //                     </Container>
-
-    //                     <Toolbar
-    //                         buttons={["save"]}
-    //                         onSave={handleSave}
-    //                         saveActive={hasUnsavedChanges()}
-    //                     />
-    //                 </>
-    //             )}
-    //         </>
-    //     )
-    // }
-
     // Delegate mounting to the shared game hook
     game.mountView(renderView)
 }

@@ -150,8 +150,8 @@ export default function Baloons(props) {
                 start()
             }
 
-            handleBlurredCover()
-            handleReticle()
+            // handleBlurredCover()
+            // handleReticle()
         }
     )
 
