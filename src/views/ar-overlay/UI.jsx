@@ -174,9 +174,6 @@ const UI = (props) => {
                         if (id) {
                             props.setSelectedGameId(id)
                         }
-                        // else {
-                        //     setState(STATE.NONE);
-                        // }
                     }
 
                     if (newState === STATE.NONE && context.appMode === "save") {
@@ -309,10 +306,11 @@ const UI = (props) => {
         setSelectedPlugin(newPlugin)
     }
 
-    // Add a new plugin to this marker!!
-    const handleAddNewPlugin = () => {
-        props.addNewPluginToMarker(selectedPlugin().fileName)
-        setSelectedPlugin(null)
+    const handleAddNewPlugin = async () => {
+        // add new plugin AND select it's ID
+        // so to have it immediately selected in the UI
+        const newGameId = await props.addNewPluginToMarker(selectedPlugin().fileName)
+        setLastSelectedGameId(newGameId)
         // change view to CURRENT
         setState(STATE.CURRENT)
     }

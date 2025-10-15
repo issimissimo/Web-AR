@@ -58,13 +58,27 @@ const FileItem = (props) => {
                 <Fa icon={faTrash} size="1x" class="icon" />
             </ButtonSecondary>
             <FileName>{props.file.name}</FileName>
-            <FileSize>{(props.file.size / 1048576).toFixed(2)+"Mb"}</FileSize>
-            
+            <FileSize>{(props.file.size / 1048576).toFixed(2) + "Mb"}</FileSize>
         </FileItemContainer>
     )
 }
 
 //region LABEL
+// const UploadButton = (props) => {
+//     const StyledLabel = styled("label")`
+//         position: relative;
+//         padding: 0.4rem;
+//         font-size: 1rem;
+//         font-weight: 700;
+//         font-family: inherit;
+//         border-radius: 90px;
+//         background: var(--color-primary-dark);
+//         color: white;
+//         text-align: center;
+//         font-family: "SebinoSoftMedium";
+//         /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
+//     `
+
 const UploadButton = (props) => {
     const StyledLabel = styled("label")`
         position: relative;
@@ -73,8 +87,8 @@ const UploadButton = (props) => {
         font-weight: 700;
         font-family: inherit;
         border-radius: 90px;
-        background: var(--color-primary-dark);
-        color: white;
+        background: var(--color-background);
+        color: var(--color-primary);
         text-align: center;
         font-family: "SebinoSoftMedium";
         /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
@@ -117,6 +131,7 @@ const UserProfile = (props) => {
     }
 
     const handleFileSelect = (event) => {
+        if (uploading()) return
         const file = event.target.files[0]
         if (file) {
             setSelectedFile(file)
@@ -130,23 +145,11 @@ const UserProfile = (props) => {
                 "Tipo:",
                 file.type
             )
-            handleUpload()
+            handleUpload(file)
         }
     }
 
-    const handleUpload = async () => {
-        const file = selectedFile()
-        if (!file) {
-            setError("Nessun file selezionato")
-            return
-        }
-
-        // const user = auth.user()
-        // if (!user) {
-        //     setError("Utente non autenticato")
-        //     return
-        // }
-
+    const handleUpload = async (file) => {
         setUploading(true)
         setError(null)
         setProgress(0)
@@ -231,7 +234,6 @@ const UserProfile = (props) => {
                             <Email>{props.user.email}</Email>
                         </EmailContainer>
                         <Button
-                            active={true}
                             border={false}
                             icon={faArrowRightFromBracket}
                             onClick={handleLogout}

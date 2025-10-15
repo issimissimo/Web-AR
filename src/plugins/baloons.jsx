@@ -142,16 +142,12 @@ export default function Baloons(props) {
     useOnce(
         () => props.enabled,
         () => {
-            console.log("BALOONS ENABLED!")
-
             if (game.appMode === "load") {
                 setShowInstructions(true)
+                handleBlurredCover()
             } else {
                 start()
             }
-
-            // handleBlurredCover()
-            // handleReticle()
         }
     )
 
@@ -611,7 +607,7 @@ export default function Baloons(props) {
         align-items: center;
         gap: 2rem;
         justify-content: center;
-        margin-top: 0.5rem;
+        margin-top: 2rem;
     `
 
     const InfoItem = styled("div")`

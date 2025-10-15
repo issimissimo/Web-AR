@@ -12,7 +12,7 @@ import { useFirebase } from "@hooks/useFirebase"
 import { config } from "@js/config"
 import { Matrix4 } from "three"
 import { styled } from "solid-styled-components"
-import useOnce from '@hooks/SolidJS/useOnce';
+import useOnce from "@hooks/SolidJS/useOnce"
 
 // Main components
 import InitialDetection from "./InitialDetection"
@@ -42,17 +42,14 @@ const LOCALIZATION_STATE = {
 export default function ArSession(props) {
     //#region [constants]
     const firebase = useFirebase()
-    const [initDetectionCompleted, setInitDetectionCompleted] =
-        createSignal(false)
-    const [localizationState, setLocalizationState] = createSignal(
-        LOCALIZATION_STATE.NONE
-    )
+    const [initDetectionCompleted, setInitDetectionCompleted] = createSignal(false)
+    const [localizationState, setLocalizationState] = createSignal(LOCALIZATION_STATE.NONE)
     const [referenceMatrix, setReferenceMatrix] = createSignal(new Matrix4())
     const [modules, setModules] = createSignal([])
     const [gamesInitialized, setGamesInitialized] = createSignal(false)
     const [gamesEnabled, setGamesEnabled] = createSignal(false)
     const [selectedGameId, setSelectedGameId] = createSignal(null)
-    const [headerText, setHeaderText] = createSignal("");
+    const [headerText, setHeaderText] = createSignal("")
 
     // Blurred cover
     const [blurVisible, setBlurVisible] = createSignal(false)
@@ -66,9 +63,8 @@ export default function ArSession(props) {
 
     //#region [lifeCycle]
     onMount(() => {
-
         // Initialize the DOM Observer for interactive elements
-        setupDomObserver();
+        setupDomObserver()
 
         // Well, if we do some changes on some scripts,
         // arSession is mounted again each time, so we need
@@ -101,12 +97,9 @@ export default function ArSession(props) {
         setInitDetectionCompleted(false)
 
         if (config.debugOnDesktop) {
-
             // Skip init detection
             setInitDetectionCompleted(true)
-            console.warn(
-                "We are DEBUGGING on desktop and Init detection is skipped!"
-            )
+            console.warn("We are DEBUGGING on desktop and Init detection is skipped!")
         }
         // If not, we must set it to transparent for compatibility on iOS
         else {
@@ -156,7 +149,7 @@ export default function ArSession(props) {
                         // Immediately dispose the temporary root to avoid leaking
                         try {
                             disposer()
-                        } catch (e) { }
+                        } catch (e) {}
                     } catch (e) {
                         console.error("Error executing game onTap:", e)
                     }
@@ -192,13 +185,10 @@ export default function ArSession(props) {
 
             // Bypass all the check for initialization
             // and props.runningGames count
-            console.log(
-                "=== ArSession: no games in this marker, let's set gamesInitialized = true"
-            )
+            console.log("=== ArSession: no games in this marker, let's set gamesInitialized = true")
             setGamesInitialized(true)
         }
     })
-
 
     // createEffect(
     //     on(
@@ -213,10 +203,9 @@ export default function ArSession(props) {
     //     )
     // )
 
-
     onCleanup(() => {
-        cleanupDomObserver();
-        removeClickableDomElements();
+        cleanupDomObserver()
+        removeClickableDomElements()
     })
 
     // createEffect(() => {
@@ -248,49 +237,45 @@ export default function ArSession(props) {
     //     console.log("*******************************")
     // })
 
-
     createEffect(
         on(
             [gamesInitialized, initDetectionCompleted, localizationState],
             ([initialized, detectionCompleted, locState]) => {
-                if (
-                    initialized &&
-                    detectionCompleted &&
-                    locState !== LOCALIZATION_STATE.REQUIRED
-                ) {
-                    console.log(
-                        "=== ArSession: all requirements to set gamesEnabled = true"
-                    )
-                    setGamesEnabled(true);
+                if (initialized && detectionCompleted && locState !== LOCALIZATION_STATE.REQUIRED) {
+                    console.log("=== ArSession: all requirements to set gamesEnabled = true")
+                    setGamesEnabled(true)
 
-                    handleBlurredCover({ visible: false, priority: 1 });
+                    handleBlurredCover({ visible: false, priority: 1 })
                 }
             }
         )
     )
 
-
-    createEffect(on(() => props.gamesRunning, (gamesRunning) => {
-        if (gamesRunning.length > 0) {
-            console.log(
-                "=== ArSession: Games running changed:",
-                gamesRunning
-            )
-            checkAllGamesReady();
-        }
-    }))
-
+    createEffect(
+        on(
+            () => props.gamesRunning,
+            (gamesRunning) => {
+                if (gamesRunning.length > 0) {
+                    console.log("=== ArSession: Games running changed:", gamesRunning)
+                    checkAllGamesReady()
+                }
+            }
+        )
+    )
 
     /** As soon as the Reticle find a surface
      * we want to hide the "InitDetection" component
      * and set prop "enabled={true}" on the games
      */
-    useOnce(() => props.planeFound, () => {
+    useOnce(
+        () => props.planeFound,
+        () => {
             console.log(
                 "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
             )
-            setInitDetectionCompleted(true);
-    });
+            setInitDetectionCompleted(true)
+        }
+    )
     // createEffect(() => {
     //     if (props.planeFound) {
     //         console.log(
@@ -354,10 +339,7 @@ export default function ArSession(props) {
         // Show all the meshes of all the games
         setGamesVisible(true)
 
-        console.log(
-            "=== ArSession: LOCALIZATION COMPLETED! Matrix:",
-            referenceMatrix()
-        )
+        console.log("=== ArSession: LOCALIZATION COMPLETED! Matrix:", referenceMatrix())
         setLocalizationState(() => LOCALIZATION_STATE.COMPLETED)
     }
 
@@ -396,23 +378,15 @@ export default function ArSession(props) {
         // AND all props.gamesRunning are set
         // (I need to check props.gamesRunning too because if initialization
         // is too quick often the game it's not yet set in props.gamesRunning...!)
-        if (
-            _gamesInitialized === _modulesToLoad &&
-            props.gamesRunning.length === _modulesToLoad
-        ) {
+        if (_gamesInitialized === _modulesToLoad && props.gamesRunning.length === _modulesToLoad) {
             // If just one of the game need localization,
             // we need to show the Localization component
             // as soon as all the games initialized
             for (let i = 0; i < props.gamesRunning.length; i++) {
                 const _game = props.gamesRunning[i]
 
-                const gameSpecs = PLUGINS_LIST.find(
-                    (g) => g.fileName === _game.name
-                )
-                if (
-                    gameSpecs.localized &&
-                    localizationState() !== LOCALIZATION_STATE.COMPLETED
-                ) {
+                const gameSpecs = PLUGINS_LIST.find((g) => g.fileName === _game.name)
+                if (gameSpecs.localized && localizationState() !== LOCALIZATION_STATE.COMPLETED) {
                     console.log(
                         "============= ",
                         _game.name,
@@ -442,42 +416,42 @@ export default function ArSession(props) {
      * but, since it's very unpredictable yo know the interactable DOM elements
      * on the page, it should be called also when something on the page change
      */
-    let _mutationObserver = null;
-    let _updateTimeout = null;
+    let _mutationObserver = null
+    let _updateTimeout = null
     let _clickableDomElements = []
     function setupDomObserver() {
         if (_mutationObserver) {
-            _mutationObserver.disconnect();
+            _mutationObserver.disconnect()
         }
-        const targetNode = document.getElementById('ar-overlay');
+        const targetNode = document.getElementById("ar-overlay")
         if (!targetNode) {
-            console.error('ar-overlay non trovato, observer non avviato');
-            return;
+            console.error("ar-overlay non trovato, observer non avviato")
+            return
         }
         const callback = (mutationsList) => {
             // Controlla se ci sono cambiamenti ai nodi figli
-            const hasChanges = mutationsList.some(m => m.type === 'childList');
+            const hasChanges = mutationsList.some((m) => m.type === "childList")
             if (hasChanges) {
-                clearTimeout(_updateTimeout);
+                clearTimeout(_updateTimeout)
                 _updateTimeout = setTimeout(() => {
-                    updateClickableDomElements();
-                }, 100);
+                    updateClickableDomElements()
+                }, 100)
             }
-        };
+        }
         // Configurazione: osserva aggiunte/rimozioni di nodi in tutto il subtree
         const config = {
-            childList: true,  // osserva aggiunte/rimozioni di nodi figli
-            subtree: true,    // osserva anche tutti i discendenti
-        };
+            childList: true, // osserva aggiunte/rimozioni di nodi figli
+            subtree: true, // osserva anche tutti i discendenti
+        }
         // Crea e avvia l'observer
-        _mutationObserver = new MutationObserver(callback);
-        _mutationObserver.observe(targetNode, config);
-        console.log('MutationObserver avviato su #ar-overlay');
+        _mutationObserver = new MutationObserver(callback)
+        _mutationObserver.observe(targetNode, config)
+        console.log("MutationObserver avviato su #ar-overlay")
     }
     function cleanupDomObserver() {
         if (_mutationObserver) {
-            _mutationObserver.disconnect();
-            _mutationObserver = null;
+            _mutationObserver.disconnect()
+            _mutationObserver = null
         }
     }
     function updateClickableDomElements() {
@@ -529,10 +503,8 @@ export default function ArSession(props) {
         })
     }
 
-
-
     const addNewPluginToMarker = async (pluginName) => {
-        console.log("ADESSO AGGIUNGO:", pluginName);
+        console.log("ADESSO AGGIUNGO:", pluginName)
 
         // save new plugin
         const newGameId = await firebase.firestore.addGame(
@@ -541,21 +513,22 @@ export default function ArSession(props) {
             pluginName
         )
 
-        console.log("Creato in Firestore il game con ID:", newGameId);
+        console.log("Creato in Firestore il game con ID:", newGameId)
 
         // refresh current marker
         // (not sure that is necessary. Ideally we should automatically
         // refresh the modules on props.marker.games changed, but
         // actually does not work as it should)
-        props.onNewGameSaved();
+        props.onNewGameSaved()
 
         // reset states and load the new module
-        setGamesInitialized(false);
-        setGamesEnabled(false);
-        _modulesToLoad++;
-        loadModule(newGameId, pluginName, true);
-    }
+        setGamesInitialized(false)
+        setGamesEnabled(false)
+        _modulesToLoad++
+        loadModule(newGameId, pluginName)
 
+        return newGameId
+    }
 
     /**
      * Import module (game) on-demand.
@@ -565,7 +538,7 @@ export default function ArSession(props) {
      * Each "gameRunning" will be added automatically as loaded
      * with the function "handleModuleLoaded")
      */
-    async function loadModule(moduleId, moduleName, selectOnEnd = false) {
+    async function loadModule(moduleId, moduleName) {
         console.log("LOADING:", moduleName)
         const raw = await import(`../../plugins/${moduleName}.jsx`)
         const newModule = {
@@ -574,11 +547,6 @@ export default function ArSession(props) {
             component: raw.default,
         }
         setModules((prev) => [...prev, newModule])
-
-        // Select the new game created
-        if (selectOnEnd) {
-            setSelectedGameId(moduleId)
-        }
     }
 
     const handleBlurredCover = (state = {}) => {
@@ -611,27 +579,25 @@ export default function ArSession(props) {
                     return
                 }
 
-                const highestState = _blurredCoverStates.reduce(
-                    (max, current) => {
-                        return current.priority > max.priority ? current : max
-                    }
-                )
+                const highestState = _blurredCoverStates.reduce((max, current) => {
+                    return current.priority > max.priority ? current : max
+                })
 
-                // // just for debugging
-                // if (_blurredCoverStates.length > 1) {
-                //     console.log(
-                //         ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
-                //     )
-                //     console.log(
-                //         "now setting - visible:",
-                //         highestState.visible,
-                //         "showHole:",
-                //         highestState.showHole
-                //     )
-                //     console.log(
-                //         "********************************************************************"
-                //     )
-                // }
+                // just for debugging
+                if (_blurredCoverStates.length > 1) {
+                    console.log(
+                        ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
+                    )
+                    console.log(
+                        "now setting - visible:",
+                        highestState.visible,
+                        "showHole:",
+                        highestState.showHole
+                    )
+                    console.log(
+                        "********************************************************************"
+                    )
+                }
 
                 setBlurVisible(highestState.visible)
                 setBlurShowHole(highestState.showHole)
@@ -687,10 +653,7 @@ export default function ArSession(props) {
                 />
 
                 {/* HEADER */}
-                <Header
-                    onClickBack={handleGoBack}>
-                    {headerText()}
-                </Header>
+                <Header onClickBack={handleGoBack}>{headerText()}</Header>
 
                 {
                     <>
@@ -704,10 +667,7 @@ export default function ArSession(props) {
                                     <Component
                                         id={item.id}
                                         enabled={gamesEnabled()}
-                                        selected={
-                                            gamesEnabled() &&
-                                            item.id === selectedGameId()
-                                        }
+                                        selected={gamesEnabled() && item.id === selectedGameId()}
                                         referenceMatrix={referenceMatrix()}
                                     />
                                 )
@@ -715,31 +675,26 @@ export default function ArSession(props) {
                         </For>
 
                         {gamesInitialized() &&
-
-                            (!initDetectionCompleted()
-                                ? (<InitialDetection />)
-                                :
-                                localizationState() ===
-                                LOCALIZATION_STATE.REQUIRED && (
+                            (!initDetectionCompleted() ? (
+                                <InitialDetection />
+                            ) : (
+                                localizationState() === LOCALIZATION_STATE.REQUIRED && (
                                     <Localization
                                         planeFound={props.planeFound}
                                         setReferenceMatrix={(matrix) =>
                                             handleLocalizationCompleted(matrix)
                                         }
-                                    />)
-                            )
-                        }
+                                    />
+                                )
+                            ))}
                         <UI
                             visible={gamesEnabled()}
                             marker={props.marker}
                             gamesRunning={props.gamesRunning}
                             addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
                             selectedGameId={selectedGameId()}
-                            setSelectedGameId={(id) =>
-                                setSelectedGameId(id)
-                            }
+                            setSelectedGameId={(id) => setSelectedGameId(id)}
                             setHeaderText={(text) => setHeaderText(text)}
-                            // gamesInitialized={gamesInitialized()}
                         />
                     </>
                 }

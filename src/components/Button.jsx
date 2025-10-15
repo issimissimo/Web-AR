@@ -50,7 +50,7 @@ const Button = (props) => {
   return (
     <StyledButton
       onClick={handleOnClick}
-      active={props.active ?? 1}
+      active={props.active ?? true}
       visible={props.visible ?? true}
       grey={props.grey}
       border={props.border ?? true}
