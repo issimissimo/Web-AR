@@ -190,52 +190,10 @@ export default function ArSession(props) {
         }
     })
 
-    // createEffect(
-    //     on(
-    //         () => props.marker.games.length,
-    //         (gamesLength) => {
-    //             if (gamesLength > 0) {
-    //                 loadAllModules();
-    //             } else {
-    //                 setGamesInitialized(true);
-    //             }
-    //         }
-    //     )
-    // )
-
     onCleanup(() => {
         cleanupDomObserver()
         removeClickableDomElements()
     })
-
-    // createEffect(() => {
-    //     if (
-    //         gamesInitialized() &&
-    //         initDetectionCompleted() &&
-    //         localizationState() !== LOCALIZATION_STATE.REQUIRED
-    //     ) {
-    //         console.log(
-    //             "=== ArSession: all requirements to set gamesEnabled = true"
-    //         )
-    //         setGamesEnabled(true)
-    //     }
-    // })
-
-    // createEffect(() => {
-    //     console.log("ADESSO E' SELEZIONATO IL GAME con ID:", selectedGameId());
-    // })
-
-    // createEffect(on(selectedGameId, (gameId) => {
-    //     if (gameId) {
-    //         console.log("ADESSO E' SELEZIONATO IL GAME con ID:", gameId);
-    //     }
-    // }));
-
-    // createEffect(() => {
-    //     console.log("*******************************")
-    //     console.log("gamesEnabled:", gamesEnabled())
-    //     console.log("*******************************")
-    // })
 
     createEffect(
         on(
@@ -244,7 +202,6 @@ export default function ArSession(props) {
                 if (initialized && detectionCompleted && locState !== LOCALIZATION_STATE.REQUIRED) {
                     console.log("=== ArSession: all requirements to set gamesEnabled = true")
                     setGamesEnabled(true)
-
                     handleBlurredCover({ visible: false, priority: 1 })
                 }
             }
@@ -276,31 +233,6 @@ export default function ArSession(props) {
             setInitDetectionCompleted(true)
         }
     )
-    // createEffect(() => {
-    //     if (props.planeFound) {
-    //         console.log(
-    //             "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
-    //         )
-    //         setInitDetectionCompleted(true);
-    //     }
-    // })
-
-    /** When init detection is completed
-     * we want to hide the blurred cover.
-     * If some other script want to show it, instead,
-     * the handleBlurredCover system should manage them
-     * on the basis of the "priority"
-     */
-    // createEffect(
-    //     on(
-    //         () => initDetectionCompleted(),
-    //         (isCompleted) => {
-    //             if (isCompleted) {
-    //                 handleBlurredCover({ visible: false, priority: 1 })
-    //             }
-    //         }
-    //     )
-    // )
 
     /**
      * Load all the games (as bundles) of the marker.
@@ -315,7 +247,6 @@ export default function ArSession(props) {
                 loadModule(el.id, el.name)
             }
         }
-        // setLoading(() => false);
     }
 
     //#region [handlers]
@@ -559,14 +490,7 @@ export default function ArSession(props) {
         }
         _blurredCoverStates.push(newState)
 
-        // console.log("|||||||||||||||||||||||||| handleBlurredCover:", newState)
-
-        const stack = new Error().stack
-        const caller = stack.split("\n")[2]?.trim() // La seconda linea è il chiamante
-        // console.log("handleBlurredCover chiamata da:", caller)
-
         if (_blurredCoverTimeout) {
-            // console.warn("ANOTHER CALL TO handleBlurredCover IN QUEUE!")
             clearTimeout(_blurredCoverTimeout)
         }
 
@@ -583,21 +507,21 @@ export default function ArSession(props) {
                     return current.priority > max.priority ? current : max
                 })
 
-                // just for debugging
-                if (_blurredCoverStates.length > 1) {
-                    console.log(
-                        ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
-                    )
-                    console.log(
-                        "now setting - visible:",
-                        highestState.visible,
-                        "showHole:",
-                        highestState.showHole
-                    )
-                    console.log(
-                        "********************************************************************"
-                    )
-                }
+                // // just for debugging
+                // if (_blurredCoverStates.length > 1) {
+                //     console.log(
+                //         ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
+                //     )
+                //     console.log(
+                //         "now setting - visible:",
+                //         highestState.visible,
+                //         "showHole:",
+                //         highestState.showHole
+                //     )
+                //     console.log(
+                //         "********************************************************************"
+                //     )
+                // }
 
                 setBlurVisible(highestState.visible)
                 setBlurShowHole(highestState.showHole)
