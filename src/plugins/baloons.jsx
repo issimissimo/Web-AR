@@ -144,10 +144,7 @@ export default function Baloons(props) {
         () => {
             console.log("BALOONS ENABLED!")
 
-            if (
-                game.appMode === "load" ||
-                (game.appMode === "save" && game.gameData().length === 0)
-            ) {
+            if (game.appMode === "load") {
                 setShowInstructions(true)
             } else {
                 start()
@@ -501,12 +498,11 @@ export default function Baloons(props) {
             const particle = new THREE.Mesh(particleGeometry, particleMaterial)
             particle.position.copy(position)
 
-            const direction = new THREE.Vector3
-                (
-                    (Math.random() - 0.5) * 2,
-                    Math.random(),
-                    (Math.random() - 0.5) * 2
-                )
+            const direction = new THREE.Vector3(
+                (Math.random() - 0.5) * 2,
+                Math.random(),
+                (Math.random() - 0.5) * 2
+            )
                 .normalize()
                 .multiplyScalar(0.1)
 
@@ -629,42 +625,25 @@ export default function Baloons(props) {
 
     const AuthorUI = () => {
         return (
-            <Show
-                when={showInstructions()}
-                fallback={
-                    <>
-                        <InfoContainer>
-                            <InfoItem style={{ gap: "0.5rem" }}>
-                                <SvgIcon
-                                    src={"icons/balloon.svg"}
-                                    color={"var(--color-secondary)"}
-                                    size={25}
-                                />
-                                {game.gameData().length}
-                            </InfoItem>
-                        </InfoContainer>
-                        <Toolbar
-                            buttons={["undo", "save"]}
-                            onUndo={handleUndo}
-                            onSave={handleSave}
-                            undoActive={game.gameData().length > 0}
-                            saveActive={hasUnsavedChanges()}
+            <>
+                <InfoContainer>
+                    <InfoItem style={{ gap: "0.5rem" }}>
+                        <SvgIcon
+                            src={"icons/balloon.svg"}
+                            color={"var(--color-secondary)"}
+                            size={25}
                         />
-                    </>
-                }
-            >
-                <MessageContainer>
-                    <Message
-                        style={{ height: "auto" }}
-                        svgIcon={"icons/tap.svg"}
-                        showDoneButton={true}
-                        onDone={handleCloseInstructions}
-                    >
-                        Fai TAP sullo schermo per posizionare i palloncini nello spazio intorno a
-                        te. L'utente dovrà poi farli scoppiare in un tempo prestabilito.
-                    </Message>
-                </MessageContainer>
-            </Show>
+                        {game.gameData().length}
+                    </InfoItem>
+                </InfoContainer>
+                <Toolbar
+                    buttons={["undo", "save"]}
+                    onUndo={handleUndo}
+                    onSave={handleSave}
+                    undoActive={game.gameData().length > 0}
+                    saveActive={hasUnsavedChanges()}
+                />
+            </>
         )
     }
 
@@ -679,13 +658,9 @@ export default function Baloons(props) {
                         {(() => {
                             switch (playerState()) {
                                 case PLAYER_STATE.WINNER:
-                                    return (
-                                        <DotLottieSolid src="lottie/winner.lottie" autoplay />
-                                    )
+                                    return <DotLottieSolid src="lottie/winner.lottie" autoplay />
                                 case PLAYER_STATE.LOOSER:
-                                    return (
-                                        <DotLottieSolid src="lottie/winner.lottie" autoplay />
-                                    )
+                                    return <DotLottieSolid src="lottie/winner.lottie" autoplay />
                                 default:
                                     return (
                                         <InfoContainer>
@@ -734,8 +709,6 @@ export default function Baloons(props) {
             </Show>
         )
     }
-
-    
 
     const renderView = () => {
         return (

@@ -444,6 +444,7 @@ const Reticle = {
     // the Reticle is not displayed AND it does not run,
     // so it's NOT updated and doesn't detect surfaces
     setEnabled(value) {
+        console.log("RECTICLE - SET ENABLED:", value)
         _enabled = value;
     },
 

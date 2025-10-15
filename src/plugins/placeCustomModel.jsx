@@ -7,7 +7,6 @@ import Message from "@components/Message"
 import { Vector3, Euler } from "three"
 import { GLBFile } from "@tools/three/modelTools"
 import { LoadTexture } from "@tools/three/textureTools"
-import { LoadPositionalAudio } from "@tools/three/audioTools"
 import { setMaterialsShadows } from "@tools/three/materialTools"
 import ContactShadowsXR from "@tools/three/ContactShadowsXR"
 import ClippingReveal from "@tools/three/ClippingReveal"
@@ -39,9 +38,7 @@ export default function placeCustomModel(props) {
     const { game } = useGame("placeCustomModel", props.id, {
         onTap: () => {
             if (state() === STATE.GAME && Reticle.visible() && Reticle.isHitting() && !spawned()) {
-                console.log("TAPPPPPP")
                 game.super.onTap() // audio
-                // const hitMatrix = Reticle.getHitMatrix()
                 setHitMatrix(Reticle.getHitMatrix())
                 spawnModel()
                 handleReticle()
@@ -101,10 +98,6 @@ export default function placeCustomModel(props) {
         on(data, (newData) => {
             // Fai quello che vuoi con i nuovi dati
             if (props.enabled) {
-                console.log("||||||||||||||||||||||||||||||||||||||||")
-                console.log("Dati aggiornati in realtime:", newData)
-                console.log("||||||||||||||||||||||||||||||||||||||||")
-
                 loadModel(newData.filePath)
             }
         })
@@ -112,6 +105,8 @@ export default function placeCustomModel(props) {
 
     const handleCloseInstructions = () => {
         setState(STATE.GAME)
+        handleBlurredCover()
+        handleReticle()
     }
 
     const clearScene = () => {
@@ -125,8 +120,6 @@ export default function placeCustomModel(props) {
     const handleUndo = () => {
         game.onUndo() // audio
         clearScene()
-        // model.resetAnimations()
-        // game.removePreviousFromScene()
         setHitMatrix(null)
         setSpawned(false)
         handleReticle()
@@ -148,20 +141,11 @@ export default function placeCustomModel(props) {
         if (game.appMode === "save") {
             setState(STATE.GAME)
         }
-        // let blobUrl = null
 
         try {
-            // const blob = await firebase.storage.getFileBlob(path)
-            // blobUrl = URL.createObjectURL(blob)
-
             const fileUrl = await firebase.storage.getFileURL(path)
-
             const glbFile = await new GLBFile(fileUrl)
             model = glbFile.model
-            // console.log(model)
-
-            // URL.revokeObjectURL(blobUrl)
-
             setLoading(false)
 
             // if we already have picked
@@ -175,12 +159,10 @@ export default function placeCustomModel(props) {
             }
         } catch (error) {
             console.error("Errore:", error)
-            // if (blobUrl) URL.revokeObjectURL(blobUrl)
         }
     }
 
     //region RETICLE AND BLURRED COVER
-
     const handleReticle = () => {
         if (state() === STATE.GAME && !spawned()) {
             Reticle.setup(Reticle.MESH_TYPE.RINGS, {
@@ -225,12 +207,12 @@ export default function placeCustomModel(props) {
         )
     )
 
-    createEffect(
-        on(state, (currentState) => {
-            handleReticle()
-            handleBlurredCover()
-        })
-    )
+    // createEffect(
+    //     on(state, (currentState) => {
+    //         handleReticle()
+    //         handleBlurredCover()
+    //     })
+    // )
 
     function spawnModel() {
         const position = new Vector3()

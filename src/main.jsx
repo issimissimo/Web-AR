@@ -120,6 +120,7 @@ export default function Main() {
         }
     })
 
+
     //#region [functions]
     /**
      * Anonymous access
@@ -263,6 +264,7 @@ export default function Main() {
             if (frame && Reticle.initialized()) {
                 Reticle.update(frame, (surfType) => {})
                 if (Reticle.enabled()) {
+                    // console.log("Reticle.isHitting():", Reticle.isHitting())
                     setPlaneFound(Reticle.isHitting())
                 }
             }
@@ -317,6 +319,7 @@ export default function Main() {
 
         setGamesRunning(() => [])
         setBackgroundVisible(true)
+        setPlaneFound(false)
         setBodyColor()
     }
 

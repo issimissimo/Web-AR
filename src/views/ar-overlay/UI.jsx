@@ -1,12 +1,4 @@
-import {
-    onMount,
-    onCleanup,
-    createSignal,
-    createEffect,
-    useContext,
-    Show,
-    on,
-} from "solid-js"
+import { onMount, onCleanup, createSignal, createEffect, useContext, Show, on } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import Button from "@components/button"
@@ -14,15 +6,10 @@ import Message from "@components/Message"
 import SvgIcon from "@components/SvgIcon"
 import { Context } from "@views/ar-overlay/arSession"
 import Fa from "solid-fa"
-import {
-    faPlus,
-    faLocationDot,
-    faHandPointUp,
-} from "@fortawesome/free-solid-svg-icons"
+import { faPlus, faLocationDot, faHandPointUp } from "@fortawesome/free-solid-svg-icons"
 
 import { PLUGINS_CATEGORIES, PLUGINS_LIST } from "@plugins/pluginsIndex"
 import Reticle from "@js/reticle"
-
 
 //region CATEGORY ITEM
 
@@ -65,11 +52,7 @@ const CategoryItem = (props) => {
             onClick={() => props.onClick(props.name)}
         >
             <IconContainer selected={props.selected}>
-                <SvgIcon
-                    src={props.icon}
-                    size={25}
-                    color={"var(--color-primary)"}
-                />
+                <SvgIcon src={props.icon} size={25} color={"var(--color-primary)"} />
                 <BorderBottomBar
                     animate={{ scaleX: props.selected ? 1 : 0 }}
                     transition={{ duration: 0.3, easing: "ease-in-out" }}
@@ -85,8 +68,7 @@ const CategoryItem = (props) => {
 //region CATEGORY PICKER
 
 const CategoriesPicker = (props) => {
-
-    const _defaultCategoryName = "Modifica";
+    const _defaultCategoryName = "Modifica"
 
     onMount(() => {
         props.onCategoryPicked(_defaultCategoryName)
@@ -121,7 +103,7 @@ const CategoriesPicker = (props) => {
                             icon={category.icon}
                             selected={
                                 props.state === props.STATE.NEW &&
-                                    props.currentCategoryName === category.name
+                                props.currentCategoryName === category.name
                                     ? true
                                     : false
                             }
@@ -156,59 +138,56 @@ const UI = (props) => {
     const [state, setState] = createSignal(STATE.NONE)
     const [currentCategoryName, setCurrentCategoryName] = createSignal(null)
     const [selectedPlugin, setSelectedPlugin] = createSignal(null)
-    const [lastSelectedGameId, setLastSelectedGameId] = createSignal(null);
+    const [lastSelectedGameId, setLastSelectedGameId] = createSignal(null)
     const context = useContext(Context)
 
     onMount(() => {
         // setCurrentCategoryName(() => PLUGINS_CATEGORIES[0].name);
         if (context.appMode === "save") {
-            setState(STATE.CURRENT);
+            setState(STATE.CURRENT)
         }
     })
 
     // Manage state changes
     createEffect(
-        on(state, (newState) => {
-            // console.log("SELECTED STATE:", newState)
+        on([state, () => props.visible], ([newState, visible]) => {
+            if (visible) {
+                // If no games are created, OR we are adding,
+                // show the blurred background
+                if (newState === STATE.NEW || props.marker.games.length === 0) {
+                    props.setSelectedGameId(null)
+                    Reticle.setEnabled(false) // TODO -- NO!
+                    context.handleBlurredCover({
+                        visible: true,
+                        priority: 999,
+                    })
+                } else {
+                    context.handleBlurredCover({
+                        visible: false,
+                    })
 
-            // If no games are created, OR we are adding,
-            // show the blurred background
-            if (newState === STATE.NEW || props.marker.games.length === 0) {
-                props.setSelectedGameId(null);
-                Reticle.setEnabled(false);
-                context.handleBlurredCover({
-                    visible: true,
-                    priority: 999,
-                })
-            }
-            else {
-                context.handleBlurredCover({
-                    visible: false,
-                })
+                    if (newState === STATE.CURRENT) {
+                        // select the 1st editable game
+                        // or the last selected game
+                        const id = lastSelectedGameId() ?? getFirstEditableGameId()
 
-                if (newState === STATE.CURRENT) {
-                    // select the 1st editable game
-                    // or the last selected game
-                    const id = lastSelectedGameId() ?? getFirstEditableGameId();
-
-                    if (id) {
-                        props.setSelectedGameId(id);
+                        if (id) {
+                            props.setSelectedGameId(id)
+                        }
+                        // else {
+                        //     setState(STATE.NONE);
+                        // }
                     }
-                    // else {
-                    //     setState(STATE.NONE);
-                    // }
-                }
 
-                if (newState === STATE.NONE && context.appMode === "save") {
-                    props.setSelectedGameId(null);
-                    props.setHeaderText(null);
-                    Reticle.setEnabled(false);
+                    if (newState === STATE.NONE && context.appMode === "save") {
+                        props.setSelectedGameId(null)
+                        props.setHeaderText(null)
+                        Reticle.setEnabled(false)
+                    }
                 }
             }
         })
-    );
-
-
+    )
 
     const InventoryContainer = styled("div")`
         flex: 1;
@@ -219,23 +198,22 @@ const UI = (props) => {
         opacity: ${(props) => (props.visible ? 1 : 0)};
     `
 
-
     const handleCategorySelected = (categoryName) => {
         setSelectedPlugin(null)
         setCurrentCategoryName(categoryName)
         if (state() !== STATE.NONE) {
-            props.setHeaderText(categoryName);
+            props.setHeaderText(categoryName)
         }
     }
 
     const getFirstEditableGameId = () => {
         for (let i = 0; i < props.marker.games.length; i++) {
-            const game = props.marker.games[i];
+            const game = props.marker.games[i]
             if (game.enabled && getGameSelectable(game.name)) {
-                return game.id;
+                return game.id
             }
         }
-        return null;
+        return null
     }
 
     const getPluginTitle = (pluginName) => {
@@ -262,9 +240,7 @@ const UI = (props) => {
         const pluginSpecs = PLUGINS_LIST.find((g) => g.fileName === pluginName)
         if (pluginSpecs.icon) return pluginSpecs.icon
         const categoryName = pluginSpecs.category
-        const categorySpecs = PLUGINS_CATEGORIES.find(
-            (g) => g.name === categoryName
-        )
+        const categorySpecs = PLUGINS_CATEGORIES.find((g) => g.name === categoryName)
         return categorySpecs.icon
     }
 
@@ -275,9 +251,7 @@ const UI = (props) => {
         let isSomeoneInteractable = false
         for (let i = 0; i < props.marker.games.length; i++) {
             const game = props.marker.games[i]
-            const currentGameSpecs = PLUGINS_LIST.find(
-                (g) => g.fileName === game.name
-            )
+            const currentGameSpecs = PLUGINS_LIST.find((g) => g.fileName === game.name)
             if (currentGameSpecs.interactable) {
                 isSomeoneInteractable = true
                 break
@@ -302,24 +276,23 @@ const UI = (props) => {
     }
 
     const getGameSelectable = (gameName) => {
-        return getPluginInteractable(gameName) || getPluginEditable(gameName);
+        return getPluginInteractable(gameName) || getPluginEditable(gameName)
     }
 
     /**
      * Select game id
      */
     const handleToggle = (id) => {
-
         // Keep selected
-        if (id === props.selectedGameId) return;
+        if (id === props.selectedGameId) return
 
         props.setSelectedGameId(null) // importante! dobbiamo cancellare il DOM prima di procedere
 
         // IMPORTANTE: Aggiungi un piccolo delay per permettere al createEffect di pulire
         // il DOM prima che il nuovo componente tenti di montare la sua view
         setTimeout(() => {
-            props.setSelectedGameId(id);
-            setLastSelectedGameId(id);
+            props.setSelectedGameId(id)
+            setLastSelectedGameId(id)
         }, 10)
     }
 
@@ -328,17 +301,13 @@ const UI = (props) => {
      */
     const handleSelectNewPlugin = (newPlugin) => {
         if (selectedPlugin()) {
-            if (
-                !newPlugin ||
-                newPlugin.fileName === selectedPlugin().fileName
-            ) {
+            if (!newPlugin || newPlugin.fileName === selectedPlugin().fileName) {
                 setSelectedPlugin(null)
                 return
             }
         }
         setSelectedPlugin(newPlugin)
     }
-
 
     // Add a new plugin to this marker!!
     const handleAddNewPlugin = () => {
@@ -418,8 +387,8 @@ const UI = (props) => {
             props.isOn
                 ? "var(--color-secondary)"
                 : props.theme === "dark"
-                    ? "var(--color-dark-transparent)"
-                    : "var(--color-background-transparent)"};
+                ? "var(--color-dark-transparent)"
+                : "var(--color-background-transparent)"};
         border: none;
         pointer-events: ${(props) => (props.enabled ? "auto" : "none")};
         opacity: ${(props) => (props.enabled ? 1 : 0.5)};
@@ -482,12 +451,7 @@ const UI = (props) => {
                     {selectedPlugin().description}
                 </Message>
 
-                <Button
-                    onClick={handleAddNewPlugin}
-                    small={true}
-                    icon={faPlus}
-                    width={"65%"}
-                >
+                <Button onClick={handleAddNewPlugin} small={true} icon={faPlus} width={"65%"}>
                     Aggiungi
                 </Button>
             </PluginDetailsContainer>
@@ -500,81 +464,57 @@ const UI = (props) => {
         <InventoryContainer id="InventoryContainer" visible={props.visible}>
             <Middle id="middle">
                 {/* LIST OF RUNNING GAMES */}
-                <Show
-                    when={
-                        context.appMode === "save" && state() === STATE.CURRENT
-                    }
-                >
+                <Show when={context.appMode === "save" && state() === STATE.CURRENT}>
                     <CurrentItemsContainer>
-                        {props.marker.games.map((game) => (
-                            game.enabled && (
-                                <ToggleButton
-                                    id={game.id}
-                                    onToggle={(id) => handleToggle(id)}
-                                    isOn={game.id === props.selectedGameId}
-                                    enabled={getGameSelectable(game.name)}
-                                >
-                                    <SvgIcon
-                                        src={getPluginIcon(game.name)}
-                                        size={16}
-                                    />
-                                    {getPluginTitle(game.name)}
-                                    {getPluginLocalized(game.name) && (
-                                        <Fa icon={faLocationDot} size="1x" />
-                                    )}
-                                    {getPluginInteractable(game.name) && (
-                                        <Fa icon={faHandPointUp} size="1x" />
-                                    )}
-                                </ToggleButton>
-                            )
-                        ))}
+                        {props.marker.games.map(
+                            (game) =>
+                                game.enabled && (
+                                    <ToggleButton
+                                        id={game.id}
+                                        onToggle={(id) => handleToggle(id)}
+                                        isOn={game.id === props.selectedGameId}
+                                        enabled={getGameSelectable(game.name)}
+                                    >
+                                        <SvgIcon src={getPluginIcon(game.name)} size={16} />
+                                        {getPluginTitle(game.name)}
+                                        {getPluginLocalized(game.name) && (
+                                            <Fa icon={faLocationDot} size="1x" />
+                                        )}
+                                        {getPluginInteractable(game.name) && (
+                                            <Fa icon={faHandPointUp} size="1x" />
+                                        )}
+                                    </ToggleButton>
+                                )
+                        )}
                     </CurrentItemsContainer>
                 </Show>
 
                 {/* LIST OF AVAILABLE GAMES */}
-                <Show
-                    when={context.appMode === "save" && state() === STATE.NEW}
-                >
+                <Show when={context.appMode === "save" && state() === STATE.NEW}>
                     <NewPanelContainer id="NewPanelContainer">
                         <PluginListContainer id="PluginListContainer">
                             {PLUGINS_LIST.map(
                                 (plugin) =>
-                                    plugin.category ===
-                                    currentCategoryName() && (
+                                    plugin.category === currentCategoryName() && (
                                         <ToggleButton
-                                            enabled={getPluginAllowed(
-                                                plugin.fileName
-                                            )}
-                                            onToggle={() =>
-                                                handleSelectNewPlugin(plugin)
-                                            }
+                                            enabled={getPluginAllowed(plugin.fileName)}
+                                            onToggle={() => handleSelectNewPlugin(plugin)}
                                             isOn={
                                                 selectedPlugin()
-                                                    ? selectedPlugin()
-                                                        .fileName ===
-                                                    plugin.fileName
+                                                    ? selectedPlugin().fileName === plugin.fileName
                                                     : false
                                             }
                                         >
                                             <SvgIcon
-                                                src={getPluginIcon(
-                                                    plugin.fileName
-                                                )}
+                                                src={getPluginIcon(plugin.fileName)}
                                                 size={16}
                                             />
                                             {plugin.title}
                                             {plugin.localized && (
-                                                <Fa
-                                                    icon={faLocationDot}
-                                                    size="1x"
-                                                    translateX={0}
-                                                />
+                                                <Fa icon={faLocationDot} size="1x" translateX={0} />
                                             )}
                                             {plugin.interactable && (
-                                                <Fa
-                                                    icon={faHandPointUp}
-                                                    size="1x"
-                                                />
+                                                <Fa icon={faHandPointUp} size="1x" />
                                             )}
                                         </ToggleButton>
                                     )
@@ -590,31 +530,27 @@ const UI = (props) => {
 
                 {/* UI OF THE GAMES !!! DON'T TOUCH! N.B. We can't use Show here
                 because the dome element is observed and must be present*/}
-                <GameUIContainer
-                    id="plugins-ui"
-                    visible={state() !== STATE.NEW}
-                >
+                <GameUIContainer id="plugins-ui" visible={state() !== STATE.NEW}>
                     <Show when={props.marker.games.length === 0}>
                         <Message>
                             <div>
-                                Aggiungi dei componenti scegliendoli dalle
-                                categorie elencate in basso.<br></br> <br></br>
+                                Aggiungi dei componenti scegliendoli dalle categorie elencate in
+                                basso.<br></br> <br></br>
                                 <Fa
                                     icon={faLocationDot}
                                     color={"var(--color-secondary)"}
                                     size="1x"
                                 />{" "}
-                                Alcuni componenti richiedono la localizzazione
-                                rispetto a un marker posizionato nell'ambiente
-                                in cui ti trovi.
+                                Alcuni componenti richiedono la localizzazione rispetto a un marker
+                                posizionato nell'ambiente in cui ti trovi.
                                 <br></br> <br></br>
                                 <Fa
                                     icon={faHandPointUp}
                                     color={"var(--color-secondary)"}
                                     size="1x"
                                 />{" "}
-                                Alcuni componenti richiedono l'interazione
-                                dell'utente, e ne puoi aggiungere solo uno.
+                                Alcuni componenti richiedono l'interazione dell'utente, e ne puoi
+                                aggiungere solo uno.
                                 <br></br> <br></br>
                             </div>
                         </Message>
@@ -628,9 +564,7 @@ const UI = (props) => {
                     <CategoriesPicker
                         visible={true}
                         currentCategoryName={currentCategoryName()}
-                        onCategoryPicked={(name) =>
-                            handleCategorySelected(name)
-                        }
+                        onCategoryPicked={(name) => handleCategorySelected(name)}
                         state={state()}
                         setState={(newState) => setState(newState)}
                         STATE={STATE}
