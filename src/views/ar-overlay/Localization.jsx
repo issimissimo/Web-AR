@@ -29,6 +29,7 @@ export default function Localization(props) {
     })
 
     const handleCloseInstructions = () => {
+        console.log("Chiudo istruzioni e setto Rericle visible!")
         setShowInstructions(false)
         Reticle.setVisible(true)
         context.handleBlurredCover({

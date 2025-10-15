@@ -582,6 +582,7 @@ export default function Baloons(props) {
                     (game.appMode === "load" && enabled && game.gameDetails.interactable) ||
                     (game.appMode === "save" && selected)
                 ) {
+                    console.log("SETUP INIZIALE PER - BALOONS -")
                     handleReticle()
                     handleBlurredCover()
                 }

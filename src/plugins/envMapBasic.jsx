@@ -131,6 +131,7 @@ export default function envMapBasic(props) {
                     (game.appMode === "load" && enabled && game.gameDetails.interactable) ||
                     (game.appMode === "save" && selected)
                 ) {
+                    console.log("SETUP INIZIALE PER - ENV MAP BASIC -")
                     Reticle.setEnabled(false)
                     game.handleBlurredCover({
                         visible: false,
