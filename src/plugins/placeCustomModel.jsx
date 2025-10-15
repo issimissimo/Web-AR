@@ -255,6 +255,31 @@ export default function placeCustomModel(props) {
         })
     }
 
+
+
+    const SliderContainer = styled("div")`
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    `
+
+    const ItemList = styled("div")`
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+    `
+
+
+
+
+
+
+
     //region RENDER
 
     const Container = styled("div")`
@@ -278,6 +303,14 @@ export default function placeCustomModel(props) {
                 Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano. <br></br>{" "}
                 Evita i piani troppo riflettenti o uniformi.
             </Message>
+        )
+    }
+
+    const FilePicker = () =>{
+        return(
+            <>
+                
+            </>
         )
     }
 
