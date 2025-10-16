@@ -87,7 +87,7 @@ export default function placeCustomModel(props) {
         } else {
             // load the saved model
             const data = game.gameData()
-            await loadModel(data.filePath)
+            await loadModel(data)
         }
 
         /*
@@ -104,7 +104,7 @@ export default function placeCustomModel(props) {
         on(data, (newData) => {
             // Fai quello che vuoi con i nuovi dati
             if (props.enabled) {
-                loadModel(newData.filePath)
+                loadModel(newData)
             }
         })
     )
@@ -141,15 +141,17 @@ export default function placeCustomModel(props) {
         game.saveGameData()
     }
 
-    const loadModel = async (path) => {
+    const loadModel = async (data) => {
         setLoading(true)
+
+        setSelectedFileName(data.fileName)
 
         if (game.appMode === "save") {
             setState(STATE.GAME)
         }
 
         try {
-            const fileUrl = await firebase.storage.getFileURL(path)
+            const fileUrl = await firebase.storage.getFileURL(data.filePath)
             const glbFile = await new GLBFile(fileUrl)
             model = glbFile.model
             setLoading(false)
@@ -343,7 +345,7 @@ export default function placeCustomModel(props) {
     `
 
     const ItemListContainer = styled("div")`
-       flex: 1;
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -353,7 +355,7 @@ export default function placeCustomModel(props) {
     `
 
     const FileNameContainer = styled("div")`
-    flex: 1;
+        flex: 1;
         font-size: small;
         font-weight: 500;
         padding: 1rem;
@@ -380,16 +382,12 @@ export default function placeCustomModel(props) {
         return (
             <Show
                 when={fileListOpen()}
-                fallback={
-                <FileItemContainer class="glass">
-                PIPPO
-                </FileItemContainer>}
+                fallback={<FileItemContainer class="glass">{selectedFileName()}</FileItemContainer>}
             >
                 <ItemListContainer>
                     {fileList?.map((file) => (
-                        <FileItemContainer 
-                        onClick={() => handleSaveData(file)}>
-                        {file.name}
+                        <FileItemContainer onClick={() => handleSaveData(file)}>
+                            {file.name}
                         </FileItemContainer>
                     ))}
                 </ItemListContainer>
@@ -402,7 +400,7 @@ export default function placeCustomModel(props) {
             <>
                 <Container>
                     <SliderContainer data-interactive>
-                        <FilePicker/>
+                        <FilePicker />
                         <ButtonCircle
                             onClick={setFileListOpen(!fileListOpen())}
                             border={false}
