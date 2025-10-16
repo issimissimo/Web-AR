@@ -32,6 +32,7 @@ export default function placeCustomModel(props) {
     const [modelRotation, setModelRotation] = createSignal(0)
 
     const [selectedFileName, setSelectedFileName] = createSignal(null)
+    const [loadingFileName, setLoadingFileName] = createSignal(null)
     const [fileListOpen, setFileListOpen] = createSignal(false)
 
     let fileList = []
@@ -142,9 +143,9 @@ export default function placeCustomModel(props) {
     }
 
     const loadModel = async (data) => {
-        setLoading(true)
-
-        setSelectedFileName(data.fileName)
+        // setLoading(true)
+        setLoadingFileName(data.fileName)
+        // setSelectedFileName(data.fileName)
 
         if (game.appMode === "save") {
             setState(STATE.GAME)
@@ -154,7 +155,10 @@ export default function placeCustomModel(props) {
             const fileUrl = await firebase.storage.getFileURL(data.filePath)
             const glbFile = await new GLBFile(fileUrl)
             model = glbFile.model
-            setLoading(false)
+            // setLoading(false)
+            setSelectedFileName(data.fileName)
+            setLoadingFileName(null)
+            setFileListOpen(false)
 
             // if we already have picked
             // replace the spawned model
@@ -346,12 +350,16 @@ export default function placeCustomModel(props) {
 
     const ItemListContainer = styled("div")`
         flex: 1;
+        width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         box-sizing: border-box;
         gap: 1rem;
+        min-height: 40px;
+        padding-bottom: 3px;
+        padding-top: 3px;
     `
 
     const FileNameContainer = styled("div")`
@@ -378,20 +386,36 @@ export default function placeCustomModel(props) {
         box-sizing: border-box;
     `
 
+    const BoxItem = styled("div")`
+        flex: 1;
+        width: 100%;
+        /* display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        box-sizing: border-box; */
+        text-align: center;
+        padding: 0.3rem;
+        border-radius: 20px;
+        background: var(--color-dark-transparent);
+        box-sizing: border-box;
+    `
+
     const FilePicker = () => {
         return (
-            <Show
-                when={fileListOpen()}
-                fallback={<FileItemContainer class="glass">{selectedFileName()}</FileItemContainer>}
-            >
-                <ItemListContainer>
-                    {fileList?.map((file) => (
-                        <FileItemContainer onClick={() => handleSaveData(file)}>
-                            {file.name}
-                        </FileItemContainer>
-                    ))}
-                </ItemListContainer>
-            </Show>
+            <ItemListContainer id="ItemListContainer">
+                <Show when={fileListOpen()}>
+                    <ItemListContainer id="ItemListContainer">
+                        {fileList
+                            ?.filter((file) => file.name !== selectedFileName())
+                            .map((file) => (
+                                <FileItemContainer onClick={() => handleSaveData(file)}>
+                                    {loadingFileName() === file.name ? "caricamento..." : file.name}
+                                </FileItemContainer>
+                            ))}
+                    </ItemListContainer>
+                </Show>
+                <FileItemContainer id="FileItemContainer" class="glass">{selectedFileName()}</FileItemContainer>
+            </ItemListContainer>
         )
     }
 

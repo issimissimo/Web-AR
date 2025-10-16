@@ -25,11 +25,10 @@ const MessageBLock = styled('div')`
     display: flex;
     justify-content: center;
     color: var(--color-white-smoke);
-    font-size: small;
+    font-size: var(--font-size-medium);
     gap: 1rem;
     padding: 2rem;
     padding-top: 0;
-    line-height: 180%;
   `;
 
 const Message = (props) => {
