@@ -12,7 +12,10 @@ import ContactShadowsXR from "@tools/three/ContactShadowsXR"
 import ClippingReveal from "@tools/three/ClippingReveal"
 import Toolbar from "@views/ar-overlay/Toolbar"
 import Button from "@components/Button"
+import ButtonCircle from "@components/ButtonCircle"
 import { useFirebase } from "@hooks/useFirebase"
+import Fa from "solid-fa"
+import { faListUl } from "@fortawesome/free-solid-svg-icons"
 
 const STATE = {
     FILE_LIST: "fileList",
@@ -27,6 +30,9 @@ export default function placeCustomModel(props) {
     const [spawned, setSpawned] = createSignal(false)
     const [hitMatrix, setHitMatrix] = createSignal(null)
     const [modelRotation, setModelRotation] = createSignal(0)
+
+    const [selectedFileName, setSelectedFileName] = createSignal(null)
+    const [fileListOpen, setFileListOpen] = createSignal(false)
 
     let fileList = []
 
@@ -255,42 +261,17 @@ export default function placeCustomModel(props) {
         })
     }
 
-
-
-    const SliderContainer = styled("div")`
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    `
-
-    const ItemList = styled("div")`
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-    `
-
-
-
-
-
-
-
     //region RENDER
 
-    const Container = styled("div")`
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-    `
+    // const Container = styled("div")`
+    //     width: 100%;
+    //     height: 100%;
+    //     display: flex;
+    //     flex-direction: column;
+    //     align-items: center;
+    //     justify-content: center;
+    //     box-sizing: border-box;
+    // `
 
     const Instructions = () => {
         return (
@@ -306,14 +287,6 @@ export default function placeCustomModel(props) {
         )
     }
 
-    const FilePicker = () =>{
-        return(
-            <>
-                
-            </>
-        )
-    }
-
     const FileList = () => {
         return (
             <>
@@ -324,31 +297,122 @@ export default function placeCustomModel(props) {
         )
     }
 
+    // const View = () => {
+    //     return (
+    //         <>
+    //             <Show when={state() === STATE.INSTRUCTIONS}>
+    //                 <Container>
+    //                     <Instructions />
+    //                 </Container>
+    //             </Show>
+
+    //             <Show when={state() === STATE.FILE_LIST}>
+    //                 <Container>
+    //                     <FileList />
+    //                 </Container>
+    //             </Show>
+
+    //             <Show when={state() === STATE.GAME}>
+    //                 {loading() && <p>loading...</p>}
+    //                 <Toolbar
+    //                     buttons={["undo", "list"]}
+    //                     onUndo={handleUndo}
+    //                     undoActive={spawned()}
+    //                     onList={setState(STATE.FILE_LIST)}
+    //                     highlightList={state() !== STATE.FILE_LIST}
+    //                 />
+    //             </Show>
+    //         </>
+    //     )
+    // }
+
+    const Container = styled("div")`
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    `
+
+    const SliderContainer = styled("div")`
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1rem;
+    `
+
+    const ItemListContainer = styled("div")`
+       flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        gap: 1rem;
+    `
+
+    const FileNameContainer = styled("div")`
+    flex: 1;
+        font-size: small;
+        font-weight: 500;
+        padding: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-radius: 90px;
+    `
+
+    const FileItemContainer = styled("div")`
+        flex: 1;
+        width: 100%;
+        /* display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        box-sizing: border-box; */
+        text-align: center;
+        padding: 0.3rem;
+        border-radius: 20px;
+        background: var(--color-dark-transparent);
+        box-sizing: border-box;
+    `
+
+    const FilePicker = () => {
+        return (
+            <Show
+                when={fileListOpen()}
+                fallback={
+                <FileItemContainer class="glass">
+                PIPPO
+                </FileItemContainer>}
+            >
+                <ItemListContainer>
+                    {fileList?.map((file) => (
+                        <FileItemContainer 
+                        onClick={() => handleSaveData(file)}>
+                        {file.name}
+                        </FileItemContainer>
+                    ))}
+                </ItemListContainer>
+            </Show>
+        )
+    }
+
     const View = () => {
         return (
             <>
-                <Show when={state() === STATE.INSTRUCTIONS}>
-                    <Container>
-                        <Instructions />
-                    </Container>
-                </Show>
-
-                <Show when={state() === STATE.FILE_LIST}>
-                    <Container>
-                        <FileList />
-                    </Container>
-                </Show>
-
-                <Show when={state() === STATE.GAME}>
-                    {loading() && <p>loading...</p>}
-                    <Toolbar
-                        buttons={["undo", "list"]}
-                        onUndo={handleUndo}
-                        undoActive={spawned()}
-                        onList={setState(STATE.FILE_LIST)}
-                        highlightList={state() !== STATE.FILE_LIST}
-                    />
-                </Show>
+                <Container>
+                    <SliderContainer data-interactive>
+                        <FilePicker/>
+                        <ButtonCircle
+                            onClick={setFileListOpen(!fileListOpen())}
+                            border={false}
+                            theme={"dark"}
+                        >
+                            <Fa icon={faListUl} size="1x" class="icon" />
+                        </ButtonCircle>
+                    </SliderContainer>
+                </Container>
+                <Toolbar buttons={["undo"]} onUndo={handleUndo} undoActive={spawned()} />
             </>
         )
     }

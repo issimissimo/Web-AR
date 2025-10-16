@@ -195,6 +195,10 @@ export default function ArSession(props) {
         removeClickableDomElements()
     })
 
+    
+    /** When all games are initialized
+     * we can finally set gamesEnabled
+     */
     createEffect(
         on(
             [gamesInitialized, initDetectionCompleted, localizationState],
@@ -208,6 +212,10 @@ export default function ArSession(props) {
         )
     )
 
+    /** When the number of games running change
+     * because a new one has loaded we need
+     * to checkAllGamesReady 
+     */
     createEffect(
         on(
             () => props.gamesRunning,
@@ -246,6 +254,11 @@ export default function ArSession(props) {
                 // load dynamically the module
                 loadModule(el.id, el.name)
             }
+        }
+        // if all games are disabled
+        // let's set initialized, to not stuck
+        if (_modulesToLoad === 0){
+            setGamesInitialized(true)
         }
     }
 
