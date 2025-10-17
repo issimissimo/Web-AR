@@ -451,18 +451,20 @@ export default function placeCustomModel(props) {
     const View = () => {
         return (
             <>
-                <Container>
-                    <SliderContainer data-interactive>
-                        <FilePicker />
-                        <ButtonCircle
-                            onClick={setFileListOpen(!fileListOpen())}
-                            border={false}
-                            theme={"dark"}
-                        >
-                            <Fa icon={faListUl} size="1x" class="icon" />
-                        </ButtonCircle>
-                    </SliderContainer>
-                </Container>
+                <Show when={game.appMode === "save"}>
+                    <Container>
+                        <SliderContainer data-interactive>
+                            <FilePicker />
+                            <ButtonCircle
+                                onClick={setFileListOpen(!fileListOpen())}
+                                border={false}
+                                theme={"dark"}
+                            >
+                                <Fa icon={faListUl} size="1x" class="icon" />
+                            </ButtonCircle>
+                        </SliderContainer>
+                    </Container>
+                </Show>
                 <Toolbar buttons={["undo"]} onUndo={handleUndo} undoActive={spawned()} />
             </>
         )
