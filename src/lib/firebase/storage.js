@@ -121,7 +121,6 @@ export const getFileMetadata = async (path) => {
             customMetadata: metadata.customMetadata || {}
         };
     } catch (error) {
-        console.error("Errore nel recupero metadata:", error);
         throw new Error(`Failed to get metadata: ${error.message}`);
     }
 };

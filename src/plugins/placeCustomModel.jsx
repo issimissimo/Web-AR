@@ -72,6 +72,8 @@ export default function placeCustomModel(props) {
         if (game.appMode === "save") {
             const path = `users/${game.userId}/uploads`
             fileList = await firebase.storage.listFiles(path)
+            console.log(fileList)
+            fileList = fileList.filter((file) => file.name && file.name.endsWith(".glb"))
         }
 
         // load data
@@ -153,10 +155,35 @@ export default function placeCustomModel(props) {
 
         try {
             const fileUrl = await firebase.storage.getFileURL(data.filePath)
-            const glbFile = await new GLBFile(fileUrl)
+
+            // check for ambient occlusion texture to load
+            const fileName = data.fileName
+            // const fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."))
+            const aoPath = data.filePath.substring(0, data.filePath.lastIndexOf(".")) + "_ao.webp"
+            console.log("VERIFICO SE ESISTE LA TEXTURE DI AO:", aoPath)
+            let aoTexture = null
+            let aoTextureUrl = null
+            try {
+                await firebase.storage.getFileMetadata(aoPath)
+                aoTextureUrl = await firebase.storage.getFileURL(aoPath)
+                console.log("✅ Texture AO trovata:", aoTextureUrl)
+            } catch (error) {
+                console.log("ℹ️ Texture AO non presente per questo modello")
+            }
+            if (aoTextureUrl) {
+                aoTexture = await new LoadTexture(aoTextureUrl, {
+                    flipY: true,
+                })
+                console.log("texture AO caricata con successo!")
+            }
+
+            const glbFile = await new GLBFile(fileUrl, {
+                aoMap: aoTexture,
+                aoMapChannel: 2,
+            })
             model = glbFile.model
             // setLoading(false)
-            setSelectedFileName(data.fileName)
+            setSelectedFileName(fileName)
             setLoadingFileName(null)
             setFileListOpen(false)
 
@@ -414,7 +441,9 @@ export default function placeCustomModel(props) {
                             ))}
                     </ItemListContainer>
                 </Show>
-                <FileItemContainer id="FileItemContainer" class="glass">{selectedFileName()}</FileItemContainer>
+                <FileItemContainer id="FileItemContainer" class="glass">
+                    {selectedFileName()}
+                </FileItemContainer>
             </ItemListContainer>
         )
     }

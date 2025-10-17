@@ -268,7 +268,7 @@ const UserProfile = (props) => {
                             type="file"
                             onChange={handleFileSelect}
                             style={{ display: "none" }}
-                            accept=".glb, .gltf, .GLB, .GLTF"
+                            accept=".glb, .webp"
                         />
                     </UploadButton>
                 </FitHeightScrollable>

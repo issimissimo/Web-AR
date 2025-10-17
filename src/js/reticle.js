@@ -417,7 +417,7 @@ const Reticle = {
     // DON't confuse with "mesh.visible" internal property
     // that's handled internally
     setVisible(value) {
-        console.trace("RECTICLE - SET VISIBLE:", value)
+        // console.trace("RECTICLE - SET VISIBLE:", value)
         if (value) {
             if (_workingMode === this.WORKING_MODE.SURFACE) {
                 _reticleMesh._shouldDisplay = true;
@@ -445,7 +445,7 @@ const Reticle = {
     // the Reticle is not displayed AND it does not run,
     // so it's NOT updated and doesn't detect surfaces
     setEnabled(value) {
-        console.log("RECTICLE - SET ENABLED:", value)
+        // console.log("RECTICLE - SET ENABLED:", value)
         _enabled = value;
     },
 
