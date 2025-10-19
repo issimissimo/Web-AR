@@ -36,10 +36,11 @@ export default function placeCustomModel(props) {
      */
     const { game } = useGame("placeCustomModel", props.id, {
         onTap: () => {
-            if (Reticle.visible() && Reticle.isHitting()) {
-                // game.super.onTap() // audio
-                setHitMatrix(Reticle.getHitMatrix())
-                spawnModel()
+            if (props.selected || game.appMode === "load") {
+                if (Reticle.visible() && Reticle.isHitting()) {
+                    setHitMatrix(Reticle.getHitMatrix())
+                    spawnModel()
+                }
             }
         },
 

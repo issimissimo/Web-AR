@@ -213,6 +213,7 @@ export default function Baloons(props) {
             balloonGlb.animate()
 
             if (game.appMode == "load") {
+                
                 if (playerState() === PLAYER_STATE.RUNNING) {
                     updateArrow()
 
@@ -473,9 +474,8 @@ export default function Baloons(props) {
                 createPopEffect(balloon.position, color)
 
                 if (explodedBalloons() == game.gameData().length) {
-                    // console.log("HAI VINTO!")
-
                     endGameWinner()
+                    break
                 }
             }
         }
@@ -536,7 +536,6 @@ export default function Baloons(props) {
             winnerAudio.play()
             setPlayerState(PLAYER_STATE.WINNER)
             clearInterval(interval)
-            
         }, 500)
     }
 
@@ -631,12 +630,13 @@ export default function Baloons(props) {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 9999;
+        pointer-events: none;
     `
     const FullScreenImg = styled("img")`
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+        pointer-events: none;
     `
 
     //#region [Author UI]
@@ -678,13 +678,13 @@ export default function Baloons(props) {
                                 case PLAYER_STATE.WINNER:
                                     return (
                                         <FullScreenImgContainer>
-                                            <FullScreenImg src="images/gif/winner.gif" />
+                                            <FullScreenImg src="images/animations/winner.gif" />
                                         </FullScreenImgContainer>
                                     )
                                 case PLAYER_STATE.LOOSER:
                                     return (
                                         <FullScreenImgContainer>
-                                            <FullScreenImg src="images/gif/winner.gif" />
+                                            <FullScreenImg src="images/animations/game-over.gif" />
                                         </FullScreenImgContainer>
                                     )
                                 default:

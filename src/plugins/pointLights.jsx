@@ -2,23 +2,18 @@ import { onMount, createEffect, createSignal, createMemo, on, Show } from "solid
 import { styled } from "solid-styled-components"
 import { SliderPicker } from "solid-color"
 import { useGame } from "@js/gameBase"
-
 import Reticle from "@js/reticle"
 import Toolbar from "@views/ar-overlay/Toolbar"
-import { config } from "@js/config"
 import * as THREE from "three"
 import useOnce from "@hooks/SolidJS/useOnce"
-import SvgIcon from '@components/SvgIcon';
+import SvgIcon from "@components/SvgIcon"
 
 const defaultGameData = []
 
 export default function pointLights(props) {
     const [currentLight, setCurrentLight] = createSignal(null)
-    const [intensity, setIntensity] = createSignal(5)
+    const [intensity, setIntensity] = createSignal(10)
     const [lastSavedGameData, setLastSavedGameData] = createSignal([])
-
-    // const [color, setColor] = createSignal(0xffffff);
-
     const [color, setColor] = createSignal({
         r: 68,
         g: 107,
@@ -45,7 +40,7 @@ export default function pointLights(props) {
             }
         },
 
-        renderLoop: () => { },
+        renderLoop: () => {},
     })
 
     const hasUnsavedChanges = createMemo(
@@ -53,14 +48,6 @@ export default function pointLights(props) {
     )
 
     // region LIFECYCLE
-
-    // createEffect(() => {
-    //     console.log("CURRENT LIGHT:", currentLight())
-    // })
-
-    createEffect(on(currentLight, (light) => {
-        console.log("CURRENT LIGHT:", light)
-    }))
 
     /*
      * On mount
@@ -87,16 +74,17 @@ export default function pointLights(props) {
     /*
      * Toggle the helpers visibility and the current light
      */
-    // createEffect(() => {
-    //     game.setAssetVisibleByName("helper", props.selected)
-    // })
-
-    createEffect(on(() => props.selected, (selected) => {
-        game.setAssetVisibleByName("helper", selected);
-        if (!selected && currentLight()) {
-            setCurrentLight(null);
-        }
-    }))
+    createEffect(
+        on(
+            () => props.selected,
+            (selected) => {
+                game.setAssetVisibleByName("helper", selected)
+                if (!selected && currentLight()) {
+                    setCurrentLight(null)
+                }
+            }
+        )
+    )
 
     /*
      * Load all saved lights
@@ -170,7 +158,6 @@ export default function pointLights(props) {
         console.log("light stored:", game.gameData())
     }
 
-
     // Create the light and its helper
     function createLight(matrix, color, intensity) {
         const newLight = new THREE.PointLight(color, intensity)
@@ -192,7 +179,6 @@ export default function pointLights(props) {
         const newColor = new THREE.Color(color.hex)
         currentLight().color = newColor
     }
-
 
     //region RETICLE AND BLURRED COVER
 
