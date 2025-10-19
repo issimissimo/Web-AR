@@ -48,82 +48,82 @@ export function RecreateMaterials(
     return model
 }
 
-export function RecreateMaterialsExtended(
-    model,
-    options = {
-        aoMap: null,
-        aoMapIntensity: 1,
-        lightMap: null,
-        lightMapIntensity: 1,
-    }
-) {
-    model.traverse((child) => {
-        if (child.isMesh) {
-            // Proprietà comuni a entrambi i materiali
-            const commonProps = {
-                alphaMap: child.material.alphaMap,
-                bumpMap: child.material.bumpMap,
-                displacementMap: child.material.displacementMap,
-                emissive: child.material.emissive,
-                emissiveMap: child.material.emissiveMap,
-                map: child.material.map,
-                name: child.material.name,
-                normalMap: child.material.normalMap,
-                opacity: child.material.opacity,
-                roughnessMap: child.material.roughnessMap,
-                transparent: child.material.transparent,
-                metalnessMap: child.material.metalnessMap,
-                aoMap: options.aoMap,
-                aoMapIntensity: options.aoMapIntensity,
-                lightMap: options.lightMap,
-                lightMapIntensity: options.lightMapIntensity,
-                color: child.material.color,
-                metalness: child.material.metalness,
-                roughness: child.material.roughness,
-            }
+// export function RecreateMaterialsExtended(
+//     model,
+//     options = {
+//         aoMap: null,
+//         aoMapIntensity: 1,
+//         lightMap: null,
+//         lightMapIntensity: 1,
+//     }
+// ) {
+//     model.traverse((child) => {
+//         if (child.isMesh) {
+//             // Proprietà comuni a entrambi i materiali
+//             const commonProps = {
+//                 alphaMap: child.material.alphaMap,
+//                 bumpMap: child.material.bumpMap,
+//                 displacementMap: child.material.displacementMap,
+//                 emissive: child.material.emissive,
+//                 emissiveMap: child.material.emissiveMap,
+//                 map: child.material.map,
+//                 name: child.material.name,
+//                 normalMap: child.material.normalMap,
+//                 opacity: child.material.opacity,
+//                 roughnessMap: child.material.roughnessMap,
+//                 transparent: child.material.transparent,
+//                 metalnessMap: child.material.metalnessMap,
+//                 aoMap: options.aoMap,
+//                 aoMapIntensity: options.aoMapIntensity,
+//                 lightMap: options.lightMap,
+//                 lightMapIntensity: options.lightMapIntensity,
+//                 color: child.material.color,
+//                 metalness: child.material.metalness,
+//                 roughness: child.material.roughness,
+//             }
 
-            let newMaterial;
+//             let newMaterial;
 
-            // Controlla se il materiale originale è MeshPhysicalMaterial
-            if (child.material.isMeshPhysicalMaterial) {
-                newMaterial = new MeshPhysicalMaterial({
-                    ...commonProps,
-                    // Proprietà specifiche di MeshPhysicalMaterial
-                    clearcoat: child.material.clearcoat,
-                    clearcoatMap: child.material.clearcoatMap,
-                    clearcoatNormalMap: child.material.clearcoatNormalMap,
-                    clearcoatNormalScale: child.material.clearcoatNormalScale,
-                    clearcoatRoughness: child.material.clearcoatRoughness,
-                    clearcoatRoughnessMap: child.material.clearcoatRoughnessMap,
-                    ior: child.material.ior,
-                    reflectivity: child.material.reflectivity,
-                    sheen: child.material.sheen,
-                    sheenColor: child.material.sheenColor,
-                    sheenColorMap: child.material.sheenColorMap,
-                    sheenRoughness: child.material.sheenRoughness,
-                    sheenRoughnessMap: child.material.sheenRoughnessMap,
-                    transmission: child.material.transmission,
-                    transmissionMap: child.material.transmissionMap,
-                    thickness: child.material.thickness,
-                    thicknessMap: child.material.thicknessMap,
-                    attenuationDistance: child.material.attenuationDistance,
-                    attenuationColor: child.material.attenuationColor,
-                    specularIntensity: child.material.specularIntensity,
-                    specularIntensityMap: child.material.specularIntensityMap,
-                    specularColor: child.material.specularColor,
-                    specularColorMap: child.material.specularColorMap,
-                })
-            } else {
-                // Default a MeshStandardMaterial
-                newMaterial = new MeshStandardMaterial(commonProps)
-            }
+//             // Controlla se il materiale originale è MeshPhysicalMaterial
+//             if (child.material.isMeshPhysicalMaterial) {
+//                 newMaterial = new MeshPhysicalMaterial({
+//                     ...commonProps,
+//                     // Proprietà specifiche di MeshPhysicalMaterial
+//                     clearcoat: child.material.clearcoat,
+//                     clearcoatMap: child.material.clearcoatMap,
+//                     clearcoatNormalMap: child.material.clearcoatNormalMap,
+//                     clearcoatNormalScale: child.material.clearcoatNormalScale,
+//                     clearcoatRoughness: child.material.clearcoatRoughness,
+//                     clearcoatRoughnessMap: child.material.clearcoatRoughnessMap,
+//                     ior: child.material.ior,
+//                     reflectivity: child.material.reflectivity,
+//                     sheen: child.material.sheen,
+//                     sheenColor: child.material.sheenColor,
+//                     sheenColorMap: child.material.sheenColorMap,
+//                     sheenRoughness: child.material.sheenRoughness,
+//                     sheenRoughnessMap: child.material.sheenRoughnessMap,
+//                     transmission: child.material.transmission,
+//                     transmissionMap: child.material.transmissionMap,
+//                     thickness: child.material.thickness,
+//                     thicknessMap: child.material.thicknessMap,
+//                     attenuationDistance: child.material.attenuationDistance,
+//                     attenuationColor: child.material.attenuationColor,
+//                     specularIntensity: child.material.specularIntensity,
+//                     specularIntensityMap: child.material.specularIntensityMap,
+//                     specularColor: child.material.specularColor,
+//                     specularColorMap: child.material.specularColorMap,
+//                 })
+//             } else {
+//                 // Default a MeshStandardMaterial
+//                 newMaterial = new MeshStandardMaterial(commonProps)
+//             }
 
-            child.material = newMaterial
-            child.material.needsUpdate = true
-        }
-    })
-    return model
-}
+//             child.material = newMaterial
+//             child.material.needsUpdate = true
+//         }
+//     })
+//     return model
+// }
 
 export function setMaterialsShadows(model, value) {
     model.traverse((child) => {

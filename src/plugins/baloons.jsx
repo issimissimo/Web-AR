@@ -15,7 +15,6 @@ import { GLBFile } from "@tools/three/modelTools"
 import { LoadTexture } from "@tools/three/textureTools"
 import useOnce from "@hooks/SolidJS/useOnce"
 import Message from "@components/Message"
-import { DotLottieSolid } from "@lottiefiles/dotlottie-solid"
 
 const balloonColors = [0xff0000, 0xffff00, 0x00ff00, 0x0000ff, 0xffa500, 0x800080, 0x000000]
 
@@ -62,7 +61,7 @@ export default function Baloons(props) {
 
     let popAudioBuffer
     let balloonExplosionAudioBuffer
-    let whooshAudio
+    let whooshAudio, winnerAudio, gameOverAudio
 
     /*
      * Put here derived functions from Game
@@ -118,6 +117,8 @@ export default function Baloons(props) {
         whooshAudio = await new LoadAudio("sounds/whoosh.ogg", SceneManager.listener, {
             volume: 0.1,
         })
+        winnerAudio = await new LoadAudio("sounds/winner.ogg", SceneManager.listener)
+        gameOverAudio = await new LoadAudio("sounds/game-over.ogg", SceneManager.listener)
 
         // Setup data
         await game.loadGameData()
@@ -530,18 +531,21 @@ export default function Baloons(props) {
     }
 
     function endGameWinner() {
+        console.log("HAI VINTO!!!")
         setTimeout(() => {
+            winnerAudio.play()
             setPlayerState(PLAYER_STATE.WINNER)
             clearInterval(interval)
-            console.log("HAI VINTO!!!")
+            
         }, 500)
     }
 
     function endGameLooser() {
+        console.log("HAI PERSO!!!")
         setTimeout(() => {
+            gameOverAudio.play()
             setPlayerState(PLAYER_STATE.LOOSER)
             clearInterval(interval)
-            console.log("HAI PERSO!!!")
         }, 500)
     }
 
@@ -618,6 +622,23 @@ export default function Baloons(props) {
         justify-content: center;
     `
 
+    const FullScreenImgContainer = styled("div")`
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    `
+    const FullScreenImg = styled("img")`
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    `
+
     //#region [Author UI]
 
     const AuthorUI = () => {
@@ -655,9 +676,17 @@ export default function Baloons(props) {
                         {(() => {
                             switch (playerState()) {
                                 case PLAYER_STATE.WINNER:
-                                    return <DotLottieSolid src="lottie/winner.lottie" autoplay />
+                                    return (
+                                        <FullScreenImgContainer>
+                                            <FullScreenImg src="images/gif/winner.gif" />
+                                        </FullScreenImgContainer>
+                                    )
                                 case PLAYER_STATE.LOOSER:
-                                    return <DotLottieSolid src="lottie/winner.lottie" autoplay />
+                                    return (
+                                        <FullScreenImgContainer>
+                                            <FullScreenImg src="images/gif/winner.gif" />
+                                        </FullScreenImgContainer>
+                                    )
                                 default:
                                     return (
                                         <InfoContainer>

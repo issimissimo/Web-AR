@@ -17,26 +17,18 @@ import { useFirebase } from "@hooks/useFirebase"
 import Fa from "solid-fa"
 import { faListUl } from "@fortawesome/free-solid-svg-icons"
 
-const STATE = {
-    FILE_LIST: "fileList",
-    INSTRUCTIONS: "instructions",
-    GAME: "game",
-}
-
 export default function placeCustomModel(props) {
     const firebase = useFirebase()
-    const [state, setState] = createSignal(STATE.INSTRUCTIONS)
-    const [loading, setLoading] = createSignal(false)
     const [spawned, setSpawned] = createSignal(false)
     const [hitMatrix, setHitMatrix] = createSignal(null)
     const [modelRotation, setModelRotation] = createSignal(0)
 
     const [selectedFileName, setSelectedFileName] = createSignal(null)
     const [loadingFileName, setLoadingFileName] = createSignal(null)
-    const [fileListOpen, setFileListOpen] = createSignal(false)
+    const [showFileList, setShowFileList] = createSignal(false)
+    const [showInstructions, setShowInstructions] = createSignal(false)
 
     let fileList = []
-
     let shadows, clippingReveal, model
 
     /*
@@ -44,11 +36,10 @@ export default function placeCustomModel(props) {
      */
     const { game } = useGame("placeCustomModel", props.id, {
         onTap: () => {
-            if (state() === STATE.GAME && Reticle.visible() && Reticle.isHitting() && !spawned()) {
-                game.super.onTap() // audio
+            if (Reticle.visible() && Reticle.isHitting()) {
+                // game.super.onTap() // audio
                 setHitMatrix(Reticle.getHitMatrix())
                 spawnModel()
-                handleReticle()
             }
         },
 
@@ -58,8 +49,8 @@ export default function placeCustomModel(props) {
         },
 
         close: () => {
-            // if (shadows) shadows.dispose()
-            // if (audioRobot) audioRobot.stop()
+            if (shadows) shadows.dispose()
+            if (clippingReveal) clippingReveal.dispose()
         },
     })
 
@@ -76,13 +67,17 @@ export default function placeCustomModel(props) {
             fileList = fileList.filter((file) => file.name && file.name.endsWith(".glb"))
         }
 
+        if (game.appMode === "load") {
+            setShowInstructions(true)
+        }
+
         // load data
         await game.loadGameData()
 
         if (!game.gameData()) {
             console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
             if (game.appMode === "save") {
-                setState(STATE.FILE_LIST)
+                setShowFileList(true)
             }
             if (game.appMode === "load") {
                 console.warn("Non è stato impostato nessun modello qui!")
@@ -113,7 +108,7 @@ export default function placeCustomModel(props) {
     )
 
     const handleCloseInstructions = () => {
-        setState(STATE.GAME)
+        setShowInstructions(false)
         handleBlurredCover()
         handleReticle()
     }
@@ -145,22 +140,15 @@ export default function placeCustomModel(props) {
     }
 
     const loadModel = async (data) => {
-        // setLoading(true)
         setLoadingFileName(data.fileName)
-        // setSelectedFileName(data.fileName)
-
-        if (game.appMode === "save") {
-            setState(STATE.GAME)
-        }
 
         try {
             const fileUrl = await firebase.storage.getFileURL(data.filePath)
 
-            // check for ambient occlusion texture to load
+            // check for ambient occlusion
+            // texture to load
             const fileName = data.fileName
-            // const fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."))
             const aoPath = data.filePath.substring(0, data.filePath.lastIndexOf(".")) + "_ao.webp"
-            console.log("VERIFICO SE ESISTE LA TEXTURE DI AO:", aoPath)
             let aoTexture = null
             let aoTextureUrl = null
             try {
@@ -185,7 +173,7 @@ export default function placeCustomModel(props) {
             // setLoading(false)
             setSelectedFileName(fileName)
             setLoadingFileName(null)
-            setFileListOpen(false)
+            setShowFileList(false)
 
             // if we already have picked
             // replace the spawned model
@@ -203,7 +191,9 @@ export default function placeCustomModel(props) {
 
     //region RETICLE AND BLURRED COVER
     const handleReticle = () => {
-        if (state() === STATE.GAME && !spawned()) {
+        if (showInstructions() || spawned()) {
+            Reticle.setEnabled(false)
+        } else {
             Reticle.setup(Reticle.MESH_TYPE.RINGS, {
                 size: 0.4,
                 ringNumber: 4,
@@ -212,13 +202,11 @@ export default function placeCustomModel(props) {
             })
             Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
             Reticle.setVisible(true)
-        } else {
-            Reticle.setEnabled(false)
         }
     }
 
     const handleBlurredCover = () => {
-        if (state() === STATE.INSTRUCTIONS) {
+        if (showInstructions()) {
             game.handleBlurredCover({
                 visible: true,
                 showHole: false,
@@ -246,19 +234,11 @@ export default function placeCustomModel(props) {
         )
     )
 
-    // createEffect(
-    //     on(state, (currentState) => {
-    //         handleReticle()
-    //         handleBlurredCover()
-    //     })
-    // )
-
     function spawnModel() {
+        game.super.onTap() // audio
+
         const position = new Vector3()
         position.setFromMatrixPosition(hitMatrix())
-
-        console.log(position)
-
         const rotation = new Euler()
         rotation.setFromRotationMatrix(hitMatrix())
 
@@ -268,17 +248,11 @@ export default function placeCustomModel(props) {
         setMaterialsShadows(model, true)
         game.addToScene(model)
 
-        setSpawned(true)
-
-        handleReticle()
-
-        console.log(model)
-
         shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
             position: position,
             resolution: 512,
             blur: 2,
-            animate: true,
+            animate: false,
             updateFrequency: 2,
         })
 
@@ -290,8 +264,11 @@ export default function placeCustomModel(props) {
             duration: 2.0,
             autoStart: true,
             startDelay: 200,
-            fadeOutDuration: 2,
+            fadeOutDuration: 1,
         })
+
+        setSpawned(true)
+        handleReticle()
     }
 
     //region RENDER
@@ -314,50 +291,11 @@ export default function placeCustomModel(props) {
                 showDoneButton={true}
                 onDone={handleCloseInstructions}
             >
-                Fai TAP sullo schermo per posizionare il robot Comau RACER 3 su un piano. <br></br>{" "}
-                Evita i piani troppo riflettenti o uniformi.
+                Fai TAP sullo schermo per posizionare il modello 3D su un piano. <br></br> Evita i
+                piani troppo riflettenti o uniformi.
             </Message>
         )
     }
-
-    const FileList = () => {
-        return (
-            <>
-                {fileList?.map((file) => (
-                    <Button onClick={() => handleSaveData(file)}>{file.name}</Button>
-                ))}
-            </>
-        )
-    }
-
-    // const View = () => {
-    //     return (
-    //         <>
-    //             <Show when={state() === STATE.INSTRUCTIONS}>
-    //                 <Container>
-    //                     <Instructions />
-    //                 </Container>
-    //             </Show>
-
-    //             <Show when={state() === STATE.FILE_LIST}>
-    //                 <Container>
-    //                     <FileList />
-    //                 </Container>
-    //             </Show>
-
-    //             <Show when={state() === STATE.GAME}>
-    //                 {loading() && <p>loading...</p>}
-    //                 <Toolbar
-    //                     buttons={["undo", "list"]}
-    //                     onUndo={handleUndo}
-    //                     undoActive={spawned()}
-    //                     onList={setState(STATE.FILE_LIST)}
-    //                     highlightList={state() !== STATE.FILE_LIST}
-    //                 />
-    //             </Show>
-    //         </>
-    //     )
-    // }
 
     const Container = styled("div")`
         width: 100%;
@@ -365,6 +303,15 @@ export default function placeCustomModel(props) {
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
+    `
+
+    const InstructionsContainer = styled("div")`
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     `
 
     const SliderContainer = styled("div")`
@@ -389,31 +336,7 @@ export default function placeCustomModel(props) {
         padding-top: 3px;
     `
 
-    const FileNameContainer = styled("div")`
-        flex: 1;
-        font-size: small;
-        font-weight: 500;
-        padding: 1rem;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-        border-radius: 90px;
-    `
-
     const FileItemContainer = styled("div")`
-        flex: 1;
-        width: 100%;
-        /* display: flex;
-        align-items: center;
-        box-sizing: border-box;
-        box-sizing: border-box; */
-        text-align: center;
-        padding: 0.3rem;
-        border-radius: 20px;
-        background: var(--color-dark-transparent);
-        box-sizing: border-box;
-    `
-
-    const BoxItem = styled("div")`
         flex: 1;
         width: 100%;
         /* display: flex;
@@ -430,7 +353,7 @@ export default function placeCustomModel(props) {
     const FilePicker = () => {
         return (
             <ItemListContainer id="ItemListContainer">
-                <Show when={fileListOpen()}>
+                <Show when={showFileList()}>
                     <ItemListContainer id="ItemListContainer">
                         {fileList
                             ?.filter((file) => file.name !== selectedFileName())
@@ -456,7 +379,7 @@ export default function placeCustomModel(props) {
                         <SliderContainer data-interactive>
                             <FilePicker />
                             <ButtonCircle
-                                onClick={setFileListOpen(!fileListOpen())}
+                                onClick={setShowFileList(!showFileList())}
                                 border={false}
                                 theme={"dark"}
                             >
@@ -465,7 +388,16 @@ export default function placeCustomModel(props) {
                         </SliderContainer>
                     </Container>
                 </Show>
-                <Toolbar buttons={["undo"]} onUndo={handleUndo} undoActive={spawned()} />
+
+                <Show when={showInstructions()}>
+                    <InstructionsContainer>
+                        <Instructions />
+                    </InstructionsContainer>
+                </Show>
+
+                <Show when={!showInstructions() && !showFileList()}>
+                    <Toolbar buttons={["undo"]} onUndo={handleUndo} undoActive={spawned()} />
+                </Show>
             </>
         )
     }
