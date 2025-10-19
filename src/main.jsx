@@ -120,7 +120,6 @@ export default function Main() {
         }
     })
 
-
     //#region [functions]
     /**
      * Anonymous access
@@ -133,8 +132,12 @@ export default function Main() {
         setUserId(() => (config.debugLoadMode ? config.debugUserId : params.get("userId")))
         const markerId = config.debugLoadMode ? config.debugMarkerId : params.get("markerId")
         const data = await firebase.firestore.fetchMarker(userId(), markerId)
-
-        setupMarker({ id: markerId, data: data }, () => goToAnonymous())
+        if (data) {
+            setupMarker({ id: markerId, data: data }, () => goToAnonymous())
+        } else {
+            setLoading(false)
+            goToAnonymous()
+        }
     }
 
     /**
@@ -205,7 +208,7 @@ export default function Main() {
         setCurrentMarker(() => newMarker)
         console.log("current marker:", currentMarker())
 
-        if (loading()) setLoading(() => false)
+        if (loading()) setLoading(false)
 
         callback?.()
     }
@@ -337,7 +340,7 @@ export default function Main() {
 
             case VIEWS.REGISTER:
                 return <Register onSuccess={goToMarkerList} onGoToLogin={goToLogin} />
-            
+
             case VIEWS.LOGIN:
                 return <Login onSuccess={goToMarkerList} onGoToRegister={goToRegister} />
 

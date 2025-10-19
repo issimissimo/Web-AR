@@ -99,7 +99,7 @@ export default function Main(props) {
 
   onMount(() => {
 
-    if (props.marker.games != null) {
+    if (props.marker?.games != null) {
 
       if (props.marker.games.length > 0) {
         setMarkerValid(() => true);
