@@ -151,19 +151,15 @@ export default function placeCustomModel(props) {
             const fileName = data.fileName
             const aoPath = data.filePath.substring(0, data.filePath.lastIndexOf(".")) + "_ao.webp"
             let aoTexture = null
-            let aoTextureUrl = null
-            try {
-                await firebase.storage.getFileMetadata(aoPath)
-                aoTextureUrl = await firebase.storage.getFileURL(aoPath)
-                console.log("✅ Texture AO trovata:", aoTextureUrl)
-            } catch (error) {
-                console.log("ℹ️ Texture AO non presente per questo modello")
-            }
-            if (aoTextureUrl) {
+
+            if (await firebase.storage.fileExists(aoPath)) {
+                const aoTextureUrl = await firebase.storage.getFileURL(aoPath)
                 aoTexture = await new LoadTexture(aoTextureUrl, {
                     flipY: true,
                 })
-                console.log("texture AO caricata con successo!")
+                console.log("✅ Texture AO caricata!")
+            } else {
+                console.log("ℹ️ Texture AO non presente per questo modello")
             }
 
             const glbFile = await new GLBFile(fileUrl, {

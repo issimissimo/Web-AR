@@ -32,7 +32,8 @@ import {
     listFiles,
     deleteAllFilesInDirectory,
     getFileBlob,
-    getFileBlobURL
+    getFileBlobURL,
+    fileExists
 } from '../lib/firebase/storage';
 
 export const useFirebase = () => {
@@ -86,7 +87,8 @@ export const useFirebase = () => {
             listFiles,
             deleteAllFilesInDirectory,
             getFileBlob,
-            getFileBlobURL
+            getFileBlobURL,
+            fileExists
         }
     };
 };

@@ -213,12 +213,14 @@ const Reticle = {
 
         // Add the circle target in front of the camera
         // to use in place of plane detection
-        const circleGeometry = new RingGeometry(0, 0.02, 24);
-        const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
-        _circleMesh = new Mesh(circleGeometry, circleMaterial);
-        _camera.add(_circleMesh);
-        _circleMesh.position.z = -1;
-        _scene.add(_camera);
+        if (!_circleMesh) {
+            const circleGeometry = new RingGeometry(0, 0.02, 24);
+            const circleMaterial = new MeshBasicMaterial({ color: 0xffffff });
+            _circleMesh = new Mesh(circleGeometry, circleMaterial);
+            _camera.add(_circleMesh);
+            _circleMesh.position.z = -1;
+            _scene.add(_camera);
+        }
 
         // We don't want to set the Reticle visible right now!
         // Let the user to set it later...

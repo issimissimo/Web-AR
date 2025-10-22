@@ -2,13 +2,11 @@ import { onMount, createSignal } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import { useFirebase } from "@hooks/useFirebase"
-
+import Loader from "@components/Loader"
 import Header from "./Header"
-
 import Button from "@components/Button"
 import ButtonSecondary from "@components/ButtonSecondary"
 import { Container, FitHeight, FitHeightScrollable, Title } from "@components/smallElements"
-
 import Fa from "solid-fa"
 import {
     faUser,
@@ -107,7 +105,7 @@ const UploadButton = (props) => {
 //region USER PROFILE
 const UserProfile = (props) => {
     const firebase = useFirebase()
-
+    const [loading, setLoading] = createSignal(false)
     const [uploadedFiles, setUploadedFiles] = createSignal([])
     const [selectedFile, setSelectedFile] = createSignal(null)
     const [uploading, setUploading] = createSignal(false)
@@ -123,11 +121,13 @@ const UserProfile = (props) => {
     })
 
     const refreshFileList = async () => {
+        setLoading(true)
         const files = await firebase.storage.listFiles(path)
         if (files) {
             setUploadedFiles(files)
             console.log(uploadedFiles())
         }
+        setLoading(false)
     }
 
     const handleFileSelect = (event) => {
@@ -223,7 +223,10 @@ const UserProfile = (props) => {
                 <span style={{ color: "var(--color-white)" }}>dati</span>
             </Header>
 
-            {props.user ? (
+            {/* CONTENT */}
+            {loading() ? (
+                <Loader />
+            ) : (
                 <FitHeightScrollable id="FitHeight">
                     <FitHeightScrollable
                         id="FitHeightScrollable"
@@ -272,8 +275,6 @@ const UserProfile = (props) => {
                         />
                     </UploadButton>
                 </FitHeightScrollable>
-            ) : (
-                <div />
             )}
         </Container>
     )

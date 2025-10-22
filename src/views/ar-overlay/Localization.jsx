@@ -110,12 +110,10 @@ export default function Localization(props) {
                     showDoneButton={true}
                     onDone={handleCloseInstructions}
                 >
-                    La tua esperienza in AR richiede che ti localizzi!<br></br>
-                    Mettiti di fronte al QR-Code e inquadralo, per localizzarti
-                    nell'ambiente circostante<br></br>
-                    Cerca di essere il più preciso possibile!<br></br>
-                    Io non posso ancora sapere quando lo avrai al centro dello
-                    schermo
+                    La tua esperienza in AR richiede che ti localizzi nell'ambiente in cui ti trovi.
+                    <br></br>
+                    Mettiti di fronte al QR-Code e inquadralo, cercando di essere il più preciso
+                    possibile!<br></br>
                 </Message>
             ) : (
                 <DoneContainer
@@ -131,9 +129,7 @@ export default function Localization(props) {
                     <Button
                         onClick={handleOnDone}
                         small={true}
-                        visible={
-                            config.debugOnDesktop ? true : props.planeFound
-                        }
+                        visible={config.debugOnDesktop ? true : props.planeFound}
                         active={config.debugOnDesktop ? true : props.planeFound}
                         icon={faCheck}
                         width={"65%"}

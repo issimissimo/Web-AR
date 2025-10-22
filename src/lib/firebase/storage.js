@@ -134,7 +134,7 @@ export const listFiles = async (path) => {
     try {
         const storageRef = ref(storage, path);
         const result = await listAll(storageRef);
-        
+
         const files = await Promise.all(
             result.items.map(async (itemRef) => {
                 const url = await getDownloadURL(itemRef);
@@ -166,7 +166,7 @@ export const deleteAllFilesInDirectory = async (path) => {
     try {
         const storageRef = ref(storage, path);
         const result = await listAll(storageRef);
-        
+
         await Promise.all(
             result.items.map(itemRef => deleteObject(itemRef))
         );
@@ -210,5 +210,29 @@ export const getFileBlobURL = async (path) => {
     } catch (error) {
         console.error("Errore nella creazione del Blob URL:", error);
         throw new Error(`Failed to create blob URL: ${error.message}`);
+    }
+};
+
+/**
+ * Verifica se un file esiste nello storage (silent, senza errori)
+ * @param {string} path - Percorso del file
+ * @returns {Promise<boolean>}
+ */
+export const fileExists = async (path) => {
+    try {
+        // Estrai directory e nome file
+        const lastSlash = path.lastIndexOf('/');
+        const dirPath = path.substring(0, lastSlash);
+        const fileName = path.substring(lastSlash + 1);
+
+        // Lista tutti i file nella directory
+        const storageRef = ref(storage, dirPath);
+        const result = await listAll(storageRef);
+
+        // Verifica se il file è nella lista
+        return result.items.some(item => item.name === fileName);
+    } catch (error) {
+        // Silenzioso - ritorna semplicemente false
+        return false;
     }
 };

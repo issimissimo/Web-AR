@@ -71,6 +71,10 @@ export default function pointLights(props) {
         game.setInitialized()
     })
 
+    const toggleHelpers = (visible) => {
+        game.setAssetVisibleByName("helper", visible)
+    }
+
     /*
      * Toggle the helpers visibility and the current light
      */
@@ -78,7 +82,7 @@ export default function pointLights(props) {
         on(
             () => props.selected,
             (selected) => {
-                game.setAssetVisibleByName("helper", selected)
+                toggleHelpers(selected)
                 if (!selected && currentLight()) {
                     setCurrentLight(null)
                 }
@@ -107,6 +111,7 @@ export default function pointLights(props) {
                 const intensity = el.intensity
                 createLight(globalMatrix, color, intensity)
             })
+            toggleHelpers(props.selected)
         }
     )
 
@@ -171,7 +176,7 @@ export default function pointLights(props) {
         const pointLightHelper = new THREE.PointLightHelper(newLight, 0.1, 0xf2e600)
         pointLightHelper.name = "helper"
         game.addToScene(pointLightHelper)
-
+        
         return newLight
     }
 
