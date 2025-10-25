@@ -68,32 +68,6 @@ export const PLUGINS_LIST = [
         requirements: {}
     },
     {
-        fileName: "backgroundTest",
-        title: 'Piano background di test',
-        description: 'Da eliminare, solo di test',
-        icon: null,
-        category: 'Oggetti',
-        allowed: 1,
-        localized: false,
-        interactable: false,
-        editable: false,
-        tags: [],
-        requirements: {}
-    },
-    {
-        fileName: "basicCube",
-        title: 'Cubo base',
-        description: 'Da eliminare, solo di test',
-        icon: null,
-        category: 'Oggetti',
-        allowed: 1,
-        localized: false,
-        interactable: false,
-        editable: false,
-        tags: [],
-        requirements: {}
-    },
-    {
         fileName: "basicSphere",
         title: 'Sfera base',
         description: 'Da eliminare, solo di test',
@@ -116,18 +90,6 @@ export const PLUGINS_LIST = [
         localized: true,
         interactable: true,
         editable: true,
-        tags: [],
-        requirements: {}
-    },
-    {
-        fileName: "growingFlowers",
-        title: 'Fiori che crescono',
-        description: 'Posiziona sulle superfici dei fiori che crescono',
-        icon: null,
-        category: 'Oggetti',
-        allowed: 1,
-        localized: false,
-        interactable: true,
         tags: [],
         requirements: {}
     },

@@ -33,7 +33,8 @@ export default function InitialDetection() {
                 svgIcon={'icons/phone.svg'}
                 showReadMore={false}
             >
-                Muovi un pò il telefono intorno a te per farmi rilevare l'ambiente
+                Muovi un pò il telefono intorno a te per farmi rilevare l'ambiente.<br></br>
+                Evita di inquadrare pavimenti o pareti molto riflettenti.
             </Message>
         </Container>
     )

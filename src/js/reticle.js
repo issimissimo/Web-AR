@@ -50,13 +50,17 @@ let _backup = {};
 
 
 function _addPlaneForReticleSurface() {
-    _geomLookAt = new PlaneGeometry(0.1, 0.1);
-    _reticleLookAt = new Mesh(
-        _geomLookAt.rotateX(- Math.PI / 2),
-        new MeshBasicMaterial({ color: 0xff0000 })
-    );
-    _reticleLookAt.translateY(.3);
-    _reticleLookAt.visible = false;
+    if (!_geomLookAt) {
+        _geomLookAt = new PlaneGeometry(0.1, 0.1);
+    }
+    if (!_reticleLookAt) {
+        _reticleLookAt = new Mesh(
+            _geomLookAt.rotateX(- Math.PI / 2),
+            new MeshBasicMaterial({ color: 0xff0000 })
+        );
+        _reticleLookAt.translateY(.3);
+        _reticleLookAt.visible = false;
+    }
     _reticleMesh.add(_reticleLookAt);
 }
 
@@ -96,7 +100,6 @@ function _setReticleProperties() {
     _reticleMesh.matrixAutoUpdate = false;
     _scene.add(_reticleMesh);
     _addPlaneForReticleSurface();
-
 }
 
 
