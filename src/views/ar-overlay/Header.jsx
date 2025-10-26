@@ -14,6 +14,7 @@ const HeaderContainer = styled('div')`
     justify-content: space-between;
     align-items: center;
     height: 40px;
+    padding: 1rem;
   `;
 
 const LeftButtonContainer = styled('div')`

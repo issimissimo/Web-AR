@@ -560,7 +560,7 @@ export default function ArSession(props) {
 
     //#region [style]
 
-    const Main = styled("div")`
+    const ArSessionContainer = styled("div")`
         position: absolute;
         top: 0;
         left: 0;
@@ -568,7 +568,7 @@ export default function ArSession(props) {
         bottom: 0;
         display: flex;
         flex-direction: column;
-        padding: 1.5em;
+        /* padding: 1.5em; */
         box-sizing: border-box;
     `
 
@@ -585,7 +585,7 @@ export default function ArSession(props) {
                 handleBlurredCover: (state) => handleBlurredCover(state),
             }}
         >
-            <Main id="arSession">
+            <ArSessionContainer id="ArSessionContainer">
                 <BlurredCover
                     visible={blurVisible()}
                     showHole={blurShowHole()}
@@ -643,7 +643,7 @@ export default function ArSession(props) {
                 <Show when={config.showLogOnScreen}>
                     <LogOnScreen />
                 </Show>
-            </Main>
+            </ArSessionContainer>
         </Context.Provider>
     )
 }

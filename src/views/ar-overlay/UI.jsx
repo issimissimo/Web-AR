@@ -320,6 +320,7 @@ const UI = (props) => {
         display: flex;
         flex-direction: column;
         flex: 1;
+        padding: 1rem;
     `
 
     const GameUIContainer = styled("div")`
@@ -348,6 +349,7 @@ const UI = (props) => {
         flex: 1;
         display: flex;
         flex-direction: column;
+        padding: 1rem;
     `
 
     const PluginListContainer = styled("div")`
@@ -362,6 +364,8 @@ const UI = (props) => {
         display: flex;
         align-items: center;
         justify-content: center;
+        background: var(--color-background);
+        padding: 1rem;
     `
 
     // region TOGGLE BUTTON
@@ -558,7 +562,7 @@ const UI = (props) => {
 
             {/* CATEGORY PICKER */}
             {context.appMode === "save" && (
-                <Bottom data-interactive>
+                <Bottom id="bottom" data-interactive>
                     <CategoriesPicker
                         visible={true}
                         currentCategoryName={currentCategoryName()}

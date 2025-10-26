@@ -119,18 +119,18 @@ export const PLUGINS_LIST = [
         tags: [],
         requirements: {}
     },
-    {
-        fileName: "backgroundTest",
-        title: 'Sfondo',
-        description: 'Da eliminare, solo di test',
-        icon: null,
-        category: 'Oggetti',
-        allowed: 1,
-        localized: false,
-        interactable: false,
-        editable: false,
-        tags: [],
-        requirements: {}
-    },
+    // {
+    //     fileName: "backgroundTest",
+    //     title: 'Sfondo',
+    //     description: 'Da eliminare, solo di test',
+    //     icon: null,
+    //     category: 'Oggetti',
+    //     allowed: 1,
+    //     localized: false,
+    //     interactable: false,
+    //     editable: false,
+    //     tags: [],
+    //     requirements: {}
+    // },
 ];
 
