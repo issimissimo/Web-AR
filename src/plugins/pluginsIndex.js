@@ -120,13 +120,13 @@ export const PLUGINS_LIST = [
         requirements: {}
     },
     {
-        fileName: "fakeLocalization",
-        title: 'Fake per localizzazione',
-        description: 'Elimina appena possibile',
+        fileName: "backgroundTest",
+        title: 'Sfondo',
+        description: 'Da eliminare, solo di test',
         icon: null,
-        category: 'Custom',
+        category: 'Oggetti',
         allowed: 1,
-        localized: true,
+        localized: false,
         interactable: false,
         editable: false,
         tags: [],

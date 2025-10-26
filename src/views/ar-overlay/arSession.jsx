@@ -32,7 +32,7 @@ import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
 
 // ===== DEBUG =====
-import { LogOnScreen } from "@tools/LogOnScreen"
+import { LogOnScreen } from "@tools/SolidJS/LogOnScreen"
 
 // ===== CONTEXT =====
 export const Context = createContext()
