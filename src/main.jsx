@@ -19,7 +19,6 @@ import ArSession from "@views/ar-overlay/arSession"
 import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
 
-import StorageTest from "./StorageTest"
 
 /*
  * This function is called by the "Enter AR" button

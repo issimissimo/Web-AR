@@ -96,7 +96,7 @@ export default function testRobot(props) {
         loadedModel = robotGlb.model
 
         audioRobot = await new LoadPositionalAudio(
-            "models/demo/Comau_RACER3/Comau_RACER3.ogg",
+            "models/demo/Comau_RACER3/Comau_RACER3.mp3",
             SceneManager.listener,
             {
                 volume: 2,

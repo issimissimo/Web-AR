@@ -112,13 +112,13 @@ export default function Baloons(props) {
         arrowModel = arrowGlb.model
 
         // load audio
-        popAudioBuffer = await new LoadAudioBuffer("sounds/pop.ogg")
-        balloonExplosionAudioBuffer = await new LoadAudioBuffer("sounds/balloon-explosion.ogg")
-        whooshAudio = await new LoadAudio("sounds/whoosh.ogg", SceneManager.listener, {
+        popAudioBuffer = await new LoadAudioBuffer("sounds/pop.mp3")
+        balloonExplosionAudioBuffer = await new LoadAudioBuffer("sounds/balloon-explosion.mp3")
+        whooshAudio = await new LoadAudio("sounds/whoosh.mp3", SceneManager.listener, {
             volume: 0.1,
         })
-        winnerAudio = await new LoadAudio("sounds/winner.ogg", SceneManager.listener)
-        gameOverAudio = await new LoadAudio("sounds/game-over.ogg", SceneManager.listener)
+        winnerAudio = await new LoadAudio("sounds/winner.mp3", SceneManager.listener)
+        gameOverAudio = await new LoadAudio("sounds/game-over.mp3", SceneManager.listener)
 
         // Setup data
         await game.loadGameData()

@@ -41,9 +41,9 @@ export function useGame(gameName, gameId, config = {}) {
     // let audioUndo
 
     onMount(async () => {
-        sounds.tap = await new LoadAudio("sounds/tap.ogg", SceneManager.listener)
-        sounds.undo = await new LoadAudio("sounds/undo.ogg", SceneManager.listener)
-        sounds.click = await new LoadAudio("sounds/smallClick.ogg", SceneManager.listener)
+        sounds.tap = await new LoadAudio("sounds/tap.mp3", SceneManager.listener)
+        sounds.undo = await new LoadAudio("sounds/undo.mp3", SceneManager.listener)
+        sounds.click = await new LoadAudio("sounds/smallClick.mp3", SceneManager.listener)
         context.onLoaded(game)
 
         // Wait for the #plugins-ui container to exist. The container may be

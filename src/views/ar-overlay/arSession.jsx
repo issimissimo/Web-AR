@@ -7,6 +7,7 @@ import {
     For,
     createRoot,
     on,
+    Show,
 } from "solid-js"
 import { useFirebase } from "@hooks/useFirebase"
 import { config } from "@js/config"
@@ -29,6 +30,9 @@ import { AppMode } from "@/main"
 // XR
 import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
+
+// ===== DEBUG =====
+import { LogOnScreen } from "@tools/LogOnScreen"
 
 // ===== CONTEXT =====
 export const Context = createContext()
@@ -195,7 +199,6 @@ export default function ArSession(props) {
         removeClickableDomElements()
     })
 
-    
     /** When all games are initialized
      * we can finally set gamesEnabled
      */
@@ -214,7 +217,7 @@ export default function ArSession(props) {
 
     /** When the number of games running change
      * because a new one has loaded we need
-     * to checkAllGamesReady 
+     * to checkAllGamesReady
      */
     createEffect(
         on(
@@ -257,7 +260,7 @@ export default function ArSession(props) {
         }
         // if all games are disabled
         // let's set initialized, to not stuck
-        if (_modulesToLoad === 0){
+        if (_modulesToLoad === 0) {
             setGamesInitialized(true)
         }
     }
@@ -635,6 +638,11 @@ export default function ArSession(props) {
                         />
                     </>
                 }
+
+                {/* LOG ON SCREEN */}
+                <Show when={config.showLogOnScreen}>
+                    <LogOnScreen />
+                </Show>
             </Main>
         </Context.Provider>
     )

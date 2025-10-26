@@ -39,10 +39,12 @@
   <script>
     var iOS;
     window.addEventListener('vlaunch-initialized', (event) => {
+      console.log("vlaunch url:", event.detail.launchUrl)
       if (event.detail.launchRequired) {
         // //We need to use launch to get WebXR as we're on iOS
         // window.location.href = event.detail.launchUrl
         iOS = true;
+        
       }
       else {
         iOS = false;

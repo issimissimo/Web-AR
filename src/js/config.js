@@ -33,10 +33,13 @@ export const config = {
   get debugLoadMode() {
     return appConfig.debugLoadMode;
   },
-   get debugUserId() {
+  get debugUserId() {
     return appConfig.debugUserId;
   },
-   get debugMarkerId() {
+  get debugMarkerId() {
     return appConfig.debugMarkerId;
+  },
+  get showLogOnScreen() {
+    return appConfig.showLogOnScreen;
   },
 };
