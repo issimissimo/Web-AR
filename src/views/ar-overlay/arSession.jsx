@@ -67,6 +67,9 @@ export default function ArSession(props) {
 
     //#region [lifeCycle]
     onMount(() => {
+        // Fix Android 15 bug
+        fixOverlayForAndroid15()
+
         // Initialize the DOM Observer for interactive elements
         setupDomObserver()
 
@@ -558,14 +561,37 @@ export default function ArSession(props) {
         }, 200)
     }
 
+    function fixOverlayForAndroid15() {
+        setTimeout(() => {
+            const overlay = document.getElementById("ar-overlay")
+            console.log(overlay)
+
+            // Calcola l'offset della status bar
+            const windowHeight = window.innerHeight
+            const screenHeight = window.screen.height
+
+            // Offset stimato per Android 15 (tipicamente tra 24px e 48px)
+            const statusBarHeight = screenHeight - windowHeight
+
+            if (statusBarHeight > 0) {
+                console.log("---------- AGGIUSTO ALTEZZA 2 --------")
+                console.log("windowHeight", windowHeight)
+                console.log("screenHeight", screenHeight)
+                overlay.style.paddingTop = `${Math.max(statusBarHeight, 24)}px`
+                overlay.style.height = `calc(100% - ${Math.max(statusBarHeight, 24)}px)`
+            }
+        }, 2000)
+    }
+
     //#region [style]
 
     const ArSessionContainer = styled("div")`
-        position: absolute;
+        /* position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        bottom: 0;
+        bottom: 0; */
+        height: 100%;
         display: flex;
         flex-direction: column;
         /* padding: 1.5em; */
@@ -627,7 +653,7 @@ export default function ArSession(props) {
                                     />
                                 )
                             ))}
-                        <UI
+                        <UI id="UI"
                             visible={gamesEnabled()}
                             marker={props.marker}
                             gamesRunning={props.gamesRunning}

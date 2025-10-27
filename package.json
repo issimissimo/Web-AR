@@ -2,16 +2,18 @@
   "name": "ar-web",
   "private": false,
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "serve-public": "concurrently \"npm run dev\" \"cloudflared tunnel --url http://localhost:5173\"",
     "preview": "vite preview",
-    "subdir-build": "vite build --base=/threejs/"
+    "subdir-build": "vite build --base=/threejs/",
+    "deploy": "node deploy.js"
   },
   "devDependencies": {
+    "basic-ftp": "^5.0.5",
     "cloudflared": "^0.7.1",
     "concurrently": "^9.2.1",
     "solid-js": "^1.9.7",

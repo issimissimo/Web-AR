@@ -16,6 +16,13 @@
 
   <link rel="preload" href="/utils/loader/loader.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <link href="index.css" rel="stylesheet">
+
+  <!-- Open Graph tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://issimissimo.com/exp/AR-Web/">
+  <meta property="og:title" content="AR Web">
+  <meta property="og:description" content="Crea facilmente le tue esperienze in Realtà Aumentata">
+  <meta property="og:image" content="https://issimissimo.com/exp/AR-Web/og-image.jpg">
 </head>
 
 <body>
@@ -44,7 +51,7 @@
         // //We need to use launch to get WebXR as we're on iOS
         // window.location.href = event.detail.launchUrl
         iOS = true;
-        
+
       }
       else {
         iOS = false;
