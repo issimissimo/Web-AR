@@ -67,23 +67,23 @@ export const PLUGINS_LIST = [
         tags: [],
         requirements: {}
     },
-    {
-        fileName: "basicSphere",
-        title: 'Sfera base',
-        description: 'Da eliminare, solo di test',
-        icon: null,
-        category: 'Oggetti',
-        allowed: 1,
-        localized: false,
-        interactable: false,
-        editable: false,
-        tags: [],
-        requirements: {}
-    },
+    // {
+    //     fileName: "basicSphere",
+    //     title: 'Sfera base',
+    //     description: 'Da eliminare, solo di test',
+    //     icon: null,
+    //     category: 'Oggetti',
+    //     allowed: 1,
+    //     localized: false,
+    //     interactable: false,
+    //     editable: false,
+    //     tags: [],
+    //     requirements: {}
+    // },
     {
         fileName: "baloons",
         title: 'Palloncini fluttuanti',
-        description: 'Inserisci dei palloncini a cazzo dove vuoi',
+        description: 'Gioco: inserisci dei palloncini intorno a te, che poi dovranno essere fatti scoppiare',
         icon: null,
         category: 'Giochi',
         allowed: 1,

@@ -92,9 +92,13 @@ canvas {
 }
 
 #ar-overlay {
-  height: 100vh;
+  height: 100dvh;
   z-index: 999;
   position: relative;
+}
+
+#ar-overlay > div {
+  height: 100% !important;
 }
 
 .xr-button-overlay {

@@ -190,7 +190,7 @@ const UI = (props) => {
         flex: 1;
         display: flex;
         flex-direction: column;
-        margin-top: 1rem;
+        margin-top: 0;
         pointer-events: ${(props) => (props.visible ? "auto" : "none")};
         opacity: ${(props) => (props.visible ? 1 : 0)};
     `

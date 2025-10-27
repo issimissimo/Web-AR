@@ -67,7 +67,7 @@ export default function BlurredCover(props) {
     }
 
     return (
-        <SvgOverlay
+        <SvgOverlay id="BlurredCover"
             xmlns="http://www.w3.org/2000/svg"
             width={vw()}
             height={vh()}
