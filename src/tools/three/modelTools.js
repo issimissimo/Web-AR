@@ -154,3 +154,8 @@ export function findUserDataKey(root, key) {
     return found; // null se non trovato
 }
 
+export function getAllMaterials(gltf){
+    let materials = gltf.parser.json.materials;
+    return materials
+}
+

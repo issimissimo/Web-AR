@@ -16,12 +16,14 @@ import ButtonCircle from "@components/ButtonCircle"
 import { useFirebase } from "@hooks/useFirebase"
 import Fa from "solid-fa"
 import { faListUl } from "@fortawesome/free-solid-svg-icons"
+import { findUserDataKey, getAllMaterials } from "@tools/three/modelTools"
 
 export default function placeCustomModel(props) {
     const firebase = useFirebase()
     const [spawned, setSpawned] = createSignal(false)
     const [hitMatrix, setHitMatrix] = createSignal(null)
-    const [modelRotation, setModelRotation] = createSignal(0)
+
+    const [customVariants, setCustomVariants] = createSignal(null)
 
     const [selectedFileName, setSelectedFileName] = createSignal(null)
     const [loadingFileName, setLoadingFileName] = createSignal(null)
@@ -30,7 +32,7 @@ export default function placeCustomModel(props) {
 
     const defaultFolder = "models/demo/default/"
 
-    let remoteFileList, defaultFileList, fileList
+    let fileList
     let shadows, clippingReveal, model
 
     /*
@@ -59,7 +61,7 @@ export default function placeCustomModel(props) {
 
     async function fetchFileList(fileExtension) {
         // get default files
-        defaultFileList = await listFiles(defaultFolder + "list.json")
+        const defaultFileList = await listFiles(defaultFolder + "list.json")
 
         // get remote files
         const path = `users/${game.userId}/uploads`
@@ -70,7 +72,7 @@ export default function placeCustomModel(props) {
         )
 
         // create list
-        fileList = [
+        const list = [
             ...defaultFileList.map((fileName) => ({
                 fileName,
                 filePath: defaultFolder + fileName,
@@ -83,7 +85,9 @@ export default function placeCustomModel(props) {
             })),
         ]
 
-        console.log("+++++++++++++++ filelist:", fileList)
+        console.log("+++++++++++++++ list:", list)
+
+        return list
     }
 
     async function fileExists(url) {
@@ -100,7 +104,7 @@ export default function placeCustomModel(props) {
      */
     onMount(async () => {
         // load the list of all available models
-        await fetchFileList(".glb")
+        fileList = await fetchFileList(".glb")
 
         // load data
         await game.loadGameData()
@@ -190,9 +194,6 @@ export default function placeCustomModel(props) {
     }
 
     const loadModel = async (data) => {
-        console.log("UEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-        console.log(data)
-
         setLoadingFileName(data.fileName)
 
         try {
@@ -215,32 +216,29 @@ export default function placeCustomModel(props) {
             const aoPath =
                 data.filePath.substring(0, data.filePath.lastIndexOf(".")) +
                 "_ao.webp"
-            console.log("aoPath", aoPath)
+            
             let aoTexture = null
+            let aoTextureUrl = null
 
             if (data.type === "default") {
                 if (await fileExists(aoPath)) {
-                    aoTexture = await new LoadTexture(aoPath, {
-                        flipY: true,
-                    })
-                    console.log("✅ Texture AO caricata!")
-                } else {
-                    console.log("ℹ️ Texture AO non presente per questo modello")
+                    aoTextureUrl = aoPath
                 }
             }
 
             if (data.type === "remote") {
                 if (await firebase.storage.fileExists(aoPath)) {
-                    const aoTextureUrl = await firebase.storage.getFileURL(
-                        aoPath
-                    )
-                    aoTexture = await new LoadTexture(aoTextureUrl, {
-                        flipY: true,
-                    })
-                    console.log("✅ Texture AO caricata!")
-                } else {
-                    console.log("ℹ️ Texture AO non presente per questo modello")
+                    aoTextureUrl = await firebase.storage.getFileURL(aoPath)
                 }
+            }
+
+            if (aoTextureUrl) {
+                aoTexture = await new LoadTexture(aoTextureUrl, {
+                    flipY: true,
+                })
+                console.log("✅ Texture AO caricata!")
+            } else {
+                console.log("ℹ️ Texture AO non presente per questo modello")
             }
 
             //
@@ -255,6 +253,33 @@ export default function placeCustomModel(props) {
             setSelectedFileName(data.fileName)
             setLoadingFileName(null)
             setShowFileList(false)
+
+            //
+            // load user data for custom_variants
+            // that are created in Blender
+            //
+            const variants = findUserDataKey(model, "custom_variants")
+            if (variants) {
+                const jsonString = variants.value
+                const data = JSON.parse(jsonString)
+                const presets = data.presets
+                console.log("PRESETS:", presets)
+                console.log("✅ Questo modello ha delle varianti!")
+                console.log("Preset di default:", data.defaultPreset)
+
+                // load all materials
+                const materials = getAllMaterials(glbFile.gltf)
+                if (materials) {
+                    console.log("materiali:", materials)
+
+                    //TODO: apply preset (if exist)
+
+
+                }
+
+            } else {
+                console.log("ℹ️ Questo modello non ha delle varianti!")
+            }
 
             // if we already have picked
             // replace the spawned model
@@ -271,6 +296,11 @@ export default function placeCustomModel(props) {
     }
 
     //region  FUNCTIONS
+
+    function applyMaterialsPreset(){
+        
+    }
+
 
     async function listFiles(folderUrl) {
         const res = await fetch(folderUrl)
@@ -451,14 +481,16 @@ export default function placeCustomModel(props) {
                 <Show when={showFileList()}>
                     <ItemListContainer id="ItemListContainer">
                         {fileList
-                            ?.filter((file) => file.name !== selectedFileName())
+                            ?.filter(
+                                (file) => file.fileName !== selectedFileName()
+                            )
                             .map((file) => (
                                 <FileItemContainer
                                     onClick={() => handleSaveData(file)}
                                 >
-                                    {loadingFileName() === file.name
+                                    {loadingFileName() === file.fileName
                                         ? "caricamento..."
-                                        : file.name}
+                                        : file.fileName}
                                 </FileItemContainer>
                             ))}
                     </ItemListContainer>
