@@ -28,9 +28,7 @@ export default function placeCustomModel(props) {
     const [showFileList, setShowFileList] = createSignal(false)
     const [showInstructions, setShowInstructions] = createSignal(false)
 
-    const defaultFolder = "models/demo/default/"
-
-    let remoteFileList, defaultFileList, fileList
+    let fileList = []
     let shadows, clippingReveal, model
 
     /*
@@ -57,87 +55,39 @@ export default function placeCustomModel(props) {
         },
     })
 
-    async function fetchFileList(fileExtension) {
-        // get default files
-        defaultFileList = await listFiles(defaultFolder + "list.json")
-
-        // get remote files
-        const path = `users/${game.userId}/uploads`
-        let remoteFileList = await firebase.storage.listFiles(path)
-
-        remoteFileList = remoteFileList.filter(
-            (file) => file.name && file.name.endsWith(fileExtension)
-        )
-
-        // create list
-        fileList = [
-            ...defaultFileList.map((fileName) => ({
-                fileName,
-                filePath: defaultFolder + fileName,
-                type: "default",
-            })),
-            ...remoteFileList.map((file) => ({
-                fileName: file.name,
-                filePath: file.fullPath,
-                type: "remote",
-            })),
-        ]
-
-        console.log("+++++++++++++++ filelist:", fileList)
-    }
-
-    async function fileExists(url) {
-        try {
-            const response = await fetch(url, { method: "HEAD" })
-            return response.ok // true se esiste, false se 404 o altro
-        } catch (error) {
-            return false // es. rete non raggiungibile
-        }
-    }
-
     /*
      * On mount
      */
     onMount(async () => {
-        // load the list of all available models
-        await fetchFileList(".glb")
-
-        // load data
-        await game.loadGameData()
-
-        // if we have don't have any data saved,
-        // load the 1st model of the list
-        if (!game.gameData()) {
-            console.log(">>>>>>>>>>>>> CARICO IL MODELLO DI DEFAULT!!!")
-            await loadModel(fileList[0])
-        } else {
-            // load the saved model
-            console.log(">>>>>>>>>>>>> CARICO IL MODELLO SALVATO!!!")
-            await loadModel(game.gameData())
+        // load the list of
+        // the available models
+        if (game.appMode === "save") {
+            const path = `users/${game.userId}/uploads`
+            fileList = await firebase.storage.listFiles(path)
+            console.log(fileList)
+            fileList = fileList.filter((file) => file.name && file.name.endsWith(".glb"))
         }
-
-        /////////////////////////////////////////////////////////
 
         if (game.appMode === "load") {
             setShowInstructions(true)
         }
 
-        // // load data
-        // await game.loadGameData()
+        // load data
+        await game.loadGameData()
 
-        // if (!game.gameData()) {
-        //     console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
-        //     if (game.appMode === "save") {
-        //         setShowFileList(true)
-        //     }
-        //     if (game.appMode === "load") {
-        //         console.warn("Non è stato impostato nessun modello qui!")
-        //     }
-        // } else {
-        //     // load the saved model
-        //     const data = game.gameData()
-        //     await loadModel(data)
-        // }
+        if (!game.gameData()) {
+            console.log(">>>>>>>>>>>>> NESSUN DATO DA CARICARE!!!")
+            if (game.appMode === "save") {
+                setShowFileList(true)
+            }
+            if (game.appMode === "load") {
+                console.warn("Non è stato impostato nessun modello qui!")
+            }
+        } else {
+            // load the saved model
+            const data = game.gameData()
+            await loadModel(data)
+        }
 
         /*
          * Don't forget to call "game.setInitialized()" at finish
@@ -184,75 +134,41 @@ export default function placeCustomModel(props) {
         const newData = {
             fileName: file.name,
             filePath: file.fullPath,
+            rotation: modelRotation(),
         }
         game.setGameData(newData)
         game.saveGameData()
     }
 
     const loadModel = async (data) => {
-        console.log("UEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-        console.log(data)
-
         setLoadingFileName(data.fileName)
 
         try {
-            //
-            // get file url
-            //
-            let fileUrl
-            if (data.type === "default") {
-                fileUrl = data.filePath
-            }
-            if (data.type === "remote") {
-                fileUrl = await firebase.storage.getFileURL(data.filePath)
-            }
+            const fileUrl = await firebase.storage.getFileURL(data.filePath)
 
-            console.log("...now loading from", fileUrl)
-
-            //
-            // check and load ambient occlusion texture
-            //
-            const aoPath =
-                data.filePath.substring(0, data.filePath.lastIndexOf(".")) +
-                "_ao.webp"
-            console.log("aoPath", aoPath)
+            // check for ambient occlusion
+            // texture to load
+            const fileName = data.fileName
+            const aoPath = data.filePath.substring(0, data.filePath.lastIndexOf(".")) + "_ao.webp"
             let aoTexture = null
 
-            if (data.type === "default") {
-                if (await fileExists(aoPath)) {
-                    aoTexture = await new LoadTexture(aoPath, {
-                        flipY: true,
-                    })
-                    console.log("✅ Texture AO caricata!")
-                } else {
-                    console.log("ℹ️ Texture AO non presente per questo modello")
-                }
+            if (await firebase.storage.fileExists(aoPath)) {
+                const aoTextureUrl = await firebase.storage.getFileURL(aoPath)
+                aoTexture = await new LoadTexture(aoTextureUrl, {
+                    flipY: true,
+                })
+                console.log("✅ Texture AO caricata!")
+            } else {
+                console.log("ℹ️ Texture AO non presente per questo modello")
             }
 
-            if (data.type === "remote") {
-                if (await firebase.storage.fileExists(aoPath)) {
-                    const aoTextureUrl = await firebase.storage.getFileURL(
-                        aoPath
-                    )
-                    aoTexture = await new LoadTexture(aoTextureUrl, {
-                        flipY: true,
-                    })
-                    console.log("✅ Texture AO caricata!")
-                } else {
-                    console.log("ℹ️ Texture AO non presente per questo modello")
-                }
-            }
-
-            //
-            // load GLTF
-            //
             const glbFile = await new GLBFile(fileUrl, {
                 aoMap: aoTexture,
                 aoMapChannel: 2,
             })
             model = glbFile.model
             // setLoading(false)
-            setSelectedFileName(data.fileName)
+            setSelectedFileName(fileName)
             setLoadingFileName(null)
             setShowFileList(false)
 
@@ -268,55 +184,6 @@ export default function placeCustomModel(props) {
         } catch (error) {
             console.error("Errore:", error)
         }
-    }
-
-    //region  FUNCTIONS
-
-    async function listFiles(folderUrl) {
-        const res = await fetch(folderUrl)
-        if (!res.ok) throw new Error("Errore nel caricamento dei file")
-        return await res.json() // array di nomi file
-    }
-
-    function spawnModel() {
-        game.super.onTap() // audio
-
-        const position = new Vector3()
-        position.setFromMatrixPosition(hitMatrix())
-        const rotation = new Euler()
-        rotation.setFromRotationMatrix(hitMatrix())
-
-        model.position.copy(position)
-        model.rotation.copy(rotation)
-        model.rotateY(Math.PI / 2)
-        setMaterialsShadows(model, true)
-        game.addToScene(model)
-
-        shadows = new ContactShadowsXR(
-            SceneManager.scene,
-            SceneManager.renderer,
-            {
-                position: position,
-                resolution: 512,
-                blur: 2,
-                animate: false,
-                updateFrequency: 2,
-            }
-        )
-
-        clippingReveal = new ClippingReveal(model, SceneManager.renderer, {
-            ringsRadius: 0.2,
-            ringNumber: 4,
-            ringThickness: 0.2,
-            ringsColor: 0xf472b6,
-            duration: 2.0,
-            autoStart: true,
-            startDelay: 200,
-            fadeOutDuration: 1,
-        })
-
-        setSpawned(true)
-        handleReticle()
     }
 
     //region RETICLE AND BLURRED COVER
@@ -354,9 +221,7 @@ export default function placeCustomModel(props) {
             () => [props.enabled, props.selected],
             ([enabled, selected]) => {
                 if (
-                    (game.appMode === "load" &&
-                        enabled &&
-                        game.gameDetails.interactable) ||
+                    (game.appMode === "load" && enabled && game.gameDetails.interactable) ||
                     (game.appMode === "save" && selected)
                 ) {
                     handleReticle()
@@ -365,6 +230,43 @@ export default function placeCustomModel(props) {
             }
         )
     )
+
+    function spawnModel() {
+        game.super.onTap() // audio
+
+        const position = new Vector3()
+        position.setFromMatrixPosition(hitMatrix())
+        const rotation = new Euler()
+        rotation.setFromRotationMatrix(hitMatrix())
+
+        model.position.copy(position)
+        model.rotation.copy(rotation)
+        model.rotateY(Math.PI / 2)
+        setMaterialsShadows(model, true)
+        game.addToScene(model)
+
+        shadows = new ContactShadowsXR(SceneManager.scene, SceneManager.renderer, {
+            position: position,
+            resolution: 512,
+            blur: 2,
+            animate: false,
+            updateFrequency: 2,
+        })
+
+        clippingReveal = new ClippingReveal(model, SceneManager.renderer, {
+            ringsRadius: 0.2,
+            ringNumber: 4,
+            ringThickness: 0.2,
+            ringsColor: 0xf472b6,
+            duration: 2.0,
+            autoStart: true,
+            startDelay: 200,
+            fadeOutDuration: 1,
+        })
+
+        setSpawned(true)
+        handleReticle()
+    }
 
     //region RENDER
 
@@ -386,8 +288,8 @@ export default function placeCustomModel(props) {
                 showDoneButton={true}
                 onDone={handleCloseInstructions}
             >
-                Fai TAP sullo schermo per posizionare il modello 3D su un piano.{" "}
-                <br></br> Evita i piani troppo riflettenti o uniformi.
+                Fai TAP sullo schermo per posizionare il modello 3D su un piano. <br></br> Evita i
+                piani troppo riflettenti o uniformi.
             </Message>
         )
     }
@@ -453,12 +355,8 @@ export default function placeCustomModel(props) {
                         {fileList
                             ?.filter((file) => file.name !== selectedFileName())
                             .map((file) => (
-                                <FileItemContainer
-                                    onClick={() => handleSaveData(file)}
-                                >
-                                    {loadingFileName() === file.name
-                                        ? "caricamento..."
-                                        : file.name}
+                                <FileItemContainer onClick={() => handleSaveData(file)}>
+                                    {loadingFileName() === file.name ? "caricamento..." : file.name}
                                 </FileItemContainer>
                             ))}
                     </ItemListContainer>
@@ -495,11 +393,7 @@ export default function placeCustomModel(props) {
                 </Show>
 
                 <Show when={!showInstructions() && !showFileList()}>
-                    <Toolbar
-                        buttons={["undo"]}
-                        onUndo={handleUndo}
-                        undoActive={spawned()}
-                    />
+                    <Toolbar buttons={["undo"]} onUndo={handleUndo} undoActive={spawned()} />
                 </Show>
             </>
         )

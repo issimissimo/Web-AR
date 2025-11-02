@@ -7,7 +7,7 @@ import {
 } from "solid-js"
 import { useFirebase } from "@hooks/useFirebase"
 import { PLUGINS_LIST } from "@plugins/pluginsIndex"
-import { AppMode } from "@/main"
+import { AppMode } from "@/app"
 import { Context } from "@views/ar-overlay/arSession"
 import SceneManager from "@js/sceneManager"
 import {

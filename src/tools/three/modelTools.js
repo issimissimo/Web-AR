@@ -18,7 +18,7 @@ export class GLBFile {
         this.clock = null;
         this.gltf = null;
         this.model = null;
-        
+
         this._loaded = false;
         return this._init();
     }
@@ -113,5 +113,44 @@ export class GLBFile {
             this.actions.push(mixerActions);
         }
     }
+}
+
+
+export function findUserDataKey(root, key) {
+    let found = null;
+
+    root.traverse(obj => {
+        if (found || !obj.userData) return;
+
+        const seen = new WeakSet();
+        function search(node, path = []) {
+            if (found) return;
+            if (node && typeof node === 'object') {
+                if (seen.has(node)) return;
+                seen.add(node);
+
+                for (const k of Object.keys(node)) {
+                    const newPath = path.concat(k);
+                    if (k === key) {
+                        found = {
+                            object: obj,
+                            path: newPath.join('.'),
+                            value: node[k]
+                        };
+                        return;
+                    }
+                    const val = node[k];
+                    if (val && typeof val === 'object') {
+                        search(val, newPath);
+                        if (found) return;
+                    }
+                }
+            }
+        }
+
+        search(obj.userData, []);
+    });
+
+    return found; // null se non trovato
 }
 

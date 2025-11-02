@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { TestGameOnDesktopFallback } from "../main";
+import { TestGameOnDesktopFallback } from "../app";
 
 
 class ARButton {

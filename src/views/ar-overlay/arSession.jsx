@@ -25,7 +25,7 @@ import BlurredCover from "./BlurredCover"
 import Loader from "@components/Loader"
 
 import { PLUGINS_LIST } from "@plugins/pluginsIndex"
-import { AppMode } from "@/main"
+import { AppMode } from "@/app"
 
 // XR
 import SceneManager from "@js/sceneManager"
@@ -238,14 +238,27 @@ export default function ArSession(props) {
      * we want to hide the "InitDetection" component
      * and set prop "enabled={true}" on the games
      */
-    useOnce(
-        () => props.planeFound,
-        () => {
-            console.log(
-                "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
-            )
-            setInitDetectionCompleted(true)
-        }
+    // useOnce(
+    //     () => props.planeFound,
+    //     () => {
+    //         console.log(
+    //             "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
+    //         )
+    //         setInitDetectionCompleted(true)
+    //     }
+    // )
+    createEffect(
+        on(
+            () => props.planeFound,
+            (planeFound) => {
+                if (planeFound && !initDetectionCompleted()) {
+                    console.log(
+                        "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
+                    )
+                    setInitDetectionCompleted(true)
+                }
+            }
+        )
     )
 
     /**
@@ -579,8 +592,11 @@ export default function ArSession(props) {
                 console.log("screenHeight", screenHeight)
                 overlay.style.paddingTop = `${Math.max(statusBarHeight, 24)}px`
                 overlay.style.height = `calc(100% - ${Math.max(statusBarHeight, 24)}px)`
+
+                // Try to fix issue on Android 15 for clickable elements
+                updateClickableDomElements()
             }
-        }, 2000)
+        }, 200)
     }
 
     //#region [style]
@@ -653,7 +669,8 @@ export default function ArSession(props) {
                                     />
                                 )
                             ))}
-                        <UI id="UI"
+                        <UI
+                            id="UI"
                             visible={gamesEnabled()}
                             marker={props.marker}
                             gamesRunning={props.gamesRunning}

@@ -49,7 +49,7 @@ const VIEWS = {
     AR_NOT_SUPPORTED: "arNotSupported",
 }
 
-export default function Main() {
+export default function App() {
     //#region [constants]
     const firebase = useFirebase()
     const [currentAppMode, setCurrentAppMode] = createSignal(null)
@@ -238,7 +238,6 @@ export default function Main() {
         setCurrentView(VIEWS.LOGIN)
     }
     const goToMarkerList = () => {
-        console.log("goToMarkerList")
         setLoading(() => false)
         setUserId(() => firebase.auth.user().uid)
         setCurrentView(VIEWS.MARKER_LIST)
@@ -266,7 +265,7 @@ export default function Main() {
             if (frame && Reticle.initialized()) {
                 Reticle.update(frame, (surfType) => {})
                 if (Reticle.enabled()) {
-                    // console.log("Reticle.isHitting():", Reticle.isHitting())
+                    console.log("Reticle.isHitting():", Reticle.isHitting())
                     setPlaneFound(Reticle.isHitting())
                 }
             }

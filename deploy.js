@@ -25,7 +25,7 @@ const FTP_CONFIG = {
 
 const VERSION = packageJson.version;
 const DIST_FOLDER = './build';
-const REMOTE_BASE = '/issimissimo.com/public_html/exp/AR-Web'; // Percorso base sul server FTP
+const REMOTE_BASE = '/issimissimo.com/public_html/prod/AR-Web'; // Percorso base sul server FTP
 
 // ============================================
 // FUNZIONI HELPER
