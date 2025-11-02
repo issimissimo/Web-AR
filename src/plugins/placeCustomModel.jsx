@@ -112,11 +112,16 @@ export default function placeCustomModel(props) {
         // if we have don't have any data saved,
         // load the 1st model of the list
         if (!game.gameData()) {
+
+            handleSaveData(fileList[0])
+
+            // next we load the model
             console.log(">>>>>>>>>>>>> CARICO IL MODELLO DI DEFAULT!!!")
             await loadModel(fileList[0])
         } else {
             // load the saved model
             console.log(">>>>>>>>>>>>> CARICO IL MODELLO SALVATO!!!")
+            console.log(game.gameData())
             await loadModel(game.gameData())
         }
 
@@ -186,8 +191,9 @@ export default function placeCustomModel(props) {
 
     const handleSaveData = (file) => {
         const newData = {
-            fileName: file.name,
-            filePath: file.fullPath,
+            fileName: file.fileName,
+            filePath: file.filePath,
+            type: file.type
         }
         game.setGameData(newData)
         game.saveGameData()
@@ -216,7 +222,7 @@ export default function placeCustomModel(props) {
             const aoPath =
                 data.filePath.substring(0, data.filePath.lastIndexOf(".")) +
                 "_ao.webp"
-            
+
             let aoTexture = null
             let aoTextureUrl = null
 
@@ -273,10 +279,7 @@ export default function placeCustomModel(props) {
                     console.log("materiali:", materials)
 
                     //TODO: apply preset (if exist)
-
-
                 }
-
             } else {
                 console.log("ℹ️ Questo modello non ha delle varianti!")
             }
@@ -297,10 +300,7 @@ export default function placeCustomModel(props) {
 
     //region  FUNCTIONS
 
-    function applyMaterialsPreset(){
-        
-    }
-
+    function applyMaterialsPreset(presetName) {}
 
     async function listFiles(folderUrl) {
         const res = await fetch(folderUrl)
