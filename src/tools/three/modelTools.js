@@ -154,8 +154,43 @@ export function findUserDataKey(root, key) {
     return found; // null se non trovato
 }
 
-export function getAllMaterials(gltf){
-    let materials = gltf.parser.json.materials;
-    return materials
+// export function getAllMaterials(gltf) {
+//     const materialMap = {};
+//     gltf.scene.traverse((node) => {
+//         if (node.isMesh) {
+
+//             // Trova l'indice del materiale nel GLTF
+//             const matIndex = gltf.parser.associations.get(node.material)?.materials;
+//             console.log("SIIIIIIIIIIIIIIIIIIIIIIII", matIndex)
+//             if (matIndex !== undefined) {
+//                 const matName = gltf.parser.json.materials[matIndex].name;
+//                 materialMap[matName] = node.material;
+//             }
+//         }
+//         else{
+//             console.log("NOOOOOOOOOOOOOOOOOOOOO")
+//         }
+//     });
+//     return materialMap
+// }
+
+export async function getAllMaterials(gltf) {
+    const materialMap = {};
+
+    // Prendi tutti i materiali direttamente dal parser JSON
+    const materialsData = gltf.parser.json.materials;
+
+    // Carica tutti i materiali usando il parser
+    for (let i = 0; i < materialsData.length; i++) {
+        const matName = materialsData[i].name;
+        const material = await gltf.parser.getDependency('material', i);
+        if (matName) {
+            materialMap[matName] = material;
+        }
+    }
+    return materialMap
 }
+
+
+
 

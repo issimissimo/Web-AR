@@ -577,7 +577,6 @@ export default function ArSession(props) {
     function fixOverlayForAndroid15() {
         setTimeout(() => {
             const overlay = document.getElementById("ar-overlay")
-            console.log(overlay)
 
             // Calcola l'offset della status bar
             const windowHeight = window.innerHeight

@@ -15,7 +15,7 @@ import Button from "@components/Button"
 import ButtonCircle from "@components/ButtonCircle"
 import { useFirebase } from "@hooks/useFirebase"
 import Fa from "solid-fa"
-import { faListUl } from "@fortawesome/free-solid-svg-icons"
+import { faListUl, faEllipsisVertical } from "@fortawesome/free-solid-svg-icons"
 import { findUserDataKey, getAllMaterials } from "@tools/three/modelTools"
 
 export default function placeCustomModel(props) {
@@ -23,17 +23,20 @@ export default function placeCustomModel(props) {
     const [spawned, setSpawned] = createSignal(false)
     const [hitMatrix, setHitMatrix] = createSignal(null)
 
-    const [customVariants, setCustomVariants] = createSignal(null)
+    const [currentFileName, setCurrentFileName] = createSignal(null)
+    const [currentPresetName, setCurrentPresetName] = createSignal(null)
+    const [variantsPresets, setVariantsPresets] = createSignal(null)
 
-    const [selectedFileName, setSelectedFileName] = createSignal(null)
     const [loadingFileName, setLoadingFileName] = createSignal(null)
     const [showFileList, setShowFileList] = createSignal(false)
+    const [showPresetList, setShowPresetList] = createSignal(false)
     const [showInstructions, setShowInstructions] = createSignal(false)
 
     const defaultFolder = "models/demo/default/"
 
     let fileList
     let shadows, clippingReveal, model
+    let variantsMaterials
 
     /*
      * Put here derived functions from Game
@@ -99,6 +102,12 @@ export default function placeCustomModel(props) {
         }
     }
 
+    function getFileInfo(fileName) {
+        const file = fileList.find((f) => f.fileName === fileName)
+        if (!file) return null // oppure { filePath: null, type: null } se preferisci
+        return { filePath: file.filePath, type: file.type }
+    }
+
     /*
      * On mount
      */
@@ -112,8 +121,7 @@ export default function placeCustomModel(props) {
         // if we have don't have any data saved,
         // load the 1st model of the list
         if (!game.gameData()) {
-
-            handleSaveData(fileList[0])
+            handleSaveData(fileList[0].fileName)
 
             // next we load the model
             console.log(">>>>>>>>>>>>> CARICO IL MODELLO DI DEFAULT!!!")
@@ -154,16 +162,27 @@ export default function placeCustomModel(props) {
         game.setInitialized()
     })
 
+    //region  REAL TIME
     /*
      * REAL TIME
      */
     const { data } = firebase.realtimeDb.useRealtimeData(game.realtimeDbPath)
     createEffect(
         on(data, (newData) => {
-            // Fai quello che vuoi con i nuovi dati
-            if (props.enabled) {
-                loadModel(newData)
-            }
+            if (!props.enabled)
+                return // async IIFE so createEffect remains synchronous
+            ;(async () => {
+                if (newData.fileName !== currentFileName()) {
+                    await loadModel(newData)
+                }
+
+                //TODO - adesso dobbiamo verificare se ci sono varianti e applicarle
+                if (newData.presetName) {
+                    if (newData.presetName !== currentPresetName()) {
+                        applyVariantsPreset(newData.presetName)
+                    }
+                }
+            })()
         })
     )
 
@@ -189,18 +208,36 @@ export default function placeCustomModel(props) {
         handleReticle()
     }
 
-    const handleSaveData = (file) => {
+    const handleSaveData = (fileName, presetName = "") => {
+        console.log("--------- SALVO ---------")
+        console.log(fileName)
+
         const newData = {
-            fileName: file.fileName,
-            filePath: file.filePath,
-            type: file.type
+            fileName: fileName,
+            presetName: presetName,
+            // filePath: file.filePath,
+            // type: file.type,
         }
         game.setGameData(newData)
         game.saveGameData()
     }
 
-    const loadModel = async (data) => {
-        setLoadingFileName(data.fileName)
+    // load
+    const loadModel = async (file) => {
+        variantsMaterials = null
+        setVariantsPresets(null)
+        setCurrentPresetName(null)
+
+        const fileName = file.fileName
+        const fileInfo = getFileInfo(fileName)
+        console.log(fileInfo)
+
+        const data = {
+            filePath: fileInfo.filePath,
+            type: fileInfo.type,
+        }
+
+        setLoadingFileName(fileName)
 
         try {
             //
@@ -255,8 +292,15 @@ export default function placeCustomModel(props) {
                 aoMapChannel: 2,
             })
             model = glbFile.model
-            // setLoading(false)
-            setSelectedFileName(data.fileName)
+
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++")
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++")
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++")
+            console.log(model)
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++")
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++")
+
+            setCurrentFileName(fileName)
             setLoadingFileName(null)
             setShowFileList(false)
 
@@ -268,17 +312,21 @@ export default function placeCustomModel(props) {
             if (variants) {
                 const jsonString = variants.value
                 const data = JSON.parse(jsonString)
-                const presets = data.presets
-                console.log("PRESETS:", presets)
+                // const presets = data.presets
+                // console.log("PRESETS:", presets)
+                setVariantsPresets(Object.entries(data.presets))
+                console.log(variantsPresets())
                 console.log("✅ Questo modello ha delle varianti!")
-                console.log("Preset di default:", data.defaultPreset)
 
                 // load all materials
-                const materials = getAllMaterials(glbFile.gltf)
-                if (materials) {
-                    console.log("materiali:", materials)
+                console.log(glbFile.gltf)
+                variantsMaterials = await getAllMaterials(glbFile.gltf)
 
-                    //TODO: apply preset (if exist)
+                // apply default preset if exist
+                if (variantsMaterials && data.defaultPreset) {
+                    console.log("Preset di default:", data.defaultPreset)
+                    console.log("materiali:", variantsMaterials)
+                    applyVariantsPreset(data.defaultPreset)
                 }
             } else {
                 console.log("ℹ️ Questo modello non ha delle varianti!")
@@ -300,7 +348,45 @@ export default function placeCustomModel(props) {
 
     //region  FUNCTIONS
 
-    function applyMaterialsPreset(presetName) {}
+    function applyVariantsPreset(presetName) {
+        const newPreset =
+            variantsPresets().find(([key]) => key === presetName)?.[1] ?? null
+        console.log("ADESSO APPLICO:", newPreset.materials)
+
+        Object.entries(newPreset.materials).forEach(([key, value]) => {
+            const objName = key
+            const materialName = value
+
+            const object = model.getObjectByName(objName)
+            console.log("oggetto:", object)
+            const material = variantsMaterials[materialName]
+            console.log("materiale:", material)
+
+            if (object && object.isMesh && material) {
+                object.material = material
+            }
+        })
+
+        // newPreset.materials.forEach(([key, value]) => {
+        //     console.log(`Nome preset: ${key}`)
+        //     console.log("Dati:", value)
+        //     const objName = key
+        //     const materialName = value
+
+        //     const object = model.getObjectByName(objName)
+        //     console.log(object)
+        //     const material = variantsMaterials[materialName]
+        //     console.log(material)
+
+        //     if (object && object.isMesh && material) {
+        //         object.material = material
+        //     }
+        // })
+
+        setCurrentPresetName(presetName)
+        console.log("ORA IL CURRENT PRESET E':", currentPresetName())
+        setShowPresetList(false)
+    }
 
     async function listFiles(folderUrl) {
         const res = await fetch(folderUrl)
@@ -456,7 +542,7 @@ export default function placeCustomModel(props) {
         justify-content: center;
         box-sizing: border-box;
         gap: 1rem;
-        min-height: 40px;
+        /* min-height: 40px; */
         padding-bottom: 3px;
         padding-top: 3px;
     `
@@ -464,6 +550,7 @@ export default function placeCustomModel(props) {
     const FileItemContainer = styled("div")`
         flex: 1;
         width: 100%;
+        font-size: 0.9rem;
         /* display: flex;
         align-items: center;
         box-sizing: border-box;
@@ -475,18 +562,42 @@ export default function placeCustomModel(props) {
         box-sizing: border-box;
     `
 
+    const getPresetName = () => {
+        if (currentPresetName()) return " | " + currentPresetName()
+        return ""
+    }
+
     const FilePicker = () => {
         return (
-            <ItemListContainer id="ItemListContainer">
+            <ItemListContainer>
+                {/* PRESETS */}
+                <Show when={showPresetList()}>
+                    <ItemListContainer>
+                        {variantsPresets()
+                            ?.filter(([key]) => key !== currentPresetName())
+                            .map(([key, value]) => (
+                                <FileItemContainer
+                                    onClick={() =>
+                                        handleSaveData(currentFileName(), key)
+                                    }
+                                >
+                                    {key}
+                                </FileItemContainer>
+                            ))}
+                    </ItemListContainer>
+                </Show>
+                {/* FILES */}
                 <Show when={showFileList()}>
-                    <ItemListContainer id="ItemListContainer">
+                    <ItemListContainer>
                         {fileList
                             ?.filter(
-                                (file) => file.fileName !== selectedFileName()
+                                (file) => file.fileName !== currentFileName()
                             )
                             .map((file) => (
                                 <FileItemContainer
-                                    onClick={() => handleSaveData(file)}
+                                    onClick={() =>
+                                        handleSaveData(file.fileName)
+                                    }
                                 >
                                     {loadingFileName() === file.fileName
                                         ? "caricamento..."
@@ -495,8 +606,9 @@ export default function placeCustomModel(props) {
                             ))}
                     </ItemListContainer>
                 </Show>
+                {/* CURRENT */}
                 <FileItemContainer id="FileItemContainer" class="glass">
-                    {selectedFileName()}
+                    {currentFileName() + getPresetName()}
                 </FileItemContainer>
             </ItemListContainer>
         )
@@ -508,6 +620,21 @@ export default function placeCustomModel(props) {
                 <Show when={game.appMode === "save"}>
                     <Container>
                         <SliderContainer data-interactive>
+                            <Show when={variantsPresets()}>
+                                <ButtonCircle
+                                    onClick={setShowPresetList(
+                                        !showPresetList()
+                                    )}
+                                    border={false}
+                                    theme={"dark"}
+                                >
+                                    <Fa
+                                        icon={faEllipsisVertical}
+                                        size="1x"
+                                        class="icon"
+                                    />
+                                </ButtonCircle>
+                            </Show>
                             <FilePicker />
                             <ButtonCircle
                                 onClick={setShowFileList(!showFileList())}
