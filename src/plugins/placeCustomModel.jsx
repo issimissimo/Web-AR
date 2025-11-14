@@ -178,6 +178,7 @@ export default function placeCustomModel(props) {
 
                 //TODO - adesso dobbiamo verificare se ci sono varianti e applicarle
                 if (newData.presetName) {
+                    console.log("RICEVUTO PRESET:", newData.presetName)
                     if (newData.presetName !== currentPresetName()) {
                         applyVariantsPreset(newData.presetName)
                     }
@@ -211,6 +212,7 @@ export default function placeCustomModel(props) {
     const handleSaveData = (fileName, presetName = "") => {
         console.log("--------- SALVO ---------")
         console.log(fileName)
+        console.log(presetName)
 
         const newData = {
             fileName: fileName,
@@ -367,25 +369,12 @@ export default function placeCustomModel(props) {
             }
         })
 
-        // newPreset.materials.forEach(([key, value]) => {
-        //     console.log(`Nome preset: ${key}`)
-        //     console.log("Dati:", value)
-        //     const objName = key
-        //     const materialName = value
-
-        //     const object = model.getObjectByName(objName)
-        //     console.log(object)
-        //     const material = variantsMaterials[materialName]
-        //     console.log(material)
-
-        //     if (object && object.isMesh && material) {
-        //         object.material = material
-        //     }
-        // })
-
         setCurrentPresetName(presetName)
         console.log("ORA IL CURRENT PRESET E':", currentPresetName())
         setShowPresetList(false)
+
+        // sound
+        game.onClick()
     }
 
     async function listFiles(folderUrl) {
@@ -617,35 +606,33 @@ export default function placeCustomModel(props) {
     const View = () => {
         return (
             <>
-                <Show when={game.appMode === "save"}>
-                    <Container>
-                        <SliderContainer data-interactive>
-                            <Show when={variantsPresets()}>
-                                <ButtonCircle
-                                    onClick={setShowPresetList(
-                                        !showPresetList()
-                                    )}
-                                    border={false}
-                                    theme={"dark"}
-                                >
-                                    <Fa
-                                        icon={faEllipsisVertical}
-                                        size="1x"
-                                        class="icon"
-                                    />
-                                </ButtonCircle>
-                            </Show>
-                            <FilePicker />
-                            <ButtonCircle
-                                onClick={setShowFileList(!showFileList())}
-                                border={false}
-                                theme={"dark"}
-                            >
-                                <Fa icon={faListUl} size="1x" class="icon" />
-                            </ButtonCircle>
-                        </SliderContainer>
-                    </Container>
-                </Show>
+                <Container>
+                    <SliderContainer data-interactive>
+                        <ButtonCircle
+                            onClick={setShowPresetList(!showPresetList())}
+                            border={false}
+                            theme={"dark"}
+                            active={variantsPresets()}
+                        >
+                            <Fa
+                                icon={faEllipsisVertical}
+                                size="1x"
+                                class="icon"
+                            />
+                        </ButtonCircle>
+
+                        <FilePicker />
+
+                        <ButtonCircle
+                            onClick={setShowFileList(!showFileList())}
+                            border={false}
+                            theme={"dark"}
+                            active={game.appMode === "save"}
+                        >
+                            <Fa icon={faListUl} size="1x" class="icon" />
+                        </ButtonCircle>
+                    </SliderContainer>
+                </Container>
 
                 <Show when={showInstructions()}>
                     <InstructionsContainer>
@@ -653,7 +640,13 @@ export default function placeCustomModel(props) {
                     </InstructionsContainer>
                 </Show>
 
-                <Show when={!showInstructions() && !showFileList()}>
+                <Show
+                    when={
+                        !showInstructions() &&
+                        !showFileList() &&
+                        !showPresetList()
+                    }
+                >
                     <Toolbar
                         buttons={["undo"]}
                         onUndo={handleUndo}

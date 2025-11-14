@@ -204,6 +204,7 @@ export function useGame(gameName, gameId, config = {}) {
         renderLoop,
         close,
         onUndo,
+        onClick,
         loadGameData,
         saveGameData,
         addToScene,

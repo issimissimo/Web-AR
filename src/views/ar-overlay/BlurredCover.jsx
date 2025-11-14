@@ -20,7 +20,7 @@ export default function BlurredCover(props) {
     const [showHole, setShowHole] = createSignal(props.showHole || false);
 
     const radius = () => props.radius ?? 20;
-    const dur = () => props.duration ?? 0.8;
+    const dur = () => props.duration ?? 0.4;
 
     createEffect(() => {
 
