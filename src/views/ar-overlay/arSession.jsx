@@ -46,8 +46,11 @@ const LOCALIZATION_STATE = {
 export default function ArSession(props) {
     //#region [constants]
     const firebase = useFirebase()
-    const [initDetectionCompleted, setInitDetectionCompleted] = createSignal(false)
-    const [localizationState, setLocalizationState] = createSignal(LOCALIZATION_STATE.NONE)
+    const [initDetectionCompleted, setInitDetectionCompleted] =
+        createSignal(false)
+    const [localizationState, setLocalizationState] = createSignal(
+        LOCALIZATION_STATE.NONE
+    )
     const [referenceMatrix, setReferenceMatrix] = createSignal(new Matrix4())
     const [modules, setModules] = createSignal([])
     const [gamesInitialized, setGamesInitialized] = createSignal(false)
@@ -68,7 +71,7 @@ export default function ArSession(props) {
     //#region [lifeCycle]
     onMount(() => {
         // Fix Android 15 bug
-        fixOverlayForAndroid15()
+        // fixOverlayForAndroid15()
 
         // Initialize the DOM Observer for interactive elements
         setupDomObserver()
@@ -106,7 +109,9 @@ export default function ArSession(props) {
         if (config.debugOnDesktop) {
             // Skip init detection
             setInitDetectionCompleted(true)
-            console.warn("We are DEBUGGING on desktop and Init detection is skipped!")
+            console.warn(
+                "We are DEBUGGING on desktop and Init detection is skipped!"
+            )
         }
         // If not, we must set it to transparent for compatibility on iOS
         else {
@@ -192,7 +197,9 @@ export default function ArSession(props) {
 
             // Bypass all the check for initialization
             // and props.runningGames count
-            console.log("=== ArSession: no games in this marker, let's set gamesInitialized = true")
+            console.log(
+                "=== ArSession: no games in this marker, let's set gamesInitialized = true"
+            )
             setGamesInitialized(true)
         }
     })
@@ -209,8 +216,14 @@ export default function ArSession(props) {
         on(
             [gamesInitialized, initDetectionCompleted, localizationState],
             ([initialized, detectionCompleted, locState]) => {
-                if (initialized && detectionCompleted && locState !== LOCALIZATION_STATE.REQUIRED) {
-                    console.log("=== ArSession: all requirements to set gamesEnabled = true")
+                if (
+                    initialized &&
+                    detectionCompleted &&
+                    locState !== LOCALIZATION_STATE.REQUIRED
+                ) {
+                    console.log(
+                        "=== ArSession: all requirements to set gamesEnabled = true"
+                    )
                     setGamesEnabled(true)
                     handleBlurredCover({ visible: false, priority: 1 })
                 }
@@ -227,7 +240,10 @@ export default function ArSession(props) {
             () => props.gamesRunning,
             (gamesRunning) => {
                 if (gamesRunning.length > 0) {
-                    console.log("=== ArSession: Games running changed:", gamesRunning)
+                    console.log(
+                        "=== ArSession: Games running changed:",
+                        gamesRunning
+                    )
                     checkAllGamesReady()
                 }
             }
@@ -302,7 +318,10 @@ export default function ArSession(props) {
         // Show all the meshes of all the games
         setGamesVisible(true)
 
-        console.log("=== ArSession: LOCALIZATION COMPLETED! Matrix:", referenceMatrix())
+        console.log(
+            "=== ArSession: LOCALIZATION COMPLETED! Matrix:",
+            referenceMatrix()
+        )
         setLocalizationState(() => LOCALIZATION_STATE.COMPLETED)
     }
 
@@ -341,15 +360,23 @@ export default function ArSession(props) {
         // AND all props.gamesRunning are set
         // (I need to check props.gamesRunning too because if initialization
         // is too quick often the game it's not yet set in props.gamesRunning...!)
-        if (_gamesInitialized === _modulesToLoad && props.gamesRunning.length === _modulesToLoad) {
+        if (
+            _gamesInitialized === _modulesToLoad &&
+            props.gamesRunning.length === _modulesToLoad
+        ) {
             // If just one of the game need localization,
             // we need to show the Localization component
             // as soon as all the games initialized
             for (let i = 0; i < props.gamesRunning.length; i++) {
                 const _game = props.gamesRunning[i]
 
-                const gameSpecs = PLUGINS_LIST.find((g) => g.fileName === _game.name)
-                if (gameSpecs.localized && localizationState() !== LOCALIZATION_STATE.COMPLETED) {
+                const gameSpecs = PLUGINS_LIST.find(
+                    (g) => g.fileName === _game.name
+                )
+                if (
+                    gameSpecs.localized &&
+                    localizationState() !== LOCALIZATION_STATE.COMPLETED
+                ) {
                     console.log(
                         "============= ",
                         _game.name,
@@ -535,9 +562,11 @@ export default function ArSession(props) {
                     return
                 }
 
-                const highestState = _blurredCoverStates.reduce((max, current) => {
-                    return current.priority > max.priority ? current : max
-                })
+                const highestState = _blurredCoverStates.reduce(
+                    (max, current) => {
+                        return current.priority > max.priority ? current : max
+                    }
+                )
 
                 // // just for debugging
                 // if (_blurredCoverStates.length > 1) {
@@ -582,6 +611,9 @@ export default function ArSession(props) {
             const windowHeight = window.innerHeight
             const screenHeight = window.screen.height
 
+            console.log("windowHeight", windowHeight)
+            console.log("screenHeight", screenHeight)
+
             // Offset stimato per Android 15 (tipicamente tra 24px e 48px)
             const statusBarHeight = screenHeight - windowHeight
 
@@ -590,10 +622,13 @@ export default function ArSession(props) {
                 console.log("windowHeight", windowHeight)
                 console.log("screenHeight", screenHeight)
                 overlay.style.paddingTop = `${Math.max(statusBarHeight, 24)}px`
-                overlay.style.height = `calc(100% - ${Math.max(statusBarHeight, 24)}px)`
+                overlay.style.height = `calc(100% - ${Math.max(
+                    statusBarHeight,
+                    24
+                )}px)`
 
-                // Try to fix issue on Android 15 for clickable elements
-                updateClickableDomElements()
+                // // Try to fix issue on Android 15 for clickable elements
+                // updateClickableDomElements()
             }
         }, 200)
     }
@@ -648,7 +683,10 @@ export default function ArSession(props) {
                                     <Component
                                         id={item.id}
                                         enabled={gamesEnabled()}
-                                        selected={gamesEnabled() && item.id === selectedGameId()}
+                                        selected={
+                                            gamesEnabled() &&
+                                            item.id === selectedGameId()
+                                        }
                                         referenceMatrix={referenceMatrix()}
                                     />
                                 )
@@ -659,7 +697,8 @@ export default function ArSession(props) {
                             (!initDetectionCompleted() ? (
                                 <InitialDetection />
                             ) : (
-                                localizationState() === LOCALIZATION_STATE.REQUIRED && (
+                                localizationState() ===
+                                    LOCALIZATION_STATE.REQUIRED && (
                                     <Localization
                                         planeFound={props.planeFound}
                                         setReferenceMatrix={(matrix) =>
@@ -673,7 +712,9 @@ export default function ArSession(props) {
                             visible={gamesEnabled()}
                             marker={props.marker}
                             gamesRunning={props.gamesRunning}
-                            addNewPluginToMarker={(pluginName) => addNewPluginToMarker(pluginName)}
+                            addNewPluginToMarker={(pluginName) =>
+                                addNewPluginToMarker(pluginName)
+                            }
                             selectedGameId={selectedGameId()}
                             setSelectedGameId={(id) => setSelectedGameId(id)}
                             setHeaderText={(text) => setHeaderText(text)}

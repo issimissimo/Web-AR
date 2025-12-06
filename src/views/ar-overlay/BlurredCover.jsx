@@ -11,6 +11,7 @@ const SvgOverlay = styled(Motion.svg)`
     bottom: 0;
     pointer-events: none;
     z-index: -1;
+    height: 100%;
 `;
 
 

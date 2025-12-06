@@ -19,7 +19,6 @@ import ArSession from "@views/ar-overlay/arSession"
 import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
 
-
 /*
  * This function is called by the "Enter AR" button
  * only when we have debugOnDesktop=true in the configuration file
@@ -77,35 +76,40 @@ export default function App() {
 
         // Auth
         if ("xr" in navigator) {
-            navigator.xr.isSessionSupported("immersive-ar").then((supported) => {
-                if (!supported && !config.debugOnDesktop) {
-                    goToArNotSupported()
-                    setLoading(false)
-                } else {
-                    // Search for URL query string
-                    const urlParams = new URLSearchParams(window.location.search)
-                    const hasQueryParams = urlParams.has("userId") && urlParams.has("markerId")
-
-                    // Access as anonymous
-                    if (hasQueryParams || config.debugLoadMode) {
-                        setCurrentAppMode(() => AppMode.LOAD)
-                        accessAnonymous(urlParams)
+            navigator.xr
+                .isSessionSupported("immersive-ar")
+                .then((supported) => {
+                    if (!supported && !config.debugOnDesktop) {
+                        goToArNotSupported()
+                        setLoading(false)
                     } else {
-                        // Login or register
-                        setCurrentAppMode(() => AppMode.SAVE)
-                        if (!firebase.auth.authLoading()) {
-                            checkAuthStatus()
+                        // Search for URL query string
+                        const urlParams = new URLSearchParams(
+                            window.location.search
+                        )
+                        const hasQueryParams =
+                            urlParams.has("userId") && urlParams.has("markerId")
+
+                        // Access as anonymous
+                        if (hasQueryParams || config.debugLoadMode) {
+                            setCurrentAppMode(() => AppMode.LOAD)
+                            accessAnonymous(urlParams)
                         } else {
-                            const timer = setInterval(() => {
-                                if (!firebase.auth.authLoading()) {
-                                    clearInterval(timer)
-                                    checkAuthStatus()
-                                }
-                            }, 100)
+                            // Login or register
+                            setCurrentAppMode(() => AppMode.SAVE)
+                            if (!firebase.auth.authLoading()) {
+                                checkAuthStatus()
+                            } else {
+                                const timer = setInterval(() => {
+                                    if (!firebase.auth.authLoading()) {
+                                        clearInterval(timer)
+                                        checkAuthStatus()
+                                    }
+                                }, 100)
+                            }
                         }
                     }
-                }
-            })
+                })
         } else {
             goToArNotSupported()
             setLoading(false)
@@ -128,8 +132,12 @@ export default function App() {
             await firebase.auth.loginAnonymous()
         }
 
-        setUserId(() => (config.debugLoadMode ? config.debugUserId : params.get("userId")))
-        const markerId = config.debugLoadMode ? config.debugMarkerId : params.get("markerId")
+        setUserId(() =>
+            config.debugLoadMode ? config.debugUserId : params.get("userId")
+        )
+        const markerId = config.debugLoadMode
+            ? config.debugMarkerId
+            : params.get("markerId")
         const data = await firebase.firestore.fetchMarker(userId(), markerId)
         if (data) {
             setupMarker({ id: markerId, data: data }, () => goToAnonymous())
@@ -145,7 +153,9 @@ export default function App() {
     const checkAuthStatus = async () => {
         if (firebase.auth.user()) {
             if (firebase.auth.user().isAnonymous) {
-                console.log("You previously logged as anonymous, so you need to login again")
+                console.log(
+                    "You previously logged as anonymous, so you need to login again"
+                )
                 goToLogin()
             } else {
                 if (config.production) {
@@ -168,8 +178,13 @@ export default function App() {
         // If no Games are provided, load the all the Games
         // from firestore for this marker
         if (marker.id && !marker.data.games) {
-            console.log("no marker.data.games provided, now loading them from firestore!")
-            marker.data.games = await firebase.firestore.fetchGames(userId(), marker.id)
+            console.log(
+                "no marker.data.games provided, now loading them from firestore!"
+            )
+            marker.data.games = await firebase.firestore.fetchGames(
+                userId(),
+                marker.id
+            )
         }
 
         // reorder games by timestamp
@@ -183,10 +198,21 @@ export default function App() {
                 const bSeconds = b?.created?.seconds
 
                 // Se uno dei due non ha il timestamp valido
-                if (typeof aSeconds !== "number" || typeof bSeconds !== "number") {
+                if (
+                    typeof aSeconds !== "number" ||
+                    typeof bSeconds !== "number"
+                ) {
                     // Gli elementi senza timestamp vanno alla fine
-                    if (typeof aSeconds !== "number" && typeof bSeconds === "number") return 1
-                    if (typeof aSeconds === "number" && typeof bSeconds !== "number") return -1
+                    if (
+                        typeof aSeconds !== "number" &&
+                        typeof bSeconds === "number"
+                    )
+                        return 1
+                    if (
+                        typeof aSeconds === "number" &&
+                        typeof bSeconds !== "number"
+                    )
+                        return -1
                     return 0
                 }
                 return aSeconds - bSeconds
@@ -216,12 +242,15 @@ export default function App() {
      * Toggle background visibility
      */
     const setBackgroundVisible = (value) => {
-        document.getElementById("backgroundContainer").style.display = value ? "flex" : "none"
+        document.getElementById("backgroundContainer").style.display = value
+            ? "flex"
+            : "none"
     }
 
     const setBodyColor = () => {
         const body = document.getElementsByTagName("body")[0]
-        const bgColor = getComputedStyle(body).getPropertyValue("--color-background")
+        const bgColor =
+            getComputedStyle(body).getPropertyValue("--color-background")
         body.style.backgroundColor = bgColor
     }
 
@@ -337,10 +366,20 @@ export default function App() {
                 )
 
             case VIEWS.REGISTER:
-                return <Register onSuccess={goToMarkerList} onGoToLogin={goToLogin} />
+                return (
+                    <Register
+                        onSuccess={goToMarkerList}
+                        onGoToLogin={goToLogin}
+                    />
+                )
 
             case VIEWS.LOGIN:
-                return <Login onSuccess={goToMarkerList} onGoToRegister={goToRegister} />
+                return (
+                    <Login
+                        onSuccess={goToMarkerList}
+                        onGoToRegister={goToRegister}
+                    />
+                )
 
             case VIEWS.MARKER_LIST:
                 return (
@@ -358,7 +397,10 @@ export default function App() {
                                 like: marker.like,
                                 views: marker.views,
                             }
-                            setupMarker({ id: marker.id, data: markerData }, () => goToEditMarker())
+                            setupMarker(
+                                { id: marker.id, data: markerData },
+                                () => goToEditMarker()
+                            )
                         }}
                         goToUserProfile={goToUserProfile()}
                     />
@@ -409,7 +451,9 @@ export default function App() {
                             planeFound={planeFound()}
                             gamesRunning={gamesRunning()}
                             resetGamesRunning={setGamesRunning(() => [])}
-                            addGame={(el) => setGamesRunning((prev) => [...prev, el])}
+                            addGame={(el) =>
+                                setGamesRunning((prev) => [...prev, el])
+                            }
                             onNewGameSaved={() => {
                                 const markerData = {
                                     name: currentMarker().name,
