@@ -19,7 +19,7 @@ const packageJson = require('./package.json');
 const FTP_CONFIG = {
   host: 'ftp.issimissimo.com',
   user: 'd.suppo@issimissimo.com',
-  password: 'pd*e#IIuj1y3',
+  password: '/wfC1^b#m124',
   secure: false // Cambia in true se usi FTPS
 };
 

@@ -2,17 +2,12 @@ import { onMount, createSignal, createEffect, on, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { useGame } from "@js/gameBase"
 import Reticle from "@js/reticle"
-import SceneManager from "@js/sceneManager"
 import Message from "@components/Message"
 import * as THREE from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
 import { Vector3, Euler } from "three"
-import { GLBFile } from "@tools/three/modelTools"
 import { LoadTexture } from "@tools/three/textureTools"
 import { LoadPositionalAudio } from "@tools/three/audioTools"
-import { setMaterialsShadows } from "@tools/three/materialTools"
-import ContactShadowsXR from "@tools/three/ContactShadowsXR"
-import ClippingReveal from "@tools/three/ClippingReveal"
 import Toolbar from "@views/ar-overlay/Toolbar"
 import { RecreateMaterials } from "@tools/three/materialTools"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
@@ -21,7 +16,12 @@ export default function demoRulliera(props) {
     // Parameters
     const materialOffset = 0.008
     const useVideo = true
-    const globalScale = 0.1
+    let globalScale = 1
+
+    const BARRRIERA_TYPE = {
+        MICRON: "MICRON",
+        STANDARD: "STANDARD",
+    }
 
     const clock = new THREE.Clock(!useVideo)
 
@@ -34,11 +34,17 @@ export default function demoRulliera(props) {
     draco.setDecoderConfig({ type: "js" })
     draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/")
 
-    let CASSONI, BARRIERE, RULLI_SCATOLE, GROUND, TENDE_RAGGI
+    let CASSONI,
+        BARRIERE_STANDARD,
+        BARRIERE_MICRON,
+        RULLI_SCATOLE,
+        GROUND,
+        TENDE_RAGGI
     let group, mixer, isReady, action, gltf, aoTexture, video, videoTexture
 
     const [showInstructions, setShowInstructions] = createSignal(true)
     const [spawned, setSpawned] = createSignal(false)
+    const [barrieraTypeSelected, setBarrieraTypeSelected] = createSignal(BARRRIERA_TYPE.STANDARD)
 
     const handleCloseInstructions = () => {
         setShowInstructions(false)
@@ -51,7 +57,7 @@ export default function demoRulliera(props) {
 
         // if (audioRobot) audioRobot.stop()
         // robotGlb.resetAnimations()
-        // game.removePreviousFromScene()
+        game.removePreviousFromScene()
         setSpawned(false)
         handleReticle()
     }
@@ -161,18 +167,27 @@ export default function demoRulliera(props) {
         group.add(GROUND)
 
         /*
-         * BARRIERE
+         * BARRIERE STANDARD
          */
         aoTexture = await loadTexture("models/demo/Rulliera/BARRIERA_AO.webp")
         aoTexture.flipY = true
-        gltf = await loadGLTF("models/demo/Rulliera/BARRIERE_001.glb")
-        BARRIERE = gltf.scene
-        BARRIERE = RecreateMaterials(BARRIERE, {
+        gltf = await loadGLTF(
+            "models/demo/Rulliera/BARRIERE_001_compressed.glb"
+        )
+        BARRIERE_STANDARD = gltf.scene
+        BARRIERE_STANDARD = RecreateMaterials(BARRIERE_STANDARD, {
             aoMap: aoTexture,
             aoMapChannel: 1,
             aoMapIntensity: 1,
         })
-        group.add(BARRIERE)
+        group.add(BARRIERE_STANDARD)
+
+        /*
+         * BARRIERE_MICRON
+         */
+        gltf = await loadGLTF("models/BARRIERE_MICRON_002_compressed.glb")
+        BARRIERE_MICRON = gltf.scene
+        group.add(BARRIERE_MICRON)
 
         /*
          * GREEN LIGHTS ALLE BARRIERE
@@ -258,7 +273,6 @@ export default function demoRulliera(props) {
              * Don't forget to call "game.setInitialized()" at finish
              */
             game.setInitialized()
-            test()
         }
     })
 
@@ -429,106 +443,58 @@ export default function demoRulliera(props) {
         })
     }
 
-    // function spawnModel(matrix) {
-    //     const position = new Vector3()
-    //     position.setFromMatrixPosition(matrix)
-
-    //     const rotation = new Euler()
-    //     rotation.setFromRotationMatrix(matrix)
-
-    //     loadedModel.position.copy(position)
-    //     loadedModel.rotation.copy(rotation)
-    //     loadedModel.rotateY(Math.PI / 2)
-    //     setMaterialsShadows(loadedModel, true)
-    //     game.addToScene(loadedModel)
-
-    //     loadedModel.add(audioRobot)
-    //     audioRobot.play()
-
-    //     setSpawned(true)
-
-    //     shadows = new ContactShadowsXR(
-    //         SceneManager.scene,
-    //         SceneManager.renderer,
-    //         {
-    //             position: position,
-    //             resolution: 512,
-    //             blur: 2,
-    //             animate: true,
-    //             updateFrequency: 2,
-    //         }
-    //     )
-
-    //     clippingReveal = new ClippingReveal(
-    //         loadedModel,
-    //         SceneManager.renderer,
-    //         {
-    //             ringsRadius: 0.2,
-    //             ringNumber: 4,
-    //             ringThickness: 0.2,
-    //             ringsColor: 0xf472b6,
-    //             duration: 2.0,
-    //             autoStart: true,
-    //             startDelay: 200,
-    //             fadeOutDuration: 2,
-    //             onComplete: () => console.log("Reveal completed"),
-    //         }
-    //     )
-    // }
-
     function spawnModel(matrix) {
-        // Resetta tutto
-        video.currentTime = 0
-        if (mixer) mixer.setTime(0)
+        const position = new Vector3()
+        position.setFromMatrixPosition(matrix)
 
-        // Avvia il video (anche se poi lo controlliamo noi)
-        video.play().catch((e) => console.error("Errore play:", e))
+        const rotation = new Euler()
+        rotation.setFromRotationMatrix(matrix)
 
-        // Avvia animazione e clock
-        // action.play();
-        actions.forEach((act) => {
-            act.play()
-        })
-
-        clock.start()
-        isReady = true
-
-        game.addToScene(group)
-
-        group.position.set(0, -0.1, 0)
-
-        group.scale.set(globalScale, globalScale, globalScale)
-    }
-
-    function test() {
-        // Resetta tutto
-        video.currentTime = 0
-        if (mixer) mixer.setTime(0)
-
-        // Avvia il video (anche se poi lo controlliamo noi)
-        video.play().catch((e) => console.error("Errore play:", e))
-
-        // Avvia animazione e clock
-        // action.play();
-        actions.forEach((act) => {
-            act.play()
-        })
-
-        clock.start()
-        isReady = true
-
-        // const boxGeom = new THREE.BoxGeometry(1, 1, 1)
-        // const boxMat = new THREE.MeshStandardMaterial({ color: 0xff0000 })
-        // const cube = new THREE.Mesh(boxGeom, boxMat)
-        // group.add(cube)
-
-        game.addToScene(group)
-
-        group.position.set(0, 0, -1)
+        group.position.copy(position)
+        group.rotation.copy(rotation)
         group.rotation.y = Math.PI / 2
 
+        game.addToScene(group)
+
         group.scale.set(globalScale, globalScale, globalScale)
 
-        setSpawned(true)
+        // Resetta tutto
+        video.currentTime = 0
+        if (mixer) mixer.setTime(0)
+
+        // Avvia il video (anche se poi lo controlliamo noi)
+        video.play().catch((e) => console.error("Errore play:", e))
+
+        // Avvia animazione e clock
+        // action.play();
+        actions.forEach((act) => {
+            act.play()
+        })
+
+        clock.start()
+        isReady = true
+
+        swapBarriera()
+    }
+
+    function swapBarriera() {
+        BARRIERE_STANDARD.traverse((child) => {
+            if (child.isMesh) {
+                if (barrieraTypeSelected() === BARRRIERA_TYPE.STANDARD) {
+                    child.visible = true
+                } else {
+                    child.visible = false
+                }
+            }
+        })
+        BARRIERE_MICRON.traverse((child) => {
+            if (child.isMesh) {
+                if (barrieraTypeSelected() === BARRRIERA_TYPE.MICRON) {
+                    child.visible = true
+                } else {
+                    child.visible = false
+                }
+            }
+        })
     }
 }
