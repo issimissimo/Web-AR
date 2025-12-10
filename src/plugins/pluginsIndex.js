@@ -134,7 +134,7 @@ export const PLUGINS_LIST = [
     // },
     {
         fileName: "demoRulliera",
-        title: 'Demo per rulliera',
+        title: 'Demo Rulliera',
         description: 'Posiziona su una superficie i rulli',
         icon: null,
         category: 'Custom',

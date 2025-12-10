@@ -11,17 +11,20 @@ import { LoadPositionalAudio } from "@tools/three/audioTools"
 import Toolbar from "@views/ar-overlay/Toolbar"
 import { RecreateMaterials } from "@tools/three/materialTools"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import HorizontalSlider from "@components/HorizontalSlider"
+import ToggleButton from "@components/ToggleButton"
+import ButtonSecondary from "@components/ButtonSecondary"
+
+const BARRRIERA_TYPE = {
+    MICRON: "MICRON",
+    STANDARD: "STANDARD",
+}
 
 export default function demoRulliera(props) {
     // Parameters
     const materialOffset = 0.008
     const useVideo = true
     let globalScale = 1
-
-    const BARRRIERA_TYPE = {
-        MICRON: "MICRON",
-        STANDARD: "STANDARD",
-    }
 
     const clock = new THREE.Clock(!useVideo)
 
@@ -39,12 +42,18 @@ export default function demoRulliera(props) {
         BARRIERE_MICRON,
         RULLI_SCATOLE,
         GROUND,
-        TENDE_RAGGI
+        TENDE_RAGGI,
+        LIGHT_GREEN,
+        LIGHT_RED
     let group, mixer, isReady, action, gltf, aoTexture, video, videoTexture
 
     const [showInstructions, setShowInstructions] = createSignal(true)
     const [spawned, setSpawned] = createSignal(false)
-    const [barrieraTypeSelected, setBarrieraTypeSelected] = createSignal(BARRRIERA_TYPE.STANDARD)
+    const [barrieraTypeSelected, setBarrieraTypeSelected] = createSignal(
+        BARRRIERA_TYPE.STANDARD
+    )
+    const [scale, setScale] = createSignal(1)
+    const [rotation, setRotation] = createSignal(0)
 
     const handleCloseInstructions = () => {
         setShowInstructions(false)
@@ -60,6 +69,18 @@ export default function demoRulliera(props) {
         game.removePreviousFromScene()
         setSpawned(false)
         handleReticle()
+    }
+
+    const handleChangeSize = (newSize) => {
+        console.log("newSize:", newSize)
+        setScale(newSize)
+        setModelScale()
+    }
+
+    const handleChangeRotation = (newRotation) => {
+        console.log("newRotation:", newRotation)
+        setRotation(newRotation)
+        setModelRotation()
     }
 
     /*
@@ -185,31 +206,36 @@ export default function demoRulliera(props) {
         /*
          * BARRIERE_MICRON
          */
-        gltf = await loadGLTF("models/BARRIERE_MICRON_002_compressed.glb")
+        gltf = await loadGLTF(
+            "models/demo/Rulliera/BARRIERE_MICRON_002_compressed.glb"
+        )
         BARRIERE_MICRON = gltf.scene
         group.add(BARRIERE_MICRON)
 
         /*
-         * GREEN LIGHTS ALLE BARRIERE
+         * GREEN LIGHT ALLE BARRIERE
          */
         // green point light at center, 1m high
-        const greenLight1 = new THREE.PointLight(
+        LIGHT_GREEN = new THREE.PointLight(
             0x00ff00,
-            1 * globalScale * globalScale,
-            4 * globalScale,
+            1 * scale() * scale(),
+            4 * scale(),
             4
         )
-        greenLight1.position.set(-0.6, 0.8, 0)
-        group.add(greenLight1)
+        LIGHT_GREEN.position.set(-0.6, 0.8, 0)
+        group.add(LIGHT_GREEN)
 
-        const redLight3 = new THREE.PointLight(
+        /*
+         * RED LIGHT ALLE BARRIERE
+         */
+        LIGHT_RED = new THREE.PointLight(
             0xf60d0d,
-            2 * globalScale * globalScale,
-            4 * globalScale,
+            2 * scale() * scale(),
+            4 * scale(),
             4
         )
-        redLight3.position.set(-0.65, 1.4, 0)
-        group.add(redLight3)
+        LIGHT_RED.position.set(-0.65, 1.4, 0)
+        group.add(LIGHT_RED)
 
         /*
          * ANIM TENDE E RAGGI
@@ -336,17 +362,93 @@ export default function demoRulliera(props) {
         box-sizing: border-box;
     `
 
+    const UIContainer = styled("div")`
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        box-sizing: border-box;
+    `
+
+    const SwapButtonsContainer = styled("div")`
+        padding-top: 1.5rem;
+        width: 90%;
+        display: flex;
+        gap: 1rem;
+        /* align-items: center;
+        justify-content: flex-end;
+        box-sizing: border-box; */
+    `
+
     const View = () => {
         return (
             <Show
                 when={showInstructions()}
                 fallback={
-                    <Toolbar
-                        id="toolbar"
-                        buttons={["undo"]}
-                        onUndo={handleUndo}
-                        undoActive={spawned()}
-                    />
+                    <>
+                        {/* <Toolbar
+                            id="toolbar"
+                            buttons={["undo"]}
+                            onUndo={handleUndo}
+                            undoActive={spawned()}
+                        /> */}
+
+                        <Show when={spawned()}>
+                            <UIContainer>
+                                <HorizontalSlider
+                                    label={"Scala"}
+                                    min={"0.1"}
+                                    max={"1"}
+                                    default={1}
+                                    step={"0.1"}
+                                    onChange={(value) =>
+                                        handleChangeSize(value)
+                                    }
+                                ></HorizontalSlider>
+
+                                <HorizontalSlider
+                                    label={"Rotazione"}
+                                    min={"0"}
+                                    max={"360"}
+                                    default={0}
+                                    step={"0.1"}
+                                    onChange={(value) =>
+                                        handleChangeRotation(value)
+                                    }
+                                    showValue={false}
+                                ></HorizontalSlider>
+
+                                <SwapButtonsContainer>
+                                    <ToggleButton
+                                        isOn={
+                                            barrieraTypeSelected() ===
+                                            BARRRIERA_TYPE.STANDARD
+                                        }
+                                        onClick={() =>
+                                            swapBarriera(
+                                                BARRRIERA_TYPE.STANDARD
+                                            )
+                                        }
+                                    >
+                                        Standard
+                                    </ToggleButton>
+                                    <ToggleButton
+                                        isOn={
+                                            barrieraTypeSelected() ===
+                                            BARRRIERA_TYPE.MICRON
+                                        }
+                                        onClick={() =>
+                                            swapBarriera(BARRRIERA_TYPE.MICRON)
+                                        }
+                                    >
+                                        Micron
+                                    </ToggleButton>
+                                </SwapButtonsContainer>
+                            </UIContainer>
+                        </Show>
+                    </>
                 }
             >
                 <Container>
@@ -357,8 +459,8 @@ export default function demoRulliera(props) {
                         onDone={handleCloseInstructions}
                     >
                         Fai TAP sullo schermo per posizionare la Rulliera su un
-                        piano. <br></br> Evita i piani troppo Evita superfici
-                        riflettenti o uniformi.
+                        piano. <br></br> Evita i piani troppo riflettenti o
+                        uniformi.
                     </Message>
                 </Container>
             </Show>
@@ -452,11 +554,18 @@ export default function demoRulliera(props) {
 
         group.position.copy(position)
         group.rotation.copy(rotation)
-        group.rotation.y = Math.PI / 2
 
         game.addToScene(group)
 
-        group.scale.set(globalScale, globalScale, globalScale)
+        setModelScale()
+        setModelRotation()
+
+        //  // group.rotation.y = Math.PI / 2
+        // // Apply rotation signal (degrees -> radians) on top of default 90°
+        // group.rotation.y = Math.PI / 2 + THREE.MathUtils.degToRad(rotation())
+
+        // // group.scale.set(globalScale, globalScale, globalScale)
+        // group.scale.set(scale(), scale(), scale())
 
         // Resetta tutto
         video.currentTime = 0
@@ -474,10 +583,12 @@ export default function demoRulliera(props) {
         clock.start()
         isReady = true
 
-        swapBarriera()
+        swapBarriera(barrieraTypeSelected())
     }
 
-    function swapBarriera() {
+    function swapBarriera(newType) {
+        game.onClick()
+        setBarrieraTypeSelected(newType)
         BARRIERE_STANDARD.traverse((child) => {
             if (child.isMesh) {
                 if (barrieraTypeSelected() === BARRRIERA_TYPE.STANDARD) {
@@ -496,5 +607,19 @@ export default function demoRulliera(props) {
                 }
             }
         })
+    }
+
+    function setModelScale() {
+        group.scale.set(scale(), scale(), scale())
+
+        LIGHT_GREEN.intensity = 1 * scale() * scale()
+        LIGHT_GREEN.distance = 4 * scale()
+
+        LIGHT_RED.intensity = 1 * scale() * scale()
+        LIGHT_RED.distance = 4 * scale()
+    }
+
+    function setModelRotation() {
+        group.rotation.y = Math.PI / 2 + THREE.MathUtils.degToRad(rotation())
     }
 }
