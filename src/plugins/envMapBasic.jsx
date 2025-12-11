@@ -93,7 +93,8 @@ export default function envMapBasic(props) {
 
     function loadEnv(callback = null) {
         setLoading(true)
-        const filePath = "images/hdr/" + game.gameData().fileName
+        const filePath = "hdr/" + game.gameData().fileName
+        console.log("ENVMAP >> LOADING:", filePath)
         hdrLoader.load(filePath, (envMap) => {
             setLoading(false)
             envMap.mapping = EquirectangularReflectionMapping

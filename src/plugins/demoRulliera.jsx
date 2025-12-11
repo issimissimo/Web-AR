@@ -6,14 +6,13 @@ import Message from "@components/Message"
 import * as THREE from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
 import { Vector3, Euler } from "three"
-import { LoadTexture } from "@tools/three/textureTools"
 import { LoadPositionalAudio } from "@tools/three/audioTools"
 import Toolbar from "@views/ar-overlay/Toolbar"
 import { RecreateMaterials } from "@tools/three/materialTools"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import HorizontalSlider from "@components/HorizontalSlider"
 import ToggleButton from "@components/ToggleButton"
-import ButtonSecondary from "@components/ButtonSecondary"
+import SceneManager from "@js/sceneManager"
 
 const BARRRIERA_TYPE = {
     MICRON: "MICRON",
@@ -24,7 +23,6 @@ export default function demoRulliera(props) {
     // Parameters
     const materialOffset = 0.008
     const useVideo = true
-    let globalScale = 1
 
     const clock = new THREE.Clock(!useVideo)
 
@@ -45,7 +43,7 @@ export default function demoRulliera(props) {
         TENDE_RAGGI,
         LIGHT_GREEN,
         LIGHT_RED
-    let group, mixer, isReady, action, gltf, aoTexture, video, videoTexture
+    let group, mixer, isReady, action, gltf, aoTexture, video, videoTexture, audio
 
     const [showInstructions, setShowInstructions] = createSignal(true)
     const [spawned, setSpawned] = createSignal(false)
@@ -64,7 +62,7 @@ export default function demoRulliera(props) {
     const handleUndo = () => {
         game.onUndo() // audio
 
-        // if (audioRobot) audioRobot.stop()
+        if (audio) audio.stop()
         // robotGlb.resetAnimations()
         game.removePreviousFromScene()
         setSpawned(false)
@@ -142,8 +140,7 @@ export default function demoRulliera(props) {
         },
 
         close: () => {
-            // if (shadows) shadows.dispose()
-            // if (audioRobot) audioRobot.stop()
+            if (audio) audio.stop()
         },
     })
 
@@ -152,6 +149,15 @@ export default function demoRulliera(props) {
      */
     onMount(async () => {
         group = new THREE.Group()
+
+        audio = await new LoadPositionalAudio(
+            "models/demo/Rulliera/Rulliera_Audio.mp3",
+            SceneManager.listener,
+            {
+                volume: 2 * scale(),
+                loop: true,
+            }
+        )
 
         /*
          * CASSONI
@@ -584,6 +590,9 @@ export default function demoRulliera(props) {
         isReady = true
 
         swapBarriera(barrieraTypeSelected())
+
+        group.add(audio)
+        audio.play()
     }
 
     function swapBarriera(newType) {
@@ -617,6 +626,8 @@ export default function demoRulliera(props) {
 
         LIGHT_RED.intensity = 1 * scale() * scale()
         LIGHT_RED.distance = 4 * scale()
+
+        audio.setVolume(2 * scale());
     }
 
     function setModelRotation() {
