@@ -13,6 +13,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import HorizontalSlider from "@components/HorizontalSlider"
 import ToggleButton from "@components/ToggleButton"
 import SceneManager from "@js/sceneManager"
+import FPSMonitor from "@tools/three/FPSMonitor"
 
 const BARRRIERA_TYPE = {
     MICRON: "MICRON",
@@ -20,6 +21,18 @@ const BARRRIERA_TYPE = {
 }
 
 export default function demoRulliera(props) {
+    const fpsMonitor = new FPSMonitor(15, 60) // soglia 15fps, campiona 60 frame
+
+    fpsMonitor.on("lowfps", (e) => {
+        console.warn(`FPS bassi: ${e.detail.fps.toFixed(2)}`)
+        // Riduci qualità, disabilita ombre, etc.
+        toggleVideo(false)
+    })
+
+    fpsMonitor.on("normalfps", (e) => {
+        console.log(`FPS ok: ${e.detail.fps.toFixed(2)}`)
+    })
+
     // Parameters
     const materialOffset = 0.008
     const useVideo = true
@@ -43,7 +56,15 @@ export default function demoRulliera(props) {
         TENDE_RAGGI,
         LIGHT_GREEN,
         LIGHT_RED
-    let group, mixer, isReady, action, gltf, aoTexture, video, videoTexture, audio
+    let group,
+        mixer,
+        isReady,
+        action,
+        gltf,
+        aoTexture,
+        video,
+        videoTexture,
+        audio
 
     const [showInstructions, setShowInstructions] = createSignal(true)
     const [spawned, setSpawned] = createSignal(false)
@@ -103,6 +124,9 @@ export default function demoRulliera(props) {
 
         renderLoop: () => {
             if (props.enabled && spawned()) {
+                // Update FPS monitor
+                fpsMonitor.update()
+
                 if (isReady && mixer) {
                     const dt = clock.getDelta()
 
@@ -112,7 +136,9 @@ export default function demoRulliera(props) {
                     })
 
                     // Sincronizza il video al tempo dell'animazione
-                    syncVideoToAnimation()
+                    if (video) {
+                        syncVideoToAnimation()
+                    }
                 }
 
                 // Anima tutti i materiali nell'array
@@ -627,10 +653,56 @@ export default function demoRulliera(props) {
         LIGHT_RED.intensity = 1 * scale() * scale()
         LIGHT_RED.distance = 4 * scale()
 
-        audio.setVolume(2 * scale());
+        audio.setVolume(2 * scale())
     }
 
     function setModelRotation() {
         group.rotation.y = Math.PI / 2 + THREE.MathUtils.degToRad(rotation())
+    }
+
+    function toggleVideo(value) {
+        if (!value && video) {
+            try {
+                // Pause and unload the HTMLVideoElement
+                if (video) {
+                    video.pause()
+                    video.currentTime = 0
+                    // Clear source and attempt to unload
+                    try {
+                        video.removeAttribute("src")
+                        video.src = ""
+                        video.load()
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+
+                // Dispose the Three.js VideoTexture
+                if (videoTexture) {
+                    videoTexture.dispose()
+                    videoTexture = null
+                }
+
+                // Remove references to the video texture from meshes so GC can reclaim resources
+                if (RULLI_SCATOLE) {
+                    RULLI_SCATOLE.traverse((child) => {
+                        if (child.isMesh && child.material) {
+                            // Clear aoMap (where videoTexture was assigned) and mark material for update
+                            if (child.material.aoMap)
+                                child.material.aoMap = null
+                            child.material.needsUpdate = true
+                        }
+                    })
+                }
+
+                // Null out the video reference to allow GC
+                video = null
+            } catch (err) {
+                console.error(
+                    "Error while stopping/clearing video resources:",
+                    err
+                )
+            }
+        }
     }
 }
