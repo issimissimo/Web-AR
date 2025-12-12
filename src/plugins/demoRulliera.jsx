@@ -116,8 +116,6 @@ export default function demoRulliera(props) {
 
         renderLoop: () => {
             if (props.enabled && spawned()) {
-                // Update FPS monitor
-                fpsMonitor.update()
 
                 if (isReady && mixer) {
                     const dt = clock.getDelta()

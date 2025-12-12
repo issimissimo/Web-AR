@@ -299,7 +299,7 @@ export default function App() {
             if (frame && Reticle.initialized()) {
                 Reticle.update(frame, (surfType) => {})
                 if (Reticle.enabled()) {
-                    console.log("Reticle.isHitting():", Reticle.isHitting())
+                    // console.log("Reticle.isHitting():", Reticle.isHitting())
                     setPlaneFound(Reticle.isHitting())
                 }
             }

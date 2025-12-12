@@ -37,6 +37,9 @@ import { LogOnScreen } from "@tools/SolidJS/LogOnScreen"
 // ===== CONTEXT =====
 export const Context = createContext()
 
+// ===== EXTRA =====
+import Toast from "@components/Toast"
+
 const LOCALIZATION_STATE = {
     NONE: "none",
     REQUIRED: "required",
@@ -67,6 +70,8 @@ export default function ArSession(props) {
     let _tapEnabled = true
     let _modulesToLoad = 0
     let _gamesInitialized = 0
+
+    let toastRef
 
     //#region [lifeCycle]
     onMount(() => {
@@ -481,6 +486,9 @@ export default function ArSession(props) {
     }
 
     function onLowFps() {
+        // Show toast message
+        toastRef.show("Ho rilevato basse prestazioni sul tuo dispositivo", 5000)
+
         // Call onLowFps function of all the gamesRunning
         props.gamesRunning.forEach((el) => {
             try {
@@ -706,6 +714,10 @@ export default function ArSession(props) {
             }}
         >
             <ArSessionContainer id="ArSessionContainer">
+                {/* TOAST MESSAGE */}
+                <Toast ref={toastRef} />
+
+                {/* BLURRED COVER */}
                 <BlurredCover
                     visible={blurVisible()}
                     showHole={blurShowHole()}
