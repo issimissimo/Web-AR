@@ -9,7 +9,8 @@ let appConfig = {
   debugOnDesktop: false,
   debugLoadMode: false,
   debugUserId: null,
-  debugMarkerId: null
+  debugMarkerId: null,
+  minimumFPS: 10
 };
 
 
@@ -41,5 +42,8 @@ export const config = {
   },
   get showLogOnScreen() {
     return appConfig.showLogOnScreen;
+  },
+  get minimumFPS() {
+    return appConfig.minimumFPS;
   },
 };

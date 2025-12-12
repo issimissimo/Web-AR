@@ -70,8 +70,12 @@ export default function ArSession(props) {
 
     //#region [lifeCycle]
     onMount(() => {
-        // Fix Android 15 bug
-        // fixOverlayForAndroid15()
+        // Link to app.jsx FPS monitor functions
+        if (typeof props.ref === "function") {
+            props.ref({ onLowFps, onNormalFps })
+        } else {
+            Object.assign(props.ref, { onLowFps, onNormalFps })
+        }
 
         // Initialize the DOM Observer for interactive elements
         setupDomObserver()
@@ -476,6 +480,52 @@ export default function ArSession(props) {
         e.stopPropagation()
     }
 
+    function onLowFps() {
+        // Call onLowFps function of all the gamesRunning
+        props.gamesRunning.forEach((el) => {
+            try {
+                // execute onLowFps inside a temporary reactive root so
+                // any computations created are attached to a root and can be disposed.
+                const disposer = createRoot(() => {
+                    try {
+                        el.onLowFps && el.onLowFps()
+                    } catch (err) {
+                        console.error("Error in game onLowFps:", err)
+                    }
+                })
+                // Immediately dispose the temporary root to avoid leaking
+                try {
+                    disposer()
+                } catch (e) {}
+            } catch (e) {
+                console.error("Error executing game onLowFps:", e)
+            }
+        })
+    }
+
+    function onNormalFps() {
+        // Call onNormalFps function of all the gamesRunning
+        props.gamesRunning.forEach((el) => {
+            try {
+                // execute onNormalFps inside a temporary reactive root so
+                // any computations created are attached to a root and can be disposed.
+                const disposer = createRoot(() => {
+                    try {
+                        el.onNormalFps && el.onNormalFps()
+                    } catch (err) {
+                        console.error("Error in game onNormalFps:", err)
+                    }
+                })
+                // Immediately dispose the temporary root to avoid leaking
+                try {
+                    disposer()
+                } catch (e) {}
+            } catch (e) {
+                console.error("Error executing game onNormalFps:", e)
+            }
+        })
+    }
+
     /**
      * Hide (or show) all the objects inside all the games,
      * or inside a specific game
@@ -603,48 +653,42 @@ export default function ArSession(props) {
         }, 200)
     }
 
-    function fixOverlayForAndroid15() {
-        setTimeout(() => {
-            const overlay = document.getElementById("ar-overlay")
+    // function fixOverlayForAndroid15() {
+    //     setTimeout(() => {
+    //         const overlay = document.getElementById("ar-overlay")
 
-            // Calcola l'offset della status bar
-            const windowHeight = window.innerHeight
-            const screenHeight = window.screen.height
+    //         // Calcola l'offset della status bar
+    //         const windowHeight = window.innerHeight
+    //         const screenHeight = window.screen.height
 
-            console.log("windowHeight", windowHeight)
-            console.log("screenHeight", screenHeight)
+    //         console.log("windowHeight", windowHeight)
+    //         console.log("screenHeight", screenHeight)
 
-            // Offset stimato per Android 15 (tipicamente tra 24px e 48px)
-            const statusBarHeight = screenHeight - windowHeight
+    //         // Offset stimato per Android 15 (tipicamente tra 24px e 48px)
+    //         const statusBarHeight = screenHeight - windowHeight
 
-            if (statusBarHeight > 0) {
-                console.log("---------- AGGIUSTO ALTEZZA 2 --------")
-                console.log("windowHeight", windowHeight)
-                console.log("screenHeight", screenHeight)
-                overlay.style.paddingTop = `${Math.max(statusBarHeight, 24)}px`
-                overlay.style.height = `calc(100% - ${Math.max(
-                    statusBarHeight,
-                    24
-                )}px)`
+    //         if (statusBarHeight > 0) {
+    //             console.log("---------- AGGIUSTO ALTEZZA 2 --------")
+    //             console.log("windowHeight", windowHeight)
+    //             console.log("screenHeight", screenHeight)
+    //             overlay.style.paddingTop = `${Math.max(statusBarHeight, 24)}px`
+    //             overlay.style.height = `calc(100% - ${Math.max(
+    //                 statusBarHeight,
+    //                 24
+    //             )}px)`
 
-                // // Try to fix issue on Android 15 for clickable elements
-                // updateClickableDomElements()
-            }
-        }, 200)
-    }
+    //             // // Try to fix issue on Android 15 for clickable elements
+    //             // updateClickableDomElements()
+    //         }
+    //     }, 200)
+    // }
 
     //#region [style]
 
     const ArSessionContainer = styled("div")`
-        /* position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0; */
         height: 100%;
         display: flex;
         flex-direction: column;
-        /* padding: 1.5em; */
         box-sizing: border-box;
     `
 

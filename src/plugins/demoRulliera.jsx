@@ -13,7 +13,6 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import HorizontalSlider from "@components/HorizontalSlider"
 import ToggleButton from "@components/ToggleButton"
 import SceneManager from "@js/sceneManager"
-import FPSMonitor from "@tools/three/FPSMonitor"
 
 const BARRRIERA_TYPE = {
     MICRON: "MICRON",
@@ -21,17 +20,6 @@ const BARRRIERA_TYPE = {
 }
 
 export default function demoRulliera(props) {
-    const fpsMonitor = new FPSMonitor(15, 60) // soglia 15fps, campiona 60 frame
-
-    fpsMonitor.on("lowfps", (e) => {
-        console.warn(`FPS bassi: ${e.detail.fps.toFixed(2)}`)
-        // Riduci qualità, disabilita ombre, etc.
-        toggleVideo(false)
-    })
-
-    fpsMonitor.on("normalfps", (e) => {
-        console.log(`FPS ok: ${e.detail.fps.toFixed(2)}`)
-    })
 
     // Parameters
     const materialOffset = 0.008
@@ -120,6 +108,10 @@ export default function demoRulliera(props) {
                 setSpawned(true)
                 handleReticle()
             }
+        },
+
+        onLowFps: () => {
+            toggleVideo(false)
         },
 
         renderLoop: () => {
@@ -661,6 +653,7 @@ export default function demoRulliera(props) {
     }
 
     function toggleVideo(value) {
+        console.warn("imposto video:", value)
         if (!value && video) {
             try {
                 // Pause and unload the HTMLVideoElement

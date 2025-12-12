@@ -19,6 +19,9 @@ import ArSession from "@views/ar-overlay/arSession"
 import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
 
+// FPS Monitor
+import FPSMonitor from "@tools/three/FPSMonitor"
+
 /*
  * This function is called by the "Enter AR" button
  * only when we have debugOnDesktop=true in the configuration file
@@ -59,6 +62,8 @@ export default function App() {
     const [currentMarker, setCurrentMarker] = createSignal(null)
     const [planeFound, setPlaneFound] = createSignal(false)
     const [gamesRunning, setGamesRunning] = createSignal([])
+    let fpsMonitor
+    let arSessionRef
 
     //#region [lifeCycle]
     onMount(() => {
@@ -299,6 +304,9 @@ export default function App() {
                 }
             }
 
+            // update FPS Monitor
+            if (fpsMonitor) fpsMonitor.update()
+
             // render the loop of the running Games
             gamesRunning().forEach((el) => el.renderLoop())
 
@@ -318,6 +326,16 @@ export default function App() {
         SceneManager.renderer.setAnimationLoop(render)
         SceneManager.renderer.xr.addEventListener("sessionstart", () => {
             goToArSession()
+        })
+        // Initialize FPS Monitor
+        fpsMonitor = new FPSMonitor(config.minimumFPS, 60) // soglia 15fps, campiona 60 frame
+        fpsMonitor.on("lowfps", (e) => {
+            console.warn(`FPS bassi: ${e.detail.fps.toFixed(2)}`)
+            if (arSessionRef) arSessionRef.onLowFps()
+        })
+        fpsMonitor.on("normalfps", (e) => {
+            console.log(`FPS ok: ${e.detail.fps.toFixed(2)}`)
+            if (arSessionRef) arSessionRef.onNormalFps()
         })
     }
 
@@ -339,6 +357,7 @@ export default function App() {
 
         if (Reticle.initialized()) Reticle.destroy()
         SceneManager.destroy()
+        fpsMonitor = null
 
         if (currentAppMode() === AppMode.SAVE) {
             goToMarkerList()
@@ -444,6 +463,7 @@ export default function App() {
                 return (
                     <Portal mount={document.getElementById("ar-overlay")}>
                         <ArSession
+                            ref={arSessionRef}
                             appMode={currentAppMode()}
                             userId={userId()}
                             marker={currentMarker()}

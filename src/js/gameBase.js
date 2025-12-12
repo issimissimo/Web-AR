@@ -37,9 +37,6 @@ export function useGame(gameName, gameId, config = {}) {
         click: null
     }
 
-    // let audioTap
-    // let audioUndo
-
     onMount(async () => {
         sounds.tap = await new LoadAudio("sounds/tap.mp3", SceneManager.listener)
         sounds.undo = await new LoadAudio("sounds/undo.mp3", SceneManager.listener)
@@ -175,6 +172,14 @@ export function useGame(gameName, gameId, config = {}) {
         console.log(`${gameName} closeBase`)
     }
 
+    const _onLowFpsBase = () => {
+        console.log(`${gameName} onLowFpsBase`)
+    }
+
+    const _onNormalFpsBase = () => {
+        console.log(`${gameName} onNormalFpsBase`)
+    }
+
     const onUndo = () => {
         sounds.undo.play()
     }
@@ -187,6 +192,8 @@ export function useGame(gameName, gameId, config = {}) {
     const onTap = config.onTap || _onTapBase
     const renderLoop = config.renderLoop || _renderLoopBase
     const close = config.close || _closeBase
+    const onLowFps = config.onLowFps || _onLowFpsBase
+    const onNormalFps = config.onNormalFps || _onNormalFpsBase
 
     // This
     const game = {
@@ -205,6 +212,8 @@ export function useGame(gameName, gameId, config = {}) {
         close,
         onUndo,
         onClick,
+        onLowFps,
+        onNormalFps,
         loadGameData,
         saveGameData,
         addToScene,
