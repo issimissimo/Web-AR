@@ -59,7 +59,7 @@ export default function ArSession(props) {
     const [gamesInitialized, setGamesInitialized] = createSignal(false)
     const [gamesEnabled, setGamesEnabled] = createSignal(false)
     const [selectedGameId, setSelectedGameId] = createSignal(null)
-    const [headerText, setHeaderText] = createSignal("")
+    // const [headerText, setHeaderText] = createSignal("")
 
     // Blurred cover
     const [blurVisible, setBlurVisible] = createSignal(false)
@@ -487,7 +487,7 @@ export default function ArSession(props) {
 
     function onLowFps() {
         // Show toast message
-        toastRef.show("Ho rilevato basse prestazioni sul tuo dispositivo", 5000)
+        toastRef.show("Il tuo dispositivo ha basse prestazioni", 10000)
 
         // Call onLowFps function of all the gamesRunning
         props.gamesRunning.forEach((el) => {
@@ -725,7 +725,7 @@ export default function ArSession(props) {
                 />
 
                 {/* HEADER */}
-                <Header onClickBack={handleGoBack}>{headerText()}</Header>
+                <Header onClickBack={handleGoBack}></Header>
 
                 {
                     <>
@@ -773,7 +773,6 @@ export default function ArSession(props) {
                             }
                             selectedGameId={selectedGameId()}
                             setSelectedGameId={(id) => setSelectedGameId(id)}
-                            setHeaderText={(text) => setHeaderText(text)}
                         />
                     </>
                 }

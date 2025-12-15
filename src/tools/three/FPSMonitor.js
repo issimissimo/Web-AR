@@ -7,6 +7,7 @@ class FPSMonitor {
         this.isLowFPS = false;
         this.eventTarget = new EventTarget();
         
+        // JUST FOR TEST
         // setTimeout(() => {
         //     this.triggerLowFPSEvent(11);
         // }, 5000);

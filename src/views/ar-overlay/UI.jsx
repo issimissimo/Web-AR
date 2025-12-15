@@ -178,7 +178,6 @@ const UI = (props) => {
 
                     if (newState === STATE.NONE && context.appMode === "save") {
                         props.setSelectedGameId(null)
-                        props.setHeaderText(null)
                         Reticle.setEnabled(false)
                     }
                 }
@@ -198,9 +197,6 @@ const UI = (props) => {
     const handleCategorySelected = (categoryName) => {
         setSelectedPlugin(null)
         setCurrentCategoryName(categoryName)
-        if (state() !== STATE.NONE) {
-            props.setHeaderText(categoryName)
-        }
     }
 
     const getFirstEditableGameId = () => {

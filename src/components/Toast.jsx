@@ -7,25 +7,31 @@ const ToastOverlay = styled("div")`
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  /* bottom: 0; */
   display: flex;
-  justify-content: center;
+  /* flex-direction: column; */
+  /* justify-content: flex-end; */
   align-items: center;
   z-index: 9999;
   pointer-events: none;
+  padding: 1rem;
+  height: 40px;
 `;
 
 const ToastContainer = styled("div")`
-  background: #141414;
+  background: #2d2d2d;
   color: #ffffff;
-  padding: 16px 16px;
-  border-radius: 12px;
+  padding: 8px 18px;
+  border-radius: 99px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  max-width: 80%;
+  width: 100%;
   text-align: center;
   font-size: small;
+  font-weight: 300;
+  opacity: 0.8;
   line-height: 1.5;
   pointer-events: auto;
+  /* margin: 1rem; */
   
   opacity: ${props => props.opacity};
   transform: translateY(${props => props.translateY}px);
@@ -36,7 +42,7 @@ function Toast(props) {
   const [isVisible, setIsVisible] = createSignal(false);
   const [message, setMessage] = createSignal("");
   const [opacity, setOpacity] = createSignal(0);
-  const [translateY, setTranslateY] = createSignal(-20);
+  const [translateY, setTranslateY] = createSignal(0);
   
   let timeoutId;
 
@@ -52,7 +58,6 @@ function Toast(props) {
     // Animazione di entrata
     setTimeout(() => {
       setOpacity(1);
-      setTranslateY(0);
     }, 10);
     
     // Programma la scomparsa
@@ -64,7 +69,6 @@ function Toast(props) {
   const hide = () => {
     // Animazione di uscita
     setOpacity(0);
-    setTranslateY(-20);
     
     // Rimuovi dal DOM dopo l'animazione
     setTimeout(() => {
