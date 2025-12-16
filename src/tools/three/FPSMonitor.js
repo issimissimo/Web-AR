@@ -7,10 +7,10 @@ class FPSMonitor {
         this.isLowFPS = false;
         this.eventTarget = new EventTarget();
         
-        // JUST FOR TEST
+        // // JUST FOR TEST
         // setTimeout(() => {
         //     this.triggerLowFPSEvent(11);
-        // }, 5000);
+        // }, 7000);
     }
 
     // Chiamare questo metodo in ogni frame (es. dentro il loop di render di Three.js)

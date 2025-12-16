@@ -277,7 +277,7 @@ export default function demoRulliera(props) {
          */
         // 1. Crea l'elemento video
         video = document.createElement("video")
-        video.src = "models/demo/Rulliera/ANIM_RULLI_SCATOLE_LM.mp4"
+        video.src = "models/demo/Rulliera/ANIM_RULLI_SCATOLE_LM_compressed.mp4"
         video.crossOrigin = "anonymous"
         video.loop = true
         video.muted = true

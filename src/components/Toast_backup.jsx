@@ -1,4 +1,4 @@
-// Toast.jsx
+// Banner.jsx
 import { createSignal, onMount, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 
@@ -7,7 +7,10 @@ const ToastOverlay = styled("div")`
   top: 0;
   left: 0;
   right: 0;
+  /* bottom: 0; */
   display: flex;
+  /* flex-direction: column; */
+  /* justify-content: flex-end; */
   align-items: center;
   z-index: 9999;
   pointer-events: none;
@@ -16,7 +19,7 @@ const ToastOverlay = styled("div")`
 `;
 
 const ToastContainer = styled("div")`
-  background: ${props => props.isError ? '#d32f2f' : '#2d2d2d'};
+  background: #2d2d2d;
   color: #ffffff;
   padding: 8px 18px;
   border-radius: 99px;
@@ -25,58 +28,36 @@ const ToastContainer = styled("div")`
   text-align: center;
   font-size: small;
   font-weight: 300;
+  opacity: 0.8;
   line-height: 1.5;
   pointer-events: auto;
+  /* margin: 1rem; */
   
   opacity: ${props => props.opacity};
   transform: translateY(${props => props.translateY}px);
-  transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 `;
 
 function Toast(props) {
   const [isVisible, setIsVisible] = createSignal(false);
   const [message, setMessage] = createSignal("");
-  const [isError, setIsError] = createSignal(false);
   const [opacity, setOpacity] = createSignal(0);
   const [translateY, setTranslateY] = createSignal(0);
   
   let timeoutId;
-  let hideTimeoutId;
 
-  const show = (text, options = {}) => {
-    // Opzioni: { duration: 3000, isError: false }
-    const duration = options.duration || 3000;
-    const error = options.isError || false;
-    
-    // ✅ GESTIONE CHIAMATE MULTIPLE
-    // Cancella i timeout precedenti se esistono
+  const show = (text, duration = 3000) => {
+    // Cancella timeout precedente se esiste
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    if (hideTimeoutId) {
-      clearTimeout(hideTimeoutId);
-    }
     
-    // Se già visibile, reset immediato
-    if (isVisible()) {
-      setOpacity(0);
-      setTimeout(() => {
-        showToast(text, error, duration);
-      }, 100);
-    } else {
-      showToast(text, error, duration);
-    }
-  };
-
-  const showToast = (text, error, duration) => {
     setMessage(text);
-    setIsError(error);
     setIsVisible(true);
     
     // Animazione di entrata
     setTimeout(() => {
       setOpacity(1);
-      // setTranslateY(0);
     }, 10);
     
     // Programma la scomparsa
@@ -90,13 +71,12 @@ function Toast(props) {
     setOpacity(0);
     
     // Rimuovi dal DOM dopo l'animazione
-    hideTimeoutId = setTimeout(() => {
+    setTimeout(() => {
       setIsVisible(false);
-      setIsError(false);
     }, 300);
   };
 
-  // Esponi le funzioni tramite ref
+  // Esponi la funzione show tramite ref
   onMount(() => {
     if (props.ref) {
       if (typeof props.ref === 'function') {
@@ -113,7 +93,6 @@ function Toast(props) {
         <ToastContainer 
           opacity={opacity()} 
           translateY={translateY()}
-          isError={isError()}
         >
           {message()}
         </ToastContainer>
@@ -125,49 +104,30 @@ function Toast(props) {
 export default Toast;
 
 // ========================================
-// ESEMPI D'USO
+// ESEMPIO D'USO nel componente genitore
 // ========================================
 
 /*
-import Toast from "./Toast";
+import Banner from "./Banner";
 
 function App() {
-  let toastRef;
+  let bannerRef;
 
-  // Toast normale (sfondo scuro)
-  const mostraSuccesso = () => {
-    toastRef.show("Operazione completata!", { duration: 3000 });
+  const mostraBanner = () => {
+    bannerRef.show("Operazione completata con successo!", 3000);
   };
 
-  // Toast di errore (sfondo rosso)
-  const mostraErrore = () => {
-    toastRef.show("Errore: operazione fallita!", { 
-      duration: 4000, 
-      isError: true 
-    });
-  };
-
-  // Chiamate multiple rapide - gestite correttamente!
-  const testMultiplo = () => {
-    toastRef.show("Primo messaggio");
-    setTimeout(() => toastRef.show("Secondo messaggio"), 500);
-    setTimeout(() => toastRef.show("Terzo messaggio"), 1000);
-  };
-
-  // Sintassi semplificata (senza opzioni)
-  const messaggioVeloce = () => {
-    toastRef.show("Messaggio veloce"); // usa defaults
+  const mostraBannerLungo = () => {
+    bannerRef.show("Questo messaggio rimarrà visibile per 5 secondi", 5000);
   };
 
   return (
     <div>
       <h1>La mia App</h1>
-      <button onClick={mostraSuccesso}>Successo</button>
-      <button onClick={mostraErrore}>Errore</button>
-      <button onClick={testMultiplo}>Test Multiplo</button>
-      <button onClick={messaggioVeloce}>Messaggio Veloce</button>
+      <button onClick={mostraBanner}>Mostra Banner</button>
+      <button onClick={mostraBannerLungo}>Mostra Banner Lungo</button>
       
-      <Toast ref={toastRef} />
+      <Banner ref={bannerRef} />
     </div>
   );
 }

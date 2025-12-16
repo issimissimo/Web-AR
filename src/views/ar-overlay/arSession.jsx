@@ -37,9 +37,6 @@ import { LogOnScreen } from "@tools/SolidJS/LogOnScreen"
 // ===== CONTEXT =====
 export const Context = createContext()
 
-// ===== EXTRA =====
-import Toast from "@components/Toast"
-
 const LOCALIZATION_STATE = {
     NONE: "none",
     REQUIRED: "required",
@@ -59,7 +56,6 @@ export default function ArSession(props) {
     const [gamesInitialized, setGamesInitialized] = createSignal(false)
     const [gamesEnabled, setGamesEnabled] = createSignal(false)
     const [selectedGameId, setSelectedGameId] = createSignal(null)
-    // const [headerText, setHeaderText] = createSignal("")
 
     // Blurred cover
     const [blurVisible, setBlurVisible] = createSignal(false)
@@ -71,15 +67,13 @@ export default function ArSession(props) {
     let _modulesToLoad = 0
     let _gamesInitialized = 0
 
-    let toastRef
-
     //#region [lifeCycle]
     onMount(() => {
         // Link to app.jsx FPS monitor functions
         if (typeof props.ref === "function") {
-            props.ref({ onLowFps, onNormalFps })
+            props.ref({ onLowFps, onNormalFps, onHighMemory })
         } else {
-            Object.assign(props.ref, { onLowFps, onNormalFps })
+            Object.assign(props.ref, { onLowFps, onNormalFps, onHighMemory })
         }
 
         // Initialize the DOM Observer for interactive elements
@@ -201,9 +195,6 @@ export default function ArSession(props) {
         if (props.marker.games.length > 0) {
             loadAllModules()
         } else {
-            //TODO - here we must move on...
-            // setLoading(() => false);
-
             // Bypass all the check for initialization
             // and props.runningGames count
             console.log(
@@ -486,9 +477,6 @@ export default function ArSession(props) {
     }
 
     function onLowFps() {
-        // Show toast message
-        toastRef.show("Il tuo dispositivo ha basse prestazioni", 10000)
-
         // Call onLowFps function of all the gamesRunning
         props.gamesRunning.forEach((el) => {
             try {
@@ -530,6 +518,29 @@ export default function ArSession(props) {
                 } catch (e) {}
             } catch (e) {
                 console.error("Error executing game onNormalFps:", e)
+            }
+        })
+    }
+
+    function onHighMemory() {
+        // Call onHighMemory function of all the gamesRunning
+        props.gamesRunning.forEach((el) => {
+            try {
+                // execute onHighMemory inside a temporary reactive root so
+                // any computations created are attached to a root and can be disposed.
+                const disposer = createRoot(() => {
+                    try {
+                        el.onHighMemory && el.onHighMemory()
+                    } catch (err) {
+                        console.error("Error in game onHighMemory:", err)
+                    }
+                })
+                // Immediately dispose the temporary root to avoid leaking
+                try {
+                    disposer()
+                } catch (e) {}
+            } catch (e) {
+                console.error("Error executing game onHighMemory:", e)
             }
         })
     }
@@ -661,36 +672,6 @@ export default function ArSession(props) {
         }, 200)
     }
 
-    // function fixOverlayForAndroid15() {
-    //     setTimeout(() => {
-    //         const overlay = document.getElementById("ar-overlay")
-
-    //         // Calcola l'offset della status bar
-    //         const windowHeight = window.innerHeight
-    //         const screenHeight = window.screen.height
-
-    //         console.log("windowHeight", windowHeight)
-    //         console.log("screenHeight", screenHeight)
-
-    //         // Offset stimato per Android 15 (tipicamente tra 24px e 48px)
-    //         const statusBarHeight = screenHeight - windowHeight
-
-    //         if (statusBarHeight > 0) {
-    //             console.log("---------- AGGIUSTO ALTEZZA 2 --------")
-    //             console.log("windowHeight", windowHeight)
-    //             console.log("screenHeight", screenHeight)
-    //             overlay.style.paddingTop = `${Math.max(statusBarHeight, 24)}px`
-    //             overlay.style.height = `calc(100% - ${Math.max(
-    //                 statusBarHeight,
-    //                 24
-    //             )}px)`
-
-    //             // // Try to fix issue on Android 15 for clickable elements
-    //             // updateClickableDomElements()
-    //         }
-    //     }, 200)
-    // }
-
     //#region [style]
 
     const ArSessionContainer = styled("div")`
@@ -714,9 +695,6 @@ export default function ArSession(props) {
             }}
         >
             <ArSessionContainer id="ArSessionContainer">
-                {/* TOAST MESSAGE */}
-                <Toast ref={toastRef} />
-
                 {/* BLURRED COVER */}
                 <BlurredCover
                     visible={blurVisible()}

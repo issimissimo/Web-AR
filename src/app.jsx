@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onMount } from "solid-js"
+import { createEffect, createSignal, onMount, Show } from "solid-js"
 import { Portal } from "solid-js/web"
 import { useFirebase } from "@hooks/useFirebase"
 import { config } from "@js/config"
@@ -19,8 +19,12 @@ import ArSession from "@views/ar-overlay/arSession"
 import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
 
-// FPS Monitor
+// Monitor
 import FPSMonitor from "@tools/three/FPSMonitor"
+import MemoryMonitor from "@tools/three/MemoryMonitor"
+
+// ===== EXTRA =====
+import Toast from "@components/Toast"
 
 /*
  * This function is called by the "Enter AR" button
@@ -63,7 +67,9 @@ export default function App() {
     const [planeFound, setPlaneFound] = createSignal(false)
     const [gamesRunning, setGamesRunning] = createSignal([])
     let fpsMonitor
+    let memoryMonitor
     let arSessionRef
+    let toastRef
 
     //#region [lifeCycle]
     onMount(() => {
@@ -304,8 +310,9 @@ export default function App() {
                 }
             }
 
-            // update FPS Monitor
+            // update Monitor
             if (fpsMonitor) fpsMonitor.update()
+            if (memoryMonitor) memoryMonitor.update(performance.now())
 
             // render the loop of the running Games
             gamesRunning().forEach((el) => el.renderLoop())
@@ -316,6 +323,14 @@ export default function App() {
     }
 
     //#region [handlers]
+
+    /**
+     * Show the toast message
+     */
+    const handleShowToast = (message, options = {}) => {
+        toastRef.show(message, options)
+    }
+
     /**
      * Initialize Three Scene, with AR Button
      * and go to ARSession
@@ -331,11 +346,23 @@ export default function App() {
         fpsMonitor = new FPSMonitor(config.minimumFPS, 60) // soglia 15fps, campiona 60 frame
         fpsMonitor.on("lowfps", (e) => {
             console.warn(`FPS bassi: ${e.detail.fps.toFixed(2)}`)
+            handleShowToast("Il tuo dispositivo ha basse prestazioni", {
+                duration: 10000,
+            })
             if (arSessionRef) arSessionRef.onLowFps()
         })
         fpsMonitor.on("normalfps", (e) => {
             console.log(`FPS ok: ${e.detail.fps.toFixed(2)}`)
             if (arSessionRef) arSessionRef.onNormalFps()
+        })
+        // Initialize Memory Monitor
+        memoryMonitor = new MemoryMonitor(90, 2000) // 90% soglia, check ogni 2 secondi
+        memoryMonitor.on("highmemory", (e) => {
+            console.warn(`Memoria al ${e.detail.usagePercent}%!`)
+            handleShowToast("Il tuo dispositivo sta esaurendo la memoria", {
+                duration: 10000,
+            })
+            if (arSessionRef) arSessionRef.onHighMemory()
         })
     }
 
@@ -358,6 +385,7 @@ export default function App() {
         if (Reticle.initialized()) Reticle.destroy()
         SceneManager.destroy()
         fpsMonitor = null
+        memoryMonitor = null
 
         if (currentAppMode() === AppMode.SAVE) {
             goToMarkerList()
@@ -462,6 +490,7 @@ export default function App() {
             case VIEWS.AR_SESSION:
                 return (
                     <Portal mount={document.getElementById("ar-overlay")}>
+                        <Toast ref={toastRef} />
                         <ArSession
                             ref={arSessionRef}
                             appMode={currentAppMode()}
@@ -495,5 +524,24 @@ export default function App() {
         }
     }
 
-    return <Container id="mainContainer">{renderView()}</Container>
+    // Opzionale: mostra stats in tempo reale
+    setInterval(() => {
+        if (memoryMonitor) {
+            const stats = memoryMonitor.getMemoryStats()
+            if (stats) {
+                console.log(
+                    `Memoria: ${stats.usedMB}MB / ${stats.limitMB}MB (${stats.usagePercent}%)`
+                )
+            }
+        }
+    }, 5000)
+
+    return (
+        <Container>
+            <Show when={currentView() !== VIEWS.AR_SESSION}>
+                <Toast ref={toastRef} />
+            </Show>
+            {renderView()}
+        </Container>
+    )
 }
