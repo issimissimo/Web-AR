@@ -490,6 +490,7 @@ export default function App() {
             case VIEWS.AR_SESSION:
                 return (
                     <Portal mount={document.getElementById("ar-overlay")}>
+                        {/* We MUST KEEP the toast here because on iOS will be just leaved ar-overlay*/}
                         <Toast ref={toastRef} />
                         <ArSession
                             ref={arSessionRef}

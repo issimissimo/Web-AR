@@ -24,6 +24,7 @@ export default function demoRulliera(props) {
     // Parameters
     const materialOffset = 0.008
     const useVideo = true
+    const lightsIntensity = 0.5
 
     const clock = new THREE.Clock(!useVideo)
 
@@ -166,6 +167,7 @@ export default function demoRulliera(props) {
     onMount(async () => {
         group = new THREE.Group()
 
+        props.setLoadingMessage("audio...")
         audio = await new LoadPositionalAudio(
             "models/demo/Rulliera/Rulliera_Audio.mp3",
             SceneManager.listener,
@@ -174,10 +176,12 @@ export default function demoRulliera(props) {
                 loop: true,
             }
         )
+       
 
         /*
          * CASSONI
          */
+        props.setLoadingMessage("CASSONI...")
         aoTexture = await loadTexture("models/demo/Rulliera/CASSONE_AO.webp")
         aoTexture.flipY = false
         gltf = await loadGLTF("models/demo/Rulliera/CASSONI_001.glb")
@@ -192,6 +196,7 @@ export default function demoRulliera(props) {
         /*
          * GROUND
          */
+        props.setLoadingMessage("GROUND...")
         const groundAlphaTexture = await loadTexture(
             "models/demo/Rulliera/GROUND_AO.webp"
         )
@@ -212,6 +217,7 @@ export default function demoRulliera(props) {
         /*
          * BARRIERE STANDARD
          */
+        props.setLoadingMessage("BARRIERE...")
         aoTexture = await loadTexture("models/demo/Rulliera/BARRIERA_AO.webp")
         aoTexture.flipY = true
         gltf = await loadGLTF(
@@ -240,7 +246,7 @@ export default function demoRulliera(props) {
         // green point light at center, 1m high
         LIGHT_GREEN = new THREE.PointLight(
             0x00ff00,
-            1 * scale() * scale(),
+            lightsIntensity * scale() * scale(),
             4 * scale(),
             4
         )
@@ -252,7 +258,7 @@ export default function demoRulliera(props) {
          */
         LIGHT_RED = new THREE.PointLight(
             0xf60d0d,
-            2 * scale() * scale(),
+            lightsIntensity * scale() * scale(),
             4 * scale(),
             4
         )
@@ -262,6 +268,7 @@ export default function demoRulliera(props) {
         /*
          * ANIM TENDE E RAGGI
          */
+        props.setLoadingMessage("TENDE E RAGGI...")
         gltf = await loadGLTF("models/demo/Rulliera/TENDE_RAGGI_001.glb")
         TENDE_RAGGI = gltf.scene
         group.add(TENDE_RAGGI)
@@ -637,10 +644,10 @@ export default function demoRulliera(props) {
     function setModelScale() {
         group.scale.set(scale(), scale(), scale())
 
-        LIGHT_GREEN.intensity = 1 * scale() * scale()
+        LIGHT_GREEN.intensity = lightsIntensity * scale() * scale()
         LIGHT_GREEN.distance = 4 * scale()
 
-        LIGHT_RED.intensity = 1 * scale() * scale()
+        LIGHT_RED.intensity = lightsIntensity * scale() * scale()
         LIGHT_RED.distance = 4 * scale()
 
         audio.setVolume(2 * scale())

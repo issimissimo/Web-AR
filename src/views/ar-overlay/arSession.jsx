@@ -56,6 +56,7 @@ export default function ArSession(props) {
     const [gamesInitialized, setGamesInitialized] = createSignal(false)
     const [gamesEnabled, setGamesEnabled] = createSignal(false)
     const [selectedGameId, setSelectedGameId] = createSignal(null)
+    const [loadingMessage, setLoadingMessage] = createSignal(null)
 
     // Blurred cover
     const [blurVisible, setBlurVisible] = createSignal(false)
@@ -701,60 +702,62 @@ export default function ArSession(props) {
                     showHole={blurShowHole()}
                     planeFound={props.planeFound}
                 />
-
                 {/* HEADER */}
                 <Header onClickBack={handleGoBack}></Header>
-
-                {
-                    <>
-                        {!gamesInitialized() && <Loader text="Inizializzo" />}
-
-                        {/* GAMES */}
-                        <For each={modules()}>
-                            {(item) => {
-                                const Component = item.component
-                                return (
-                                    <Component
-                                        id={item.id}
-                                        enabled={gamesEnabled()}
-                                        selected={
-                                            gamesEnabled() &&
-                                            item.id === selectedGameId()
-                                        }
-                                        referenceMatrix={referenceMatrix()}
-                                    />
-                                )
-                            }}
-                        </For>
-
-                        {gamesInitialized() &&
-                            (!initDetectionCompleted() ? (
-                                <InitialDetection />
-                            ) : (
-                                localizationState() ===
-                                    LOCALIZATION_STATE.REQUIRED && (
-                                    <Localization
-                                        planeFound={props.planeFound}
-                                        setReferenceMatrix={(matrix) =>
-                                            handleLocalizationCompleted(matrix)
-                                        }
-                                    />
-                                )
-                            ))}
-                        <UI
-                            id="UI"
-                            visible={gamesEnabled()}
-                            marker={props.marker}
-                            gamesRunning={props.gamesRunning}
-                            addNewPluginToMarker={(pluginName) =>
-                                addNewPluginToMarker(pluginName)
-                            }
-                            selectedGameId={selectedGameId()}
-                            setSelectedGameId={(id) => setSelectedGameId(id)}
+                <>
+                    {!gamesInitialized() && (
+                        <Loader
+                            text={`Sto caricando\n${loadingMessage() || ""}`}
                         />
-                    </>
-                }
+                    )}
 
+                    {/* GAMES */}
+                    <For each={modules()}>
+                        {(item) => {
+                            const Component = item.component
+                            return (
+                                <Component
+                                    id={item.id}
+                                    enabled={gamesEnabled()}
+                                    selected={
+                                        gamesEnabled() &&
+                                        item.id === selectedGameId()
+                                    }
+                                    referenceMatrix={referenceMatrix()}
+                                    setLoadingMessage={(msg) =>
+                                        setLoadingMessage(msg)
+                                    }
+                                />
+                            )
+                        }}
+                    </For>
+
+                    {gamesInitialized() &&
+                        (!initDetectionCompleted() ? (
+                            <InitialDetection />
+                        ) : (
+                            localizationState() ===
+                                LOCALIZATION_STATE.REQUIRED && (
+                                <Localization
+                                    planeFound={props.planeFound}
+                                    setReferenceMatrix={(matrix) =>
+                                        handleLocalizationCompleted(matrix)
+                                    }
+                                />
+                            )
+                        ))}
+                    <UI
+                        id="UI"
+                        visible={gamesEnabled()}
+                        marker={props.marker}
+                        gamesRunning={props.gamesRunning}
+                        addNewPluginToMarker={(pluginName) =>
+                            addNewPluginToMarker(pluginName)
+                        }
+                        selectedGameId={selectedGameId()}
+                        setSelectedGameId={(id) => setSelectedGameId(id)}
+                    />
+                </>
                 {/* LOG ON SCREEN */}
                 <Show when={config.showLogOnScreen}>
                     <LogOnScreen />

@@ -9,20 +9,9 @@ const HeaderContainer = styled("div")`
     margin-bottom: 0;
     display: flex;
     justify-content: space-between;
-    /* align-items: center; */
     height: 40px;
     padding: 1rem;
 `
-
-// const LeftButtonContainer = styled("div")`
-//     display: flex;
-//     justify-content: flex-start;
-// `
-
-// const RightButtonContainer = styled("div")`
-//     display: flex;
-//     justify-content: flex-end;
-// `
 
 const Header = (props) => {
     return (
