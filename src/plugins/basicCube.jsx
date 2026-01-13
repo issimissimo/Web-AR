@@ -42,7 +42,7 @@ export default function basicCube(props) {
         const cubeGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
         const cubeMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
         cube = new Mesh(cubeGeometry, cubeMaterial);
-        cube.position.set(0, 0.5, -1);
+        cube.position.set(0, 0, -0.5);
         game.addToScene(cube);
 
 

@@ -48,6 +48,7 @@ export default function ArSession(props) {
     const firebase = useFirebase()
     const [initDetectionCompleted, setInitDetectionCompleted] =
         createSignal(false)
+
     const [localizationState, setLocalizationState] = createSignal(
         LOCALIZATION_STATE.NONE
     )
@@ -97,8 +98,6 @@ export default function ArSession(props) {
         handleBlurredCover({ visible: true })
 
         // ...and Starting the Reticle, to detect the space around us.
-        // We start the Reticle here, and not in the games, because
-        // we want the 1st detection to be as quick as possible!
         Reticle.setup(Reticle.MESH_TYPE.RINGS, {
             size: 0.4,
             ringNumber: 4,
@@ -242,9 +241,30 @@ export default function ArSession(props) {
             (gamesRunning) => {
                 if (gamesRunning.length > 0) {
                     console.log(
-                        "=== ArSession: Games running changed:",
+                        "===>>>>> ArSession: Games running changed:",
                         gamesRunning
                     )
+
+                    // Here we want to check if we need the initial detection
+                    // (because for simple plugins it should be annoying...)!!!
+                    // BE CAREFUL!!! You actually can't mix plugins that use and
+                    // don't use initial detection
+                    for (let i = 0; i < gamesRunning.length; i++) {
+                        const _game = props.gamesRunning[i]
+                        const gameSpecs = PLUGINS_LIST.find(
+                            (g) => g.fileName === _game.name
+                        )
+                        const useInitial =
+                            gameSpecs?.useInitialDetection ?? true
+                        if (!useInitial && !initDetectionCompleted()) {
+                            setInitDetectionCompleted(true)
+                            console.log(
+                                "NON C'E' BISOGNO DI INITIAL DETECTION!!!"
+                            )
+                        }
+                    }
+
+                    // Finally check if all games are ready
                     checkAllGamesReady()
                 }
             }

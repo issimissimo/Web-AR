@@ -2,7 +2,7 @@
   "name": "ar-web",
   "private": false,
   "license": "MIT",
-  "version": "0.3.2.2",
+  "version": "0.3.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,8 @@
     "serve-public": "concurrently \"npm run dev\" \"cloudflared tunnel --url http://localhost:5173\"",
     "preview": "vite preview",
     "subdir-build": "vite build --base=/threejs/",
-    "deploy": "node deploy.js"
+    "deploy": "node deploy.js",
+    "deploy-staging": "node deploy.js --staging"
   },
   "devDependencies": {
     "basic-ftp": "^5.0.5",
@@ -30,7 +31,8 @@
     "solid-fa": "^0.2.0",
     "solid-motionone": "^1.0.4",
     "solid-styled-components": "^0.28.5",
-    "three": "^0.180.0"
+    "three": "^0.180.0",
+    "troika-three-text": "^0.52.4"
   },
   "coloredRegions": {
     "namedColors": {
