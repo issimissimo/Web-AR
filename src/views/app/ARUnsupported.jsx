@@ -37,8 +37,8 @@ export default function ARUnsupported() {
           icon={faSadCry}
         >
           Purtroppo questo dispositivo non è compatibile per questa app! <br></br>
-          Scansiona il Qr Code con un dispositivo compatibile per vivere
-          l'esperienza di realtà aumentata completa.
+          Scansiona il Qr Code con un dispositivo compatibile Android con Chrome, o iOS con Safari, per vivere
+          l'esperienza di realtà aumentata.
         </Message>
       </div>
 

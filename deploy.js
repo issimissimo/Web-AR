@@ -27,6 +27,9 @@ const VERSION = packageJson.version;
 const DIST_FOLDER = './build';
 const REMOTE_BASE = '/issimissimo.com/public_html/prod/AR-Web'; // Percorso base sul server FTP
 
+// Verifica se è un deploy in staging
+const IS_STAGING = process.argv.includes('--staging');
+
 // ============================================
 // FUNZIONI HELPER
 // ============================================
@@ -36,12 +39,12 @@ const REMOTE_BASE = '/issimissimo.com/public_html/prod/AR-Web'; // Percorso base
  */
 async function uploadDirectory(client, localDir, remoteDir) {
   const files = fs.readdirSync(localDir);
-  
+
   for (const file of files) {
     const localPath = path.join(localDir, file);
     const remotePath = `${remoteDir}/${file}`;
     const stat = fs.statSync(localPath);
-    
+
     if (stat.isDirectory()) {
       // Crea la directory remota e continua ricorsivamente
       await client.ensureDir(remotePath);
@@ -72,9 +75,12 @@ async function clearRemoteDirectory(client, remoteDir) {
 // ============================================
 
 async function deploy() {
-  console.log('╔════════════════════════════════════════╗');
-  console.log(`║  🚀 Deploy versione ${VERSION.padEnd(18)} ║`);
-  console.log('╚════════════════════════════════════════╝\n');
+  const deployType = IS_STAGING ? 'STAGING' : 'PRODUZIONE';
+  const deployTypeEmoji = IS_STAGING ? '🧪' : '🚀';
+
+  console.log('╔═══════════════════════════════════════════╗');
+  console.log(`║  ${deployTypeEmoji} Deploy ${deployType} v${VERSION.padEnd(18)} ║`);
+  console.log('╚═══════════════════════════════════════════╝\n');
 
   try {
     // STEP 1: Build
@@ -91,33 +97,51 @@ async function deploy() {
     console.log('🔌 Step 2/3: Connessione al server FTP...');
     const client = new ftp.Client();
     client.ftp.verbose = false; // Disabilita log verbosi
-    
+
     await client.access(FTP_CONFIG);
     console.log('✓ Connesso al server\n');
 
-    // STEP 3a: Upload nella cartella versionata
-    console.log(`📤 Step 3a/3: Upload in /${path.basename(REMOTE_BASE)}/${VERSION}/`);
-    const versionedPath = `${REMOTE_BASE}/${VERSION}`;
-    await client.ensureDir(versionedPath);
-    await uploadDirectory(client, DIST_FOLDER, versionedPath);
-    console.log('\n✓ Versione backup salvata\n');
+    if (IS_STAGING) {
+      // DEPLOY STAGING: solo upload in /staging (sovrascrive)
+      console.log(`📤 Step 3/3: Upload in /${path.basename(REMOTE_BASE)}/staging/`);
+      const stagingPath = `${REMOTE_BASE}/staging`;
+      await clearRemoteDirectory(client, stagingPath);
+      await uploadDirectory(client, DIST_FOLDER, stagingPath);
+      console.log('\n✓ Staging aggiornato\n');
 
-    // STEP 3b: Upload nella cartella "current"
-    console.log(`📤 Step 3b/3: Upload in /${path.basename(REMOTE_BASE)}/current/`);
-    const currentPath = `${REMOTE_BASE}/current`;
-    await clearRemoteDirectory(client, currentPath);
-    await uploadDirectory(client, DIST_FOLDER, currentPath);
-    console.log('\n✓ Versione corrente aggiornata\n');
+    } else {
+      // DEPLOY PRODUZIONE: upload versione + current
+
+      // STEP 3a: Upload nella cartella versionata
+      console.log(`📤 Step 3a/3: Upload in /${path.basename(REMOTE_BASE)}/${VERSION}/`);
+      const versionedPath = `${REMOTE_BASE}/${VERSION}`;
+      await client.ensureDir(versionedPath);
+      await uploadDirectory(client, DIST_FOLDER, versionedPath);
+      console.log('\n✓ Versione backup salvata\n');
+
+      // STEP 3b: Upload nella cartella "current"
+      console.log(`📤 Step 3b/3: Upload in /${path.basename(REMOTE_BASE)}/current/`);
+      const currentPath = `${REMOTE_BASE}/current`;
+      await clearRemoteDirectory(client, currentPath);
+      await uploadDirectory(client, DIST_FOLDER, currentPath);
+      console.log('\n✓ Versione corrente aggiornata\n');
+    }
 
     client.close();
 
     // SUCCESSO
-    console.log('╔════════════════════════════════════════╗');
+    console.log('╔═══════════════════════════════════════════╗');
     console.log('║  ✅ Deploy completato con successo!   ║');
-    console.log('╚════════════════════════════════════════╝\n');
-    console.log('🌐 Link disponibili:');
-    console.log(`   → Principale: www.miositoweb${REMOTE_BASE}/current/`);
-    console.log(`   → Backup:     www.miositoweb${REMOTE_BASE}/${VERSION}/\n`);
+    console.log('╚═══════════════════════════════════════════╝\n');
+
+    if (IS_STAGING) {
+      console.log('🌐 Link disponibile:');
+      console.log(`   → Staging: www.miositoweb${REMOTE_BASE}/staging/\n`);
+    } else {
+      console.log('🌐 Link disponibili:');
+      console.log(`   → Principale: www.miositoweb${REMOTE_BASE}/current/`);
+      console.log(`   → Backup:     www.miositoweb${REMOTE_BASE}/${VERSION}/\n`);
+    }
 
   } catch (err) {
     console.error('\n❌ Errore durante il deploy:', err.message);
@@ -130,7 +154,8 @@ async function deploy() {
 // ============================================
 
 // Chiedi conferma prima di procedere
-console.log(`Stai per deployare la versione ${VERSION}`);
+const deployType = IS_STAGING ? 'STAGING' : 'PRODUZIONE';
+console.log(`Stai per deployare in ${deployType} - versione ${VERSION}`);
 console.log(`Server: ${FTP_CONFIG.host}`);
 console.log(`Percorso: ${REMOTE_BASE}\n`);
 

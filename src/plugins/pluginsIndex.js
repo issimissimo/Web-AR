@@ -1,5 +1,6 @@
 import pointLightIcon from '/icons/pointLight.svg';
 import hdrIcon from '/icons/HDR.svg';
+import textIcon from '/icons/text.svg';
 import categoryLuciIcon from '/icons/Category_luci.svg';
 import category3DIcon from '/icons/Category_3D.svg';
 import categoryGiochiIcon from '/icons/Category_giochi.svg';
@@ -67,19 +68,20 @@ export const PLUGINS_LIST = [
         tags: [],
         requirements: {}
     },
-    // {
-    //     fileName: "basicSphere",
-    //     title: 'Sfera base',
-    //     description: 'Da eliminare, solo di test',
-    //     icon: null,
-    //     category: 'Oggetti',
-    //     allowed: 1,
-    //     localized: false,
-    //     interactable: false,
-    //     editable: false,
-    //     tags: [],
-    //     requirements: {}
-    // },
+    {
+        fileName: "basicCube",
+        title: 'Cubo di test',
+        description: 'Solo per i test',
+        icon: null,
+        category: 'Oggetti',
+        allowed: 1,
+        useInitialDetection: false,
+        localized: false,
+        interactable: false,
+        editable: false,
+        tags: [],
+        requirements: {}
+    },
     {
         fileName: "baloons",
         title: 'Palloncini fluttuanti',
@@ -144,6 +146,19 @@ export const PLUGINS_LIST = [
         editable: false,
         tags: [],
         requirements: {}
+    },
+    {
+        fileName: "text",
+        title: "Testo",
+        description: "Inserisci testo",
+        icon: textIcon,
+        category: 'Oggetti',
+        allowed: 10,
+        localized: true,
+        interactable: false,
+        editable: true,
+        tags: [],
+        requirements: {},
     },
 ];
 

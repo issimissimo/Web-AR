@@ -68,13 +68,10 @@ export default function Baloons(props) {
      */
     const { game } = useGame("baloons", props.id, {
         onTap: () => {
-            console.log("TAAPPP-1")
             if (props.enabled) {
-                console.log("TAAPPP-2")
                 switch (game.appMode) {
                     case "save":
                         if (props.selected) {
-                            console.log("TAAPPP-3")
                             spawnModelOnTap()
                         }
                         break
@@ -304,9 +301,6 @@ export default function Baloons(props) {
      * Spawn on TAP
      */
     function spawnModelOnTap() {
-        const p = new Vector3().setFromMatrixPosition(Reticle.getHitMatrix())
-        console.log("SPAWN...", p)
-
         // clone model on hitMatrix with random Y rotation
         const newModel = balloonGlb.clone({
             position: new Vector3().setFromMatrixPosition(Reticle.getHitMatrix()),

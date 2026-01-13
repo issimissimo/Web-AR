@@ -13,6 +13,7 @@ import MarkerList from "@views/app/markerList"
 import EditMarker from "@views/app/editMarker"
 import Anonymous from "@views/app/anonymous"
 import ARUnsupported from "@views/app/ARunsupported"
+import Offline from "@/views/app/Offline"
 import ArSession from "@views/ar-overlay/arSession"
 
 // XR
@@ -22,6 +23,9 @@ import Reticle from "@js/reticle"
 // Monitor
 import FPSMonitor from "@tools/three/FPSMonitor"
 import MemoryMonitor from "@tools/three/MemoryMonitor"
+
+// Check Internet
+import { checkInternetConnection } from "@/tools/internetCheck"
 
 // ===== EXTRA =====
 import Toast from "@components/Toast"
@@ -53,6 +57,7 @@ const VIEWS = {
     ANONYMOUS: "anonymous",
     AR_SESSION: "arSession",
     AR_NOT_SUPPORTED: "arNotSupported",
+    OFFLINE: "offLine",
 }
 
 export default function App() {
@@ -72,9 +77,17 @@ export default function App() {
     let toastRef
 
     //#region [lifeCycle]
-    onMount(() => {
+    onMount(async () => {
+        // Check if you have Internet
+        const isOnline = await checkInternetConnection()
+        if (!isOnline) {
+            console.error("NON SEI ONLINE!!!")
+            goToOffline()
+            return
+        }
+
+        // Disable log
         if (config.production) {
-            // disable log
             console.log = function () {}
         }
 
@@ -92,7 +105,6 @@ export default function App() {
                 .then((supported) => {
                     if (!supported && !config.debugOnDesktop) {
                         goToArNotSupported()
-                        setLoading(false)
                     } else {
                         // Search for URL query string
                         const urlParams = new URLSearchParams(
@@ -123,7 +135,6 @@ export default function App() {
                 })
         } else {
             goToArNotSupported()
-            setLoading(false)
         }
     })
 
@@ -274,11 +285,11 @@ export default function App() {
     }
     const goToRegister = () => setCurrentView(VIEWS.REGISTER)
     const goToLogin = () => {
-        setLoading(() => false)
+        setLoading(false)
         setCurrentView(VIEWS.LOGIN)
     }
     const goToMarkerList = () => {
-        setLoading(() => false)
+        setLoading(false)
         setUserId(() => firebase.auth.user().uid)
         setCurrentView(VIEWS.MARKER_LIST)
     }
@@ -288,7 +299,14 @@ export default function App() {
         setBackgroundVisible(false)
         setCurrentView(VIEWS.AR_SESSION)
     }
-    const goToArNotSupported = () => setCurrentView(VIEWS.AR_NOT_SUPPORTED)
+    const goToArNotSupported = () => {
+        setLoading(false)
+        setCurrentView(VIEWS.AR_NOT_SUPPORTED)
+    }
+    const goToOffline = () => {
+        setLoading(false)
+        setCurrentView(VIEWS.OFFLINE)
+    }
     const goToPreviousView = () => setCurrentView(previousView())
 
     /**
@@ -520,22 +538,13 @@ export default function App() {
             case VIEWS.AR_NOT_SUPPORTED:
                 return <ARUnsupported />
 
+            case VIEWS.OFFLINE:
+                return <Offline />
+
             default:
                 return <div />
         }
     }
-
-    // Opzionale: mostra stats in tempo reale
-    setInterval(() => {
-        if (memoryMonitor) {
-            const stats = memoryMonitor.getMemoryStats()
-            if (stats) {
-                console.log(
-                    `Memoria: ${stats.usedMB}MB / ${stats.limitMB}MB (${stats.usagePercent}%)`
-                )
-            }
-        }
-    }, 5000)
 
     return (
         <Container>
