@@ -247,6 +247,7 @@ export default function App() {
             created: marker?.data?.created ?? null,
             name: marker?.data?.name ?? null,
             coverTitle: marker?.data?.coverTitle ?? null,
+            cover: marker?.data?.cover ?? null,
             views: marker?.data?.views ?? null,
             like: marker?.data?.like ?? null,
             games: marker?.data?.games ?? null,

@@ -3,7 +3,8 @@ import { getAuth, signInAnonymously } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage";
-import { firebaseConfig } from "@js/env";
+// import { firebaseConfig } from "@js/env";
+import { firebaseConfig } from "@root/CREDENTIALS.js";
 
 const app = initializeApp(firebaseConfig);
 

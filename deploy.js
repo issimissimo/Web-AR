@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import { ftpCredentials } from './CREDENTIALS.js';
 
 // Necessario per usare __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -17,9 +18,9 @@ const packageJson = require('./package.json');
 // CONFIGURAZIONE
 // ============================================
 const FTP_CONFIG = {
-  host: 'ftp.issimissimo.com',
-  user: 'd.suppo@issimissimo.com',
-  password: '/wfC1^b#m124',
+  host: ftpCredentials.host,
+  user: ftpCredentials.user,
+  password: ftpCredentials.password,
   secure: false // Cambia in true se usi FTPS
 };
 
@@ -39,12 +40,12 @@ const IS_STAGING = process.argv.includes('--staging');
  */
 async function uploadDirectory(client, localDir, remoteDir) {
   const files = fs.readdirSync(localDir);
-
+  
   for (const file of files) {
     const localPath = path.join(localDir, file);
     const remotePath = `${remoteDir}/${file}`;
     const stat = fs.statSync(localPath);
-
+    
     if (stat.isDirectory()) {
       // Crea la directory remota e continua ricorsivamente
       await client.ensureDir(remotePath);
@@ -59,11 +60,39 @@ async function uploadDirectory(client, localDir, remoteDir) {
 
 /**
  * Rimuove tutti i file in una directory remota
+ * @param {boolean} preserveHtaccess - Se true, mantiene il file .htaccess
  */
-async function clearRemoteDirectory(client, remoteDir) {
+async function clearRemoteDirectory(client, remoteDir, preserveHtaccess = false) {
   try {
-    await client.removeDir(remoteDir);
-    await client.ensureDir(remoteDir);
+    if (preserveHtaccess) {
+      // Scarica .htaccess se esiste
+      let htaccessContent = null;
+      const htaccessPath = `${remoteDir}/.htaccess`;
+      try {
+        const tempHtaccess = path.join(__dirname, '.htaccess.temp');
+        await client.downloadTo(tempHtaccess, htaccessPath);
+        htaccessContent = fs.readFileSync(tempHtaccess, 'utf8');
+        fs.unlinkSync(tempHtaccess);
+      } catch (err) {
+        // .htaccess non esiste, va bene così
+      }
+      
+      // Rimuove tutto
+      await client.removeDir(remoteDir);
+      await client.ensureDir(remoteDir);
+      
+      // Ripristina .htaccess se esisteva
+      if (htaccessContent) {
+        const tempHtaccess = path.join(__dirname, '.htaccess.temp');
+        fs.writeFileSync(tempHtaccess, htaccessContent);
+        await client.uploadFrom(tempHtaccess, htaccessPath);
+        fs.unlinkSync(tempHtaccess);
+      }
+    } else {
+      // Comportamento normale: rimuove tutto
+      await client.removeDir(remoteDir);
+      await client.ensureDir(remoteDir);
+    }
   } catch (err) {
     // Se la directory non esiste, la creiamo
     await client.ensureDir(remoteDir);
@@ -77,7 +106,7 @@ async function clearRemoteDirectory(client, remoteDir) {
 async function deploy() {
   const deployType = IS_STAGING ? 'STAGING' : 'PRODUZIONE';
   const deployTypeEmoji = IS_STAGING ? '🧪' : '🚀';
-
+  
   console.log('╔═══════════════════════════════════════════╗');
   console.log(`║  ${deployTypeEmoji} Deploy ${deployType} v${VERSION.padEnd(18)} ║`);
   console.log('╚═══════════════════════════════════════════╝\n');
@@ -97,21 +126,21 @@ async function deploy() {
     console.log('🔌 Step 2/3: Connessione al server FTP...');
     const client = new ftp.Client();
     client.ftp.verbose = false; // Disabilita log verbosi
-
+    
     await client.access(FTP_CONFIG);
     console.log('✓ Connesso al server\n');
 
     if (IS_STAGING) {
-      // DEPLOY STAGING: solo upload in /staging (sovrascrive)
+      // DEPLOY STAGING: solo upload in /staging (sovrascrive, ma preserva .htaccess)
       console.log(`📤 Step 3/3: Upload in /${path.basename(REMOTE_BASE)}/staging/`);
       const stagingPath = `${REMOTE_BASE}/staging`;
-      await clearRemoteDirectory(client, stagingPath);
+      await clearRemoteDirectory(client, stagingPath, true); // true = preserva .htaccess
       await uploadDirectory(client, DIST_FOLDER, stagingPath);
-      console.log('\n✓ Staging aggiornato\n');
-
+      console.log('\n✓ Staging aggiornato (preservato .htaccess)\n');
+      
     } else {
       // DEPLOY PRODUZIONE: upload versione + current
-
+      
       // STEP 3a: Upload nella cartella versionata
       console.log(`📤 Step 3a/3: Upload in /${path.basename(REMOTE_BASE)}/${VERSION}/`);
       const versionedPath = `${REMOTE_BASE}/${VERSION}`;
@@ -133,7 +162,7 @@ async function deploy() {
     console.log('╔═══════════════════════════════════════════╗');
     console.log('║  ✅ Deploy completato con successo!   ║');
     console.log('╚═══════════════════════════════════════════╝\n');
-
+    
     if (IS_STAGING) {
       console.log('🌐 Link disponibile:');
       console.log(`   → Staging: www.miositoweb${REMOTE_BASE}/staging/\n`);

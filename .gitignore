@@ -26,4 +26,5 @@ build
 
 _wipFiles/
 
-src/js/env.js
+
+CREDENTIALS.js

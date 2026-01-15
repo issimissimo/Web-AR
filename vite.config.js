@@ -23,6 +23,7 @@ export default defineConfig({
   plugins: [solid()],
   resolve: {
     alias: {
+      '@root': resolve(__dirname, './'),
       '@': resolve(__dirname, './src'),
       '@views': resolve(__dirname, './src/views'),
       '@components': resolve(__dirname, './src/components'),

@@ -13,6 +13,10 @@ import { faSadCry, faStar } from '@fortawesome/free-solid-svg-icons';
 //#region [Welcome]
 const Welcome = (props) => {
 
+  onMount(()=>{
+    console.log(props.cover)
+  })
+
   const ArButtonContainer = styled(Motion.div)`
     z-index: 1000;
   `;
@@ -117,6 +121,7 @@ export default function Main(props) {
         markerValid() ?
           <Welcome
             coverTitle={props.marker.coverTitle}
+            cover={props.marker.cover}
           />
           :
           <Unavailable />
