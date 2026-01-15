@@ -53,7 +53,14 @@ const Welcome = (props) => {
         if (!el) return false
         while (el.firstChild) el.removeChild(el.firstChild)
         el.style.backgroundImage = "none"
-        el.style.backgroundColor = color
+        // animate background color from CSS var --color-background to new color
+        const root = document.documentElement
+        const from = getComputedStyle(root).getPropertyValue('--color-background')?.trim() || 'transparent'
+        el.style.backgroundColor = from
+        el.style.transition = 'background-color 2000ms ease-in-out'
+        requestAnimationFrame(() => {
+            el.style.backgroundColor = color
+        })
         return true
     }
 
@@ -90,7 +97,7 @@ const Welcome = (props) => {
                         }}
                         animate={{ opacity: [0, 1], scale: [0.9, 1] }}
                         transition={{
-                            duration: 1,
+                            duration: 0.8,
                             easing: "ease-in-out",
                         }}
                     />
