@@ -1,4 +1,9 @@
 @font-face {
+  font-family: SebinoSoftLight;
+  src: url("/fonts/Sebino_Soft_Light.woff2");
+}
+
+@font-face {
   font-family: SebinoSoftRegular;
   src: url("/fonts/Sebino_Soft_Regular.woff2");
 }
@@ -7,6 +12,18 @@
   font-family: SebinoSoftMedium;
   src: url("/fonts/Sebino_Soft_Medium.woff2");
 }
+
+@font-face {
+  font-family: SebinoSoftSemiBold;
+  src: url("/fonts/Sebino_Soft_SemiBold.woff2");
+}
+
+
+@font-face {
+  font-family: SebinoSoftBold;
+  src: url("/fonts/Sebino_Soft_Bold.woff2");
+}
+
 
 @font-face {
   font-family: Montessori;
@@ -18,13 +35,12 @@
   --font-size-small: 0.8rem;
   --font-size-medium: 0.9rem;
   --font-size-regular: 1rem;
-  --font-size-large: 1.25rem;
+  --font-size-large: 1.15rem;
   --font-size-xlarge: 1.5rem;
 
   --color-primary: #f472b6;
   --color-primary-transparent: #f472b588;
   --color-primary-dark: #661f44;
-  /* --color-primary-dark-dark: #612e4888; */
   --color-primary-dark-dark: #0e050a;
   --color-secondary: #60a5fa;
   --color-secondary-dark: #458dfa67;
@@ -38,6 +54,7 @@
   --color-background-transparent: #00000018;
   --color-dark-transparent: #1e283685;
   --color-dark-transparent-dark: #1e283636;
+  --color-accent: #f472b6;
 
   font-family: "SebinoSoftRegular", sans-serif;
   line-height: 1.5;
@@ -129,17 +146,9 @@ canvas {
   animation: expand 12s ease-in-out infinite;
 }
 
-/* .circle-1 {
-  border-color: var(--color-primary-transparent);
-  width: 80vw;
-  height: 80vw;
-  top: 5%;
-  left: -20%;
-  animation-delay: 0s;
-} */
-
 .circle-1 {
-  border-color: var(--color-primary-transparent);
+  /* border-color: var(--color-primary-transparent); */
+  border-color: color-mix(in srgb, var(--color-primary), transparent 50%);
   width: 80vw;
   height: 80vw;
   top: 5%;

@@ -93,8 +93,9 @@ export default function ArSession(props) {
             props.resetGamesRunning
         }
 
-        // Let's start immediately darkening the background...
-        // setBlurVisible(true);
+        // Let's start immediately darkening the background
+        // because we assume that some asset should be loaded,
+        // so we want the loading screen darken and blurred
         handleBlurredCover({ visible: true })
 
         // ...and Starting the Reticle, to detect the space around us.
@@ -319,6 +320,10 @@ export default function ArSession(props) {
     }
 
     //#region [handlers]
+    createEffect(()=>{
+        console.log("**************************")
+        console.log("******** LO STATO di blurVisible è:", blurVisible())
+    })
 
     /**
      * Go back
@@ -658,21 +663,21 @@ export default function ArSession(props) {
                     }
                 )
 
-                // // just for debugging
-                // if (_blurredCoverStates.length > 1) {
-                //     console.log(
-                //         ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
-                //     )
-                //     console.log(
-                //         "now setting - visible:",
-                //         highestState.visible,
-                //         "showHole:",
-                //         highestState.showHole
-                //     )
-                //     console.log(
-                //         "********************************************************************"
-                //     )
-                // }
+                // just for debugging
+                if (_blurredCoverStates.length > 1) {
+                    console.log(
+                        ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
+                    )
+                    console.log(
+                        "now setting - visible:",
+                        highestState.visible,
+                        "showHole:",
+                        highestState.showHole
+                    )
+                    console.log(
+                        "********************************************************************"
+                    )
+                }
 
                 setBlurVisible(highestState.visible)
                 setBlurShowHole(highestState.showHole)

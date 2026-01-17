@@ -121,19 +121,19 @@ export const PLUGINS_LIST = [
         tags: [],
         requirements: {}
     },
-    // {
-    //     fileName: "backgroundTest",
-    //     title: 'Sfondo',
-    //     description: 'Da eliminare, solo di test',
-    //     icon: null,
-    //     category: 'Oggetti',
-    //     allowed: 1,
-    //     localized: false,
-    //     interactable: false,
-    //     editable: false,
-    //     tags: [],
-    //     requirements: {}
-    // },
+    {
+        fileName: "backgroundTest",
+        title: 'Sfondo',
+        description: 'Sfondo di test',
+        icon: null,
+        category: 'Oggetti',
+        allowed: 1,
+        localized: false,
+        interactable: false,
+        editable: false,
+        tags: [],
+        requirements: {}
+    },
     {
         fileName: "demoRulliera",
         title: 'Demo Rulliera',
@@ -144,6 +144,20 @@ export const PLUGINS_LIST = [
         localized: false,
         interactable: true,
         editable: false,
+        tags: [],
+        requirements: {}
+    },
+    {
+        fileName: "demoFinder",
+        title: 'Demo Finder',
+        description: 'Posiziona su un muro una presa Finder',
+        icon: null,
+        category: 'Custom',
+        allowed: 1,
+        localized: false,
+        interactable: true,
+        editable: false,
+        useInitialDetection: false,
         tags: [],
         requirements: {}
     },

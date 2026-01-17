@@ -31,7 +31,7 @@ export const FitHeightScrollable = styled(FitHeight)`
 
 export const BigTitle = styled(Motion.p)`
     font-size: 2.6rem;
-    font-family: "SebinoSoftMedium";
+    font-family: ${(props) => props.fontFamily ?? "SebinoSoftSemiBold"};
     line-height: 120%;
     color: ${(props) => props.color ?? props.color};
     margin: 0;

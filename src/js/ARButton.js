@@ -10,19 +10,20 @@ class ARButton {
     button.style.width = "100%";
     // button.style.height = "40px";
     button.style.borderRadius = "90px";
-    button.style.border = "2px solid";
+    button.style.border = "3px solid";
     // button.style.outline = "none";
     // margin-top: 15px;
     button.style.display = "flex";
     button.style.alignItems = "center";
     button.style.justifyContent = "center";
 
-    button.style.fontWeight = 500;
-    button.style.fontFamily = "inherit";
     button.style.background = "var(--color-background)";
-    button.style.padding = "0.7rem";
-    button.style.fontSize = "1rem";
+    button.style.padding = "0.8rem";
+    button.style.paddingLeft = "2.8rem";
+    button.style.paddingRight = "2.8rem";
+    button.style.fontSize = "var(--font-size-large)";
     button.style.color = "var(--color-primary)";
+    button.style.fontFamily = "SebinoSoftSemiBold";
 
 
     navigator.xr
@@ -30,7 +31,7 @@ class ARButton {
       .then(function (supported) {
 
         if (supported) {
-          button.textContent = "Entra in AR";
+          button.textContent = "Vedila in AR";
           button.style.pointerEvents = "auto";
           // button.style.backgroundColor = "rgba(0, 123, 255, 0.8)";
           initializeButton();

@@ -62,20 +62,6 @@ const FileItem = (props) => {
 }
 
 //region LABEL
-// const UploadButton = (props) => {
-//     const StyledLabel = styled("label")`
-//         position: relative;
-//         padding: 0.4rem;
-//         font-size: 1rem;
-//         font-weight: 700;
-//         font-family: inherit;
-//         border-radius: 90px;
-//         background: var(--color-primary-dark);
-//         color: white;
-//         text-align: center;
-//         font-family: "SebinoSoftMedium";
-//         /* pointer-events: ${(props) => (props.active ? "auto" : "none")}; */
-//     `
 
 const UploadButton = (props) => {
     const StyledLabel = styled("label")`
