@@ -16,7 +16,9 @@ const StyledButton = styled(Motion.button)`
     /* font-family: "SebinoSoftMedium"; */
     border-radius: 90px;
     /* background: ${(props) => (props.background ? props.background : "var(--color-background)")}; */
-    background: var(--color-background);
+    /* background: var(--color-background); */
+    /* background: rgba(180, 21, 130, 0.4); */
+    background: ${(props) => props.background || "var(--color-background)"};
     border: ${(props) => (props.border ? (props.small ? "0px solid" : "3px solid") : "1px solid")};
     /* border: none; */
     border-color: ${(props) =>
@@ -55,6 +57,7 @@ const Button = (props) => {
             visible={props.visible ?? true}
             grey={props.grey}
             border={props.border ?? true}
+            background={props.background}
             small={props.small ?? false}
             class={props.class}
             style={props.style}

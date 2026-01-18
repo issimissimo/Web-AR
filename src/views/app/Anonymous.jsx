@@ -32,34 +32,22 @@ const Welcome = (props) => {
 
     onMount(() => {
         // setup delay
-        // let val = 0
         if (props.cover?.images?.logo?.url) {
             enterDelay.title += enterDelayIncrement
         }
         enterDelay.subTitle += enterDelay.title + enterDelayIncrement
-
-        // if (props.cover?.text?.title) {
-        //     val += enterDelayIncrement
-        //     enterDelay.title = val
-        // }
-        // if (props.cover?.text?.subTitle) {
-        //     val += enterDelayIncrement
-        //     enterDelay.subTitle = val
-        // }
         if (props.cover?.images?.hero?.url) {
-            // val += enterDelayIncrement
             enterDelay.hero += enterDelay.subTitle + enterDelayIncrement
         }
         enterDelay.enterButton += enterDelay.hero
             ? enterDelay.hero + enterDelayIncrement
             : enterDelay.subTitle + enterDelayIncrement
 
-        console.log(enterDelay)
-
         // set background
         if (props.cover?.colors?.background) {
             setBackground(props.cover.colors.background)
         }
+        changeColors()
 
         //preload all images before to render the page
         if (props.cover?.images) {
@@ -78,11 +66,38 @@ const Welcome = (props) => {
         await smartImageLoader.load(images)
     }
 
+    const changeColors = () => {
+        if (props.cover?.colors?.primary) {
+            document.documentElement.style.setProperty(
+                "--color-primary",
+                props.cover.colors.primary
+            )
+        }
+        if (props.cover?.colors?.secondary) {
+            document.documentElement.style.setProperty(
+                "--color-secondary",
+                props.cover.colors.secondary
+            )
+        }
+        if (props.cover?.colors?.accent) {
+            document.documentElement.style.setProperty(
+                "--color-accent",
+                props.cover.colors.accent
+            )
+        }
+        if (props.cover?.colors?.background) {
+            document.documentElement.style.setProperty(
+                "--color-background",
+                props.cover.colors.background
+            )
+        }
+    }
+
     const setBackground = (color = "transparent") => {
         const el = document.getElementById("backgroundContainer")
         if (!el) return false
-        while (el.firstChild) el.removeChild(el.firstChild)
-        el.style.backgroundImage = "none"
+        // while (el.firstChild) el.removeChild(el.firstChild)
+        // el.style.backgroundImage = "none"
         // animate background color from CSS var --color-background to new color
         const root = document.documentElement
         const from =
@@ -107,11 +122,15 @@ const Welcome = (props) => {
         text-align: center;
     `
 
-    const TitleStyled = styled(BigTitle)`
+    const Spacer = styled("div")`
         flex: 1;
+    `
+
+    const TitleStyled = styled(BigTitle)`
+        /* flex: 1;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
+        justify-content: flex-end; */
     `
 
     const ArButtonContainer = styled(Motion.div)`
@@ -155,6 +174,7 @@ const Welcome = (props) => {
     return (
         <Container id="0001">
             <Show when={allImagesLoaded()}>
+                <Spacer></Spacer>
                 {/* LOGO */}
                 <Show when={props.cover?.images?.logo?.url}>
                     <Image

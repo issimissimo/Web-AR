@@ -134,13 +134,13 @@ canvas {
 }
 
 .circle-1 {
-  /* border-color: var(--color-primary-transparent); */
   border-color: color-mix(in srgb, var(--color-accent), transparent 50%);
   width: 80vw;
   height: 80vw;
   top: 5%;
   left: -20%;
   animation-delay: 0s;
+  transition: border-color 1s ease;
 }
 
 .circle-2 {
@@ -151,6 +151,7 @@ canvas {
   top: 25%;
   right: -25%;
   animation-delay: -4s;
+  transition: border-color 1s ease;
 }
 
 .circle-3 {
@@ -161,6 +162,7 @@ canvas {
   bottom: 15%;
   left: -10%;
   animation-delay: -8s;
+  transition: border-color 1s ease;
 }
 
 .circle-4 {
@@ -171,6 +173,7 @@ canvas {
   top: 45%;
   right: -15%;
   animation-delay: -2s;
+  transition: border-color 1s ease;
 }
 
 .circle-5 {
@@ -181,6 +184,7 @@ canvas {
   bottom: 35%;
   left: -30%;
   animation-delay: -6s;
+  transition: border-color 1s ease;
 }
 
 .circle-6 {
@@ -191,6 +195,7 @@ canvas {
   top: 60%;
   right: -20%;
   animation-delay: -10s;
+  transition: border-color 1s ease;
 }
 
 /* Ottimizzazioni per tablet */
