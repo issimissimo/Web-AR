@@ -61,14 +61,14 @@ const TimestampContainer = styled("div")``
 
 const Timestamp = styled("p")`
     font-size: 0.7rem;
-    color: var(--color-grey);
+    color: var(--color-secondary);
     margin: 0;
     font-weight: 500;
 `
 
 const NameContainer = styled("div")`
     box-sizing: border-box;
-    color: var(--color-white);
+    color: var(--color-primary);
     width: fit-content;
 `
 
@@ -179,8 +179,7 @@ const MarkersList = (props) => {
     <Container>
       {/* HEADER */}
       <Header showBack={false} onClickUser={props.goToUserProfile}>
-        <span style={{ color: "var(--color-secondary)" }}>I tuoi </span>
-        <span style={{ color: "var(--color-white)" }}>ambienti AR</span>
+        <span style={{ color: "var(--color-secondary)" }}>I tuoi ambienti AR</span>
       </Header>
 
       {/* CONTENT */}
@@ -189,6 +188,7 @@ const MarkersList = (props) => {
       ) : (
         <FitHeightScrollable
           id="FitHeight"
+          style={{"align-items": "center"}}
           animate={{ opacity: [0, 1] }}
           transition={{
             duration: 0.5,
@@ -223,7 +223,8 @@ const MarkersList = (props) => {
           <Button
             active={true}
             icon={faPlus}
-            border={markers().length === 0 ? true : false}
+            width={"100%"}
+            // border={markers().length === 0 ? true : false}
             onClick={() => props.onCreateNewMarker()}
           >
             Crea nuovo

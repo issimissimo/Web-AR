@@ -5,11 +5,22 @@ import { Motion } from 'solid-motionone';
 
 import Header from './Header';
 
-import { Container, Title } from '@components/smallElements'
+// import { Container } from '@components/smallElements'
 import InputField from '@components/inputField';
 import Button from '@components/button';
 
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+
+const Container = styled(Motion.div)`
+    box-sizing: border-box;
+    /* width: 100%; */
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    z-index: 1;
+`
 
 
 const Login = (props) => {
@@ -134,7 +145,7 @@ const Login = (props) => {
       <Button
         onClick={props.onGoToRegister}
         style={{ "margin-top": "30px" }}
-        grey={true}
+        // grey={true}
         icon={faChevronRight}
         border={false}
       >Oppure registrati

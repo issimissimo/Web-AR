@@ -37,29 +37,16 @@
   --font-size-regular: 1rem;
   --font-size-large: 1.15rem;
   --font-size-xlarge: 1.5rem;
+  --font-size-xxlarge: 1.6rem;
+  --font-size-xxxlarge: 2.1rem;
 
-  --color-primary: #f472b6;
-  --color-primary-transparent: #f472b588;
-  --color-primary-dark: #661f44;
-  --color-primary-dark-dark: #0e050a;
+  --color-primary: #f0f0f0;
   --color-secondary: #60a5fa;
-  --color-secondary-dark: #458dfa67;
-  --color-secondary-dark-dark: #203f6db9;
-  --color-white: #fff;
-  --color-white-smoke: #d3d3d3;
-  --color-grey: #adb5bd;
-  --color-grey-dark: #adb5bdad;
-  --color-background: #000000;
-  --color-background-light: #222121;
-  --color-background-transparent: #00000018;
-  --color-dark-transparent: #1e283685;
-  --color-dark-transparent-dark: #1e283636;
   --color-accent: #f472b6;
+  --color-background: #000000;
 
   font-family: "SebinoSoftRegular", sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -74,7 +61,7 @@ body {
   overflow: hidden;
   height: 100dvh;
   position: relative;
-  color: var(--color-white);
+  color: var(--color-primary);
   background-color: var(--color-background);
 }
 
@@ -114,7 +101,7 @@ canvas {
   position: relative;
 }
 
-#ar-overlay > div {
+#ar-overlay>div {
   height: 100% !important;
 }
 
@@ -148,7 +135,7 @@ canvas {
 
 .circle-1 {
   /* border-color: var(--color-primary-transparent); */
-  border-color: color-mix(in srgb, var(--color-primary), transparent 50%);
+  border-color: color-mix(in srgb, var(--color-accent), transparent 50%);
   width: 80vw;
   height: 80vw;
   top: 5%;
@@ -157,7 +144,8 @@ canvas {
 }
 
 .circle-2 {
-  border-color: var(--color-secondary-dark);
+  /* border-color: var(--color-secondary-dark); */
+  border-color: color-mix(in srgb, var(--color-secondary), transparent 50%);
   width: 90vw;
   height: 90vw;
   top: 25%;
@@ -166,7 +154,8 @@ canvas {
 }
 
 .circle-3 {
-  border-color: var(--color-grey-dark);
+  /* border-color: var(--color-grey-dark); */
+  border-color: color-mix(in srgb, var(--color-primary), transparent 70%);
   width: 100vw;
   height: 100vw;
   bottom: 15%;
@@ -175,7 +164,8 @@ canvas {
 }
 
 .circle-4 {
-  border-color: var(--color-primary-dark);
+  /* border-color: var(--color-primary-dark); */
+  border-color: color-mix(in srgb, var(--color-accent), transparent 70%);
   width: 70vw;
   height: 70vw;
   top: 45%;
@@ -184,7 +174,8 @@ canvas {
 }
 
 .circle-5 {
-  border-color: var(--color-secondary-dark);
+  /* border-color: var(--color-secondary-dark); */
+  border-color: color-mix(in srgb, var(--color-secondary), transparent 60%);
   width: 85vw;
   height: 85vw;
   bottom: 35%;
@@ -193,7 +184,8 @@ canvas {
 }
 
 .circle-6 {
-  border-color: #adb5bdad;
+  /* border-color: #adb5bdad; */
+  border-color: color-mix(in srgb, var(--color-primary), transparent 80%);
   width: 75vw;
   height: 75vw;
   top: 60%;

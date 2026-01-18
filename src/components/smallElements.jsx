@@ -30,20 +30,20 @@ export const FitHeightScrollable = styled(FitHeight)`
 `
 
 export const BigTitle = styled(Motion.p)`
-    font-size: 2.6rem;
-    font-family: ${(props) => props.fontFamily ?? "SebinoSoftSemiBold"};
-    line-height: 120%;
+    font-size: var(--font-size-xxxlarge);
+    font-family: ${(props) => props.fontFamily ?? "SebinoSoftBold"};
+    line-height: 125%;
     color: ${(props) => props.color ?? props.color};
     margin: 0;
 `
 
 export const Title = styled(Motion.p)`
-    font-size: 1.8rem;
-    font-family: "SebinoSoftMedium";
-    line-height: 100%;
-    color: ${(props) => props.color ?? props.color};
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    font-size: var(--font-size-xxlarge);
+    font-family: "SebinoSoftBold";
+    line-height: 130%;
+    color: ${(props) => props.color ?? 'var(--color-primary)'};
+    /* margin-top: 1rem;
+    margin-bottom: 1rem; */
     vertical-align: text-top;
 
     span {
@@ -52,15 +52,16 @@ export const Title = styled(Motion.p)`
 `
 
 export const SubTitle = styled(Motion.p)`
-    font-size: 1.8rem;
-    font-family: "SebinoSoftRegular";
-    line-height: 100%;
-    color: ${(props) => props.color ?? props.color};
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    font-size: var(--font-size-xxlarge);
+    font-family: "SebinoSoftSemiBold";
+    line-height: 130%;
+    color: ${(props) => props.color ?? 'var(--color-secondary)'};
+    /* margin-top: 1rem;
+    margin-bottom: 1rem; */
     vertical-align: text-top;
+    margin: 0;
 
-    span {
+    /* span {
         vertical-align: text-top;
-    }
+    } */
 `

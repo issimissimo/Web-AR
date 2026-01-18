@@ -22,8 +22,9 @@ class ARButton {
     button.style.paddingLeft = "2.8rem";
     button.style.paddingRight = "2.8rem";
     button.style.fontSize = "var(--font-size-large)";
-    button.style.color = "var(--color-primary)";
+    button.style.color = "var(--color-accent)";
     button.style.fontFamily = "SebinoSoftSemiBold";
+    button.style.minWidth = "80%";
 
 
     navigator.xr
@@ -31,7 +32,7 @@ class ARButton {
       .then(function (supported) {
 
         if (supported) {
-          button.textContent = "Vedila in AR";
+          button.textContent = "Entra in AR";
           button.style.pointerEvents = "auto";
           // button.style.backgroundColor = "rgba(0, 123, 255, 0.8)";
           initializeButton();

@@ -11,7 +11,11 @@ import {
 } from "@components/smallElements"
 import Message from "@components/Message"
 
-import { faSadCry, faStar } from "@fortawesome/free-solid-svg-icons"
+import {
+    faSadCry,
+    faStar,
+    faHandPointRight,
+} from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
 
 //#region [Welcome]
@@ -27,7 +31,7 @@ const Welcome = (props) => {
 
     onMount(() => {
         // setup delay
-        let val
+        let val = 0
         if (props.cover?.images?.logo?.url) {
             val += 0.5
             enterDelay.logo = val
@@ -45,6 +49,8 @@ const Welcome = (props) => {
             enterDelay.hero = val
         }
         enterDelay.enterButton = val + 1
+
+        console.log(enterDelay)
 
         // set background
         if (props.cover?.colors?.background) {
@@ -88,14 +94,17 @@ const Welcome = (props) => {
     }
 
     const Container = styled("div")`
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1rem;
+        justify-content: center;
+        gap: 1.5rem;
         text-align: center;
     `
 
     const ArButtonContainer = styled(Motion.div)`
+        width: 100%;
         z-index: 1000;
     `
 
@@ -104,11 +113,31 @@ const Welcome = (props) => {
     `
 
     const CoverTitle = styled(Motion.p)`
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         text-align: center;
+        font-size: var(--font-size-xlarge);
+        font-family: "SebinoSoftSemiBold";
+        color: var(--color-secondary);
+        margin-bottom: 3rem;
+    `
+
+    const DisclaimerStyled = styled(Motion.div)`
+        justify-self: flex-end;
+    `
+
+    const DisclaimerLink = styled("p")`
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        cursor: pointer;
+        text-decoration-thickness: 1px;
+        text-decoration-color: inherit;
     `
 
     return (
-        <Container>
+        <Container id="0001">
             <Show when={allImagesLoaded()}>
                 {/* LOGO */}
                 <Show when={props.cover?.images?.logo?.url}>
@@ -133,22 +162,7 @@ const Welcome = (props) => {
                     fallback={
                         <>
                             <BigTitle
-                                animate={{ opacity: [0, 1] }}
-                                transition={{
-                                    duration: 0.5,
-                                    easing: "ease-in-out",
-                                    delay: 0,
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        color: "var(--color-secondary)",
-                                    }}
-                                >
-                                    Benvenuto
-                                </span>
-                            </BigTitle>
-                            <BigTitle
+                                style={{ fontSize: "var(--font-size-small)" }}
                                 animate={{ opacity: [0, 1] }}
                                 transition={{
                                     duration: 0.5,
@@ -159,35 +173,20 @@ const Welcome = (props) => {
                                 <span
                                     style={{
                                         color: "var(--color-secondary)",
+                                        fontFamily: "SebinoSoftMedium",
                                     }}
                                 >
-                                    nella{" "}
+                                    Benvenuti <br></br> nella vostra
                                 </span>
-                                <span style={{ color: "var(--color-white)" }}>
-                                    tua esperienza in
-                                </span>
-                            </BigTitle>
-                            <BigTitle
-                                color={"var(--color-primary)"}
-                                animate={{ opacity: [0, 1] }}
-                                transition={{
-                                    duration: 0.5,
-                                    easing: "ease-in-out",
-                                    delay: 0.5,
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        color: "var(--color-primary)",
-                                    }}
-                                >
-                                    Realtà Aumentata
+                                <span style={{ color: "var(--color-primary)" }}>
+                                    <br></br>esperienza <br></br> in AR
                                 </span>
                             </BigTitle>
                         </>
                     }
                 >
                     <BigTitle
+                        style={{ fontSize: "var(--font-size-small)" }}
                         color={
                             props.cover.colors.primary ?? {
                                 color: "var(--color-primary)",
@@ -239,29 +238,6 @@ const Welcome = (props) => {
                         }}
                     />
                 </Show>
-
-                <FitHeight style={{ "justify-content": "center" }}>
-                    {props.coverTitle !== null && (
-                        <CoverTitle
-                            id="cover"
-                            animate={{ opacity: [0, 1] }}
-                            transition={{
-                                duration: 1,
-                                easing: "ease-in-out",
-                                delay: 1,
-                            }}
-                        >
-                            <Fa
-                                icon={faStar}
-                                color={"var(--color-secondary)"}
-                                translateY={-0.5}
-                                size="3x"
-                                class="icon"
-                            />
-                            {props.coverTitle}
-                        </CoverTitle>
-                    )}
-                </FitHeight>
             </Show>
             <ArButtonContainer
                 id="ArButtonContainer"
@@ -272,6 +248,11 @@ const Welcome = (props) => {
                     delay: enterDelay.enterButton - 0.5,
                 }}
             />
+            <DisclaimerStyled>
+                <DisclaimerLink onClick={() => props.onDisclaimer?.()}>
+                    Disclaimer
+                </DisclaimerLink>
+            </DisclaimerStyled>
         </Container>
     )
 }

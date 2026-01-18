@@ -101,8 +101,7 @@ const Label = styled('div')`
   display: flex;
   align-items: center;
   background: transparent;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-size: var(--font-size-medium);
   transition: color 0.3s;
 `;
 
@@ -127,7 +126,7 @@ const ErrorContainer = styled('div')`
 `;
 
 const ErrorMsg = styled('span')`
-  color: var(--color-secondary);
+  color: var(--color-accent);
   font-size: 0.75rem;
 `;
 
@@ -168,7 +167,7 @@ const InputField = (props) => {
             x: isFocused() || props.value ? -20 : 0,
             y: isFocused() || props.value ? -35 : 0,
             scale: isFocused() || props.value ? 0.8 : 1,
-            color: isFocused() ? (props['data-error'] ? 'var(--color-primary)' : 'var(--color-grey)') : 'var(--color-secondary)',
+            color: isFocused() ? (props['data-error'] ? 'var(--color-accent)' : 'var(--color-secondary)') : 'var(--color-secondary)',
           }}
           transition={{ duration: 0.3, easing: 'ease-in-out' }}
         >
@@ -223,7 +222,7 @@ const InputField = (props) => {
         {/* Eye icon for password */}
         {props.type === 'password' && !isMultiline() && (
           <EyeButton type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword() ? 'Nascondi password' : 'Mostra password'}>
-            <Fa icon={showPassword() ? faEyeSlash : faEye} color='var(--color-grey)' />
+            <Fa icon={showPassword() ? faEyeSlash : faEye} color='var(--color-secondary)' />
           </EyeButton>
         )}
       </InputFieldContainer>
