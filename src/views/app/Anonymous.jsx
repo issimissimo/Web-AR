@@ -13,15 +13,13 @@ import Message from "@components/Message"
 
 import {
     faSadCry,
-    faStar,
-    faHandPointRight,
 } from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
 
 //#region [Welcome]
 const Welcome = (props) => {
     const [allImagesLoaded, setAllImagesLoaded] = createSignal(false)
-    const enterDelayIncrement = 0.5
+    const enterDelayIncrement = 0.75
     const enterDelay = {
         logo: 0,
         title: 0,
@@ -131,6 +129,7 @@ const Welcome = (props) => {
         display: flex;
         flex-direction: column;
         justify-content: flex-end; */
+        width: 80%;
     `
 
     const ArButtonContainer = styled(Motion.div)`
@@ -187,7 +186,7 @@ const Welcome = (props) => {
                         transition={{
                             duration: 0.8,
                             easing: "ease-in-out",
-                            delay: enterDelay.logo - 0.5,
+                            delay: enterDelay.logo,
                         }}
                     />
                 </Show>
