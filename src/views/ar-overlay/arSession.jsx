@@ -73,9 +73,9 @@ export default function ArSession(props) {
     onMount(() => {
         // Link to app.jsx FPS monitor functions
         if (typeof props.ref === "function") {
-            props.ref({ onLowFps, onNormalFps, onHighMemory })
+            props.ref({ onLowFps, onNormalFps, onHighMemory, onLowTracking, onNormalTracking })
         } else {
-            Object.assign(props.ref, { onLowFps, onNormalFps, onHighMemory })
+            Object.assign(props.ref, { onLowFps, onNormalFps, onHighMemory, onLowTracking, onNormalTracking })
         }
 
         // Initialize the DOM Observer for interactive elements
@@ -500,6 +500,52 @@ export default function ArSession(props) {
     function disableTap(e) {
         _tapEnabled = false
         e.stopPropagation()
+    }
+
+    function onLowTracking(){
+        // Call onLowTracking function of all the gamesRunning
+        props.gamesRunning.forEach((el) => {
+            try {
+                // execute onLowTracking inside a temporary reactive root so
+                // any computations created are attached to a root and can be disposed.
+                const disposer = createRoot(() => {
+                    try {
+                        el.onLowTracking && el.onLowTracking()
+                    } catch (err) {
+                        console.error("Error in game onLowTracking:", err)
+                    }
+                })
+                // Immediately dispose the temporary root to avoid leaking
+                try {
+                    disposer()
+                } catch (e) {}
+            } catch (e) {
+                console.error("Error executing game onLowTracking:", e)
+            }
+        })
+    }
+
+    function onNormalTracking(){
+        // Call onNormalTracking function of all the gamesRunning
+        props.gamesRunning.forEach((el) => {
+            try {
+                // execute onNormalTracking inside a temporary reactive root so
+                // any computations created are attached to a root and can be disposed.
+                const disposer = createRoot(() => {
+                    try {
+                        el.onNormalTracking && el.onNormalTracking()
+                    } catch (err) {
+                        console.error("Error in game onNormalTracking:", err)
+                    }
+                })
+                // Immediately dispose the temporary root to avoid leaking
+                try {
+                    disposer()
+                } catch (e) {}
+            } catch (e) {
+                console.error("Error executing game onNormalTracking:", e)
+            }
+        })
     }
 
     function onLowFps() {

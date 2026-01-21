@@ -20,7 +20,8 @@ import ArSession from "@views/ar-overlay/arSession"
 import SceneManager from "@js/sceneManager"
 import Reticle from "@js/reticle"
 
-// Monitor
+// Monitors
+import ARTrackingMonitor from "@tools/three/ARTrackingMonitor"
 import FPSMonitor from "@tools/three/FPSMonitor"
 import MemoryMonitor from "@tools/three/MemoryMonitor"
 
@@ -71,8 +72,7 @@ export default function App() {
     const [currentMarker, setCurrentMarker] = createSignal(null)
     const [planeFound, setPlaneFound] = createSignal(false)
     const [gamesRunning, setGamesRunning] = createSignal([])
-    let fpsMonitor
-    let memoryMonitor
+    let arTrackingMonitor, fpsMonitor, memoryMonitor
     let arSessionRef
     let toastRef
 
@@ -329,21 +329,13 @@ export default function App() {
                 }
             }
 
-            if (frame) {
-                const referenceSpace = SceneManager.renderer.xr.getReferenceSpace()
-                const pose = frame.getViewerPose(referenceSpace)
-                if (pose) {
-                    console.log("---> POSE <--- :", pose)
-                } else {
-                    console.log("Tracking perso. Inquadra l'ambiente.")
-                }
-            }
-
-            // update Monitors
+            // Update Monitors
+            if (arTrackingMonitor)
+                arTrackingMonitor.update(frame, SceneManager.renderer)
             if (fpsMonitor) fpsMonitor.update()
             if (memoryMonitor) memoryMonitor.update(performance.now())
 
-            // render the loop of the running Games
+            // Render the loop of the running Games
             gamesRunning().forEach((el) => el.renderLoop())
 
             // Update Scene
@@ -371,6 +363,25 @@ export default function App() {
         SceneManager.renderer.xr.addEventListener("sessionstart", () => {
             goToArSession()
         })
+
+        // Initialize AR Tracking Monitor
+        arTrackingMonitor = new ARTrackingMonitor(30) // Campiona 30 frame
+        arTrackingMonitor.on("lowtracking", () => {
+            console.warn("Accuratezza tracking degradata (3DoF/Emulated)")
+            handleShowToast(
+                "Il tracking è instabile. Inquadra meglio l'ambiente.",
+                {
+                    duration: 10000,
+                },
+            )
+            if (arSessionRef) arSessionRef.onLowTracking()
+        })
+
+        arTrackingMonitor.on("normaltracking", () => {
+            console.log("Tracking tornato ottimale (6DoF)")
+            if (arSessionRef) arSessionRef.onNormalTracking()
+        })
+
         // Initialize FPS Monitor
         fpsMonitor = new FPSMonitor(config.minimumFPS, 60) // soglia 15fps, campiona 60 frame
         fpsMonitor.on("lowfps", (e) => {
@@ -413,6 +424,7 @@ export default function App() {
 
         if (Reticle.initialized()) Reticle.destroy()
         SceneManager.destroy()
+        arTrackingMonitor = null
         fpsMonitor = null
         memoryMonitor = null
 

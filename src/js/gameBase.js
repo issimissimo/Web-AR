@@ -172,12 +172,20 @@ export function useGame(gameName, gameId, config = {}) {
         console.log(`${gameName} closeBase`)
     }
 
+    const _onLowTrackingBase = () => {
+        // console.log(`${gameName} onLowTrackingBase`)
+    }
+
+    const _onNormalTrackingBase = () => {
+        // console.log(`${gameName} onNormalTrackingBase`)
+    }
+
     const _onLowFpsBase = () => {
-        console.log(`${gameName} onLowFpsBase`)
+        // console.log(`${gameName} onLowFpsBase`)
     }
 
     const _onNormalFpsBase = () => {
-        console.log(`${gameName} onNormalFpsBase`)
+        // console.log(`${gameName} onNormalFpsBase`)
     }
 
     const onUndo = () => {
@@ -192,6 +200,9 @@ export function useGame(gameName, gameId, config = {}) {
     const onTap = config.onTap || _onTapBase
     const renderLoop = config.renderLoop || _renderLoopBase
     const close = config.close || _closeBase
+    const onLowTracking = config.onLowTracking || _onLowTrackingBase
+    const onNormalTracking =
+        config.onNormalTracking || _onNormalTrackingBase   
     const onLowFps = config.onLowFps || _onLowFpsBase
     const onNormalFps = config.onNormalFps || _onNormalFpsBase
 
@@ -212,6 +223,8 @@ export function useGame(gameName, gameId, config = {}) {
         close,
         onUndo,
         onClick,
+        onLowTracking,
+        onNormalTracking,
         onLowFps,
         onNormalFps,
         loadGameData,
