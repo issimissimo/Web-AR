@@ -37,6 +37,11 @@ class SmartImageLoader {
    * Carica una singola immagine
    */
   _loadImage(url) {
+
+    if (!url) {
+      return null;
+    }
+
     this.pendingImages.add(url);
 
     return new Promise((resolve, reject) => {

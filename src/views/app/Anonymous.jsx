@@ -1,14 +1,7 @@
 import { createSignal, onMount, Show } from "solid-js"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
-import Fa from "solid-fa"
-import {
-    Centered,
-    BigTitle,
-    Title,
-    SubTitle,
-    FitHeight,
-} from "@components/smallElements"
+import { Centered, Title, SubTitle } from "@components/smallElements"
 import Message from "@components/Message"
 
 import { faSadCry } from "@fortawesome/free-solid-svg-icons"
@@ -38,8 +31,6 @@ const Welcome = (props) => {
         enterDelay.enterButton += enterDelay.hero
             ? enterDelay.hero + enterDelayIncrement * 4
             : enterDelay.subTitle + enterDelayIncrement * 4
-
-        console.log(enterDelay)
 
         changeColors()
 
@@ -105,7 +96,7 @@ const Welcome = (props) => {
     `
 
     const TitleStyled = styled(Title)`
-        width: 90%;
+        width: 80%;
         margin-top: 0.5rem;
     `
 
@@ -120,12 +111,8 @@ const Welcome = (props) => {
         z-index: 1000;
     `
 
-    const Image = styled(Motion.img)`
-        margin-bottom: 1rem;
-    `
-
     const LogoImageStyled = styled(Motion.img)`
-        margin-bottom: 1rem;
+        margin-bottom: ${(props) => props.marginBottom ?? "1rem"};
     `
 
     const HeroImageStyled = styled(Motion.img)`
@@ -173,6 +160,7 @@ const Welcome = (props) => {
                         style={{
                             width: props.cover.images.logo.width ?? "100px",
                         }}
+                        marginBottom={props.cover.images.logo.marginBottom}
                         animate={{ opacity: [0, 1], scale: [0.9, 1] }}
                         transition={{
                             duration: 0.8,
