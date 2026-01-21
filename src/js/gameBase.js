@@ -165,7 +165,7 @@ export function useGame(gameName, gameId, config = {}) {
     }
 
     const _renderLoopBase = () => {
-        console.log(`${gameName} renderLoopBase`)
+        // console.log(`${gameName} renderLoopBase`)
     }
 
     const _closeBase = () => {

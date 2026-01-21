@@ -19,7 +19,7 @@ import { smartImageLoader } from "@tools/smartImageLoader"
 //#region [Welcome]
 const Welcome = (props) => {
     const [allImagesLoaded, setAllImagesLoaded] = createSignal(false)
-    const enterDelayIncrement = 0.75
+    const enterDelayIncrement = 0.6
     const enterDelay = {
         logo: 0,
         title: 0,
@@ -31,7 +31,7 @@ const Welcome = (props) => {
     onMount(() => {
         // setup delay
         if (props.cover?.images?.logo?.url) {
-            enterDelay.title += enterDelayIncrement
+            enterDelay.title += enterDelay.logo + enterDelayIncrement
         }
         enterDelay.subTitle += enterDelay.title + enterDelayIncrement
         if (props.cover?.images?.hero?.url) {
@@ -41,10 +41,7 @@ const Welcome = (props) => {
             ? enterDelay.hero + enterDelayIncrement
             : enterDelay.subTitle + enterDelayIncrement
 
-        // set background
-        if (props.cover?.colors?.background) {
-            setBackground(props.cover.colors.background)
-        }
+       
         changeColors()
 
         //preload all images before to render the page
@@ -60,7 +57,7 @@ const Welcome = (props) => {
     })
 
     const loadImages = async () => {
-        const images = [props.cover?.images?.logo?.url]
+        const images = [props.cover?.images?.logo?.url, props.cover?.images?.hero?.url]
         await smartImageLoader.load(images)
     }
 
@@ -91,32 +88,13 @@ const Welcome = (props) => {
         }
     }
 
-    const setBackground = (color = "transparent") => {
-        const el = document.getElementById("backgroundContainer")
-        if (!el) return false
-        // while (el.firstChild) el.removeChild(el.firstChild)
-        // el.style.backgroundImage = "none"
-        // animate background color from CSS var --color-background to new color
-        const root = document.documentElement
-        const from =
-            getComputedStyle(root)
-                .getPropertyValue("--color-background")
-                ?.trim() || "transparent"
-        el.style.backgroundColor = from
-        el.style.transition = "background-color 2000ms ease-in-out"
-        requestAnimationFrame(() => {
-            el.style.backgroundColor = color
-        })
-        return true
-    }
-
     const Container = styled("div")`
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 1.5rem;
+        /* gap: 1.5rem; */
         text-align: center;
     `
 
@@ -139,7 +117,7 @@ const Welcome = (props) => {
     `
 
     const Image = styled(Motion.img)`
-        margin-bottom: 2rem;
+        /* margin-bottom: 2rem; */
     `
 
     const CoverTitle = styled(Motion.p)`

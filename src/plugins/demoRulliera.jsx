@@ -22,9 +22,9 @@ const BARRRIERA_TYPE = {
 export default function demoRulliera(props) {
 
     // Parameters
-    const materialOffset = 0.008
+    const materialOffsetSpeed = 0.008
     const useVideo = true
-    const lightsIntensity = 0.5
+    const lightsIntensity = 0.3
 
     const clock = new THREE.Clock(!useVideo)
 
@@ -134,7 +134,7 @@ export default function demoRulliera(props) {
 
                 // Anima tutti i materiali nell'array
                 materialsToAnimateOffset.forEach((material) => {
-                    const offsetSpeed = materialOffset // Regola la velocità
+                    const offsetSpeed = materialOffsetSpeed // Regola la velocità
 
                     // Lista di tutte le possibili texture maps
                     const textureMaps = [
