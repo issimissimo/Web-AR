@@ -15,7 +15,7 @@ export default function demoFinder(props) {
     // const [showInstructions, setShowInstructions] = createSignal(true)
     // const [spawned, setSpawned] = createSignal(false)
 
-    let glb, frutto, cornice, retro
+    let aoTexture, glb, frutto, cornice, retro, wall
 
     // const handleCloseInstructions = () => {
     //     setShowInstructions(false);
@@ -62,7 +62,7 @@ export default function demoFinder(props) {
         await loadEnvAsync()
 
         // FRUTTO
-        const aoTexture = await new LoadTexture(
+        aoTexture = await new LoadTexture(
             "models/demo/Finder/4box_USBP_503_su_muro_FRUTTO_AO.webp",
             {
                 flipY: false,
@@ -117,9 +117,23 @@ export default function demoFinder(props) {
             }
         })
 
+        // WALL
+        aoTexture = await new LoadTexture("models/demo/Finder/wall_AO.webp", {
+            flipY: false,
+        })
+
+        glb = await new GLBFile("models/demo/Finder/wall.glb", {
+            aoMap: aoTexture,
+            aoMapIntensity: 1,
+        })
+
+        wall = glb.model
+        wall.position.set(0, 0, -0.5)
+
         game.addToScene(frutto)
         game.addToScene(cornice)
         game.addToScene(retro)
+        game.addToScene(wall)
 
         /*
          * Don't forget to call "game.setInitialized()" at finish

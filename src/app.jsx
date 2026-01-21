@@ -38,7 +38,7 @@ import Toast from "@components/Toast"
 let globalGoToArSession
 export const TestGameOnDesktopFallback = () => {
     console.warn(
-        "We are DEBUGGING on desktop and AR session is NOT initialized! Just use for debug on desktop purpose! Please check 'appConfig.json' file in PUBLIC folder to modify the settings!"
+        "We are DEBUGGING on desktop and AR session is NOT initialized! Just use for debug on desktop purpose! Please check 'appConfig.json' file in PUBLIC folder to modify the settings!",
     )
     globalGoToArSession()
 }
@@ -108,7 +108,7 @@ export default function App() {
                     } else {
                         // Search for URL query string
                         const urlParams = new URLSearchParams(
-                            window.location.search
+                            window.location.search,
                         )
                         const hasQueryParams =
                             urlParams.has("userId") && urlParams.has("markerId")
@@ -155,7 +155,7 @@ export default function App() {
         }
 
         setUserId(() =>
-            config.debugLoadMode ? config.debugUserId : params.get("userId")
+            config.debugLoadMode ? config.debugUserId : params.get("userId"),
         )
         const markerId = config.debugLoadMode
             ? config.debugMarkerId
@@ -176,7 +176,7 @@ export default function App() {
         if (firebase.auth.user()) {
             if (firebase.auth.user().isAnonymous) {
                 console.log(
-                    "You previously logged as anonymous, so you need to login again"
+                    "You previously logged as anonymous, so you need to login again",
                 )
                 goToLogin()
             } else {
@@ -201,11 +201,11 @@ export default function App() {
         // from firestore for this marker
         if (marker.id && !marker.data.games) {
             console.log(
-                "no marker.data.games provided, now loading them from firestore!"
+                "no marker.data.games provided, now loading them from firestore!",
             )
             marker.data.games = await firebase.firestore.fetchGames(
                 userId(),
-                marker.id
+                marker.id,
             )
         }
 
@@ -329,7 +329,17 @@ export default function App() {
                 }
             }
 
-            // update Monitor
+            if (frame) {
+                const referenceSpace = SceneManager.renderer.xr.getReferenceSpace()
+                const pose = frame.getViewerPose(referenceSpace)
+                if (pose) {
+                    console.log("---> POSE <--- :", pose)
+                } else {
+                    console.log("Tracking perso. Inquadra l'ambiente.")
+                }
+            }
+
+            // update Monitors
             if (fpsMonitor) fpsMonitor.update()
             if (memoryMonitor) memoryMonitor.update(performance.now())
 
@@ -465,7 +475,7 @@ export default function App() {
                             }
                             setupMarker(
                                 { id: marker.id, data: markerData },
-                                () => goToEditMarker()
+                                () => goToEditMarker(),
                             )
                         }}
                         goToUserProfile={goToUserProfile()}
