@@ -11,15 +11,13 @@ import {
 } from "@components/smallElements"
 import Message from "@components/Message"
 
-import {
-    faSadCry,
-} from "@fortawesome/free-solid-svg-icons"
+import { faSadCry } from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
 
 //#region [Welcome]
 const Welcome = (props) => {
     const [allImagesLoaded, setAllImagesLoaded] = createSignal(false)
-    const enterDelayIncrement = 0.6
+    const enterDelayIncrement = 0.4
     const enterDelay = {
         logo: 0,
         title: 0,
@@ -38,10 +36,11 @@ const Welcome = (props) => {
             enterDelay.hero += enterDelay.subTitle + enterDelayIncrement
         }
         enterDelay.enterButton += enterDelay.hero
-            ? enterDelay.hero + enterDelayIncrement
-            : enterDelay.subTitle + enterDelayIncrement
+            ? enterDelay.hero + enterDelayIncrement * 4
+            : enterDelay.subTitle + enterDelayIncrement * 4
 
-       
+        console.log(enterDelay)
+
         changeColors()
 
         //preload all images before to render the page
@@ -57,7 +56,10 @@ const Welcome = (props) => {
     })
 
     const loadImages = async () => {
-        const images = [props.cover?.images?.logo?.url, props.cover?.images?.hero?.url]
+        const images = [
+            props.cover?.images?.logo?.url,
+            props.cover?.images?.hero?.url,
+        ]
         await smartImageLoader.load(images)
     }
 
@@ -65,25 +67,25 @@ const Welcome = (props) => {
         if (props.cover?.colors?.primary) {
             document.documentElement.style.setProperty(
                 "--color-primary",
-                props.cover.colors.primary
+                props.cover.colors.primary,
             )
         }
         if (props.cover?.colors?.secondary) {
             document.documentElement.style.setProperty(
                 "--color-secondary",
-                props.cover.colors.secondary
+                props.cover.colors.secondary,
             )
         }
         if (props.cover?.colors?.accent) {
             document.documentElement.style.setProperty(
                 "--color-accent",
-                props.cover.colors.accent
+                props.cover.colors.accent,
             )
         }
         if (props.cover?.colors?.background) {
             document.documentElement.style.setProperty(
                 "--color-background",
-                props.cover.colors.background
+                props.cover.colors.background,
             )
         }
     }
@@ -102,12 +104,14 @@ const Welcome = (props) => {
         flex: 1;
     `
 
-    const TitleStyled = styled(BigTitle)`
-        /* flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end; */
-        width: 80%;
+    const TitleStyled = styled(Title)`
+        width: 90%;
+        margin-top: 0.5rem;
+    `
+
+    const SubTitleStyled = styled(SubTitle)`
+        width: 90%;
+        margin-top: 0.5rem;
     `
 
     const ArButtonContainer = styled(Motion.div)`
@@ -117,7 +121,16 @@ const Welcome = (props) => {
     `
 
     const Image = styled(Motion.img)`
-        /* margin-bottom: 2rem; */
+        margin-bottom: 1rem;
+    `
+
+    const LogoImageStyled = styled(Motion.img)`
+        margin-bottom: 1rem;
+    `
+
+    const HeroImageStyled = styled(Motion.img)`
+        margin-top: 1rem;
+        /* margin-bottom: 1rem; */
     `
 
     const CoverTitle = styled(Motion.p)`
@@ -127,7 +140,7 @@ const Welcome = (props) => {
         justify-content: center;
         text-align: center;
         font-size: var(--font-size-xlarge);
-        font-family: "SebinoSoftSemiBold";
+        font-family: "SebinoSoftMedium";
         color: var(--color-secondary);
         margin-bottom: 3rem;
     `
@@ -154,7 +167,7 @@ const Welcome = (props) => {
                 <Spacer></Spacer>
                 {/* LOGO */}
                 <Show when={props.cover?.images?.logo?.url}>
-                    <Image
+                    <LogoImageStyled
                         src={props.cover.images.logo.url}
                         alt={props.cover.images.logo.alt ?? "Cover logo"}
                         style={{
@@ -186,7 +199,7 @@ const Welcome = (props) => {
                                     {props.coverTitle}
                                 </span>
                             </TitleStyled>
-                            <SubTitle
+                            <SubTitleStyled
                                 animate={{ opacity: [0, 1] }}
                                 transition={{
                                     duration: 0.5,
@@ -195,12 +208,12 @@ const Welcome = (props) => {
                                 }}
                             >
                                 La tua esperienza<br></br> in Realtà Aumentata
-                            </SubTitle>
+                            </SubTitleStyled>
                         </>
                     }
                 >
-                    <BigTitle
-                        style={{ fontSize: "var(--font-size-small)" }}
+                    <TitleStyled
+                        // style={{ fontSize: "var(--font-size-small)" }}
                         color={
                             props.cover.colors.primary ?? {
                                 color: "var(--color-primary)",
@@ -210,16 +223,16 @@ const Welcome = (props) => {
                         transition={{
                             duration: 1.5,
                             easing: "ease-in-out",
-                            delay: enterDelay.title - 0.5,
+                            delay: enterDelay.title,
                         }}
                     >
                         {props.cover.text.title}
-                    </BigTitle>
+                    </TitleStyled>
                 </Show>
 
                 {/* SUBTITLE */}
                 <Show when={props.cover?.text?.subTitle}>
-                    <SubTitle
+                    <SubTitleStyled
                         color={
                             props.cover.colors.secondary ?? {
                                 color: "var(--color-secondary)",
@@ -229,16 +242,16 @@ const Welcome = (props) => {
                         transition={{
                             duration: 1.5,
                             easing: "ease-in-out",
-                            delay: enterDelay.subTitle - 0.5,
+                            delay: enterDelay.subTitle,
                         }}
                     >
                         {props.cover.text.subTitle}
-                    </SubTitle>
+                    </SubTitleStyled>
                 </Show>
 
                 {/* HERO IMAGE */}
                 <Show when={props.cover?.images?.hero?.url}>
-                    <Image
+                    <HeroImageStyled
                         src={props.cover.images.hero.url}
                         alt={props.cover.images.hero.alt ?? "Cover hero"}
                         style={{
@@ -248,7 +261,7 @@ const Welcome = (props) => {
                         transition={{
                             duration: 0.8,
                             easing: "ease-in-out",
-                            delay: enterDelay.hero - 0.5,
+                            delay: enterDelay.hero,
                         }}
                     />
                 </Show>
@@ -259,7 +272,7 @@ const Welcome = (props) => {
                 transition={{
                     duration: 1.5,
                     easing: "ease-in-out",
-                    delay: enterDelay.enterButton - 0.5,
+                    delay: enterDelay.enterButton,
                 }}
             />
             <DisclaimerStyled>

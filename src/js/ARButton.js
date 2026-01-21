@@ -23,7 +23,7 @@ class ARButton {
     button.style.paddingRight = "2.8rem";
     button.style.fontSize = "var(--font-size-large)";
     button.style.color = "var(--color-accent)";
-    button.style.fontFamily = "SebinoSoftSemiBold";
+    button.style.fontFamily = "SebinoSoftBold";
     button.style.minWidth = "80%";
 
 

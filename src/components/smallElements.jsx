@@ -38,13 +38,12 @@ export const BigTitle = styled(Motion.p)`
 `
 
 export const Title = styled(Motion.p)`
-    font-size: var(--font-size-xxlarge);
+    font-size: var(--font-size-xxxlarge);
     font-family: "SebinoSoftBold";
-    line-height: 130%;
+    line-height: 100%;
     color: ${(props) => props.color ?? 'var(--color-primary)'};
-    /* margin-top: 1rem;
-    margin-bottom: 1rem; */
     vertical-align: text-top;
+    margin: 0;
 
     span {
         vertical-align: text-top;
@@ -53,15 +52,13 @@ export const Title = styled(Motion.p)`
 
 export const SubTitle = styled(Motion.p)`
     font-size: var(--font-size-xxlarge);
-    font-family: "SebinoSoftSemiBold";
+    font-family: "SebinoSoftMedium";
     line-height: 130%;
     color: ${(props) => props.color ?? 'var(--color-secondary)'};
-    /* margin-top: 1rem;
-    margin-bottom: 1rem; */
     vertical-align: text-top;
     margin: 0;
-
-    /* span {
+    
+    span {
         vertical-align: text-top;
-    } */
+    }
 `
