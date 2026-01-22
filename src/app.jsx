@@ -249,7 +249,7 @@ export default function App() {
             coverTitle: marker?.data?.coverTitle ?? null,
             cover: marker?.data?.cover ?? null,
             views: marker?.data?.views ?? null,
-            like: marker?.data?.like ?? null,
+            // like: marker?.data?.like ?? null,
             games: marker?.data?.games ?? null,
         }
 
@@ -368,12 +368,12 @@ export default function App() {
         arTrackingMonitor = new ARTrackingMonitor(30) // Campiona 30 frame
         arTrackingMonitor.on("lowtracking", () => {
             console.warn("Accuratezza tracking degradata (3DoF/Emulated)")
-            handleShowToast(
-                "Il tracking è instabile. Inquadra meglio l'ambiente.",
-                {
-                    duration: 10000,
-                },
-            )
+            // handleShowToast(
+            //     "Il tracking è instabile. Inquadra meglio l'ambiente.",
+            //     {
+            //         duration: 10000,
+            //     },
+            // )
             if (arSessionRef) arSessionRef.onLowTracking()
         })
 
@@ -482,7 +482,7 @@ export default function App() {
                                 name: marker.name,
                                 coverTitle: marker.coverTitle,
                                 created: marker.created,
-                                like: marker.like,
+                                // like: marker.like,
                                 views: marker.views,
                             }
                             setupMarker(

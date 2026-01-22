@@ -31,7 +31,7 @@ const baseInputStyles = `
   padding-left: 1.5rem;
   position: relative;
   z-index: 1;
-  font-size: 1rem;
+  font-size: var(--font-size-regular);
   font-family: inherit;
 
   &:focus {
@@ -63,6 +63,7 @@ const Input = styled('input')`
   &[type="password"] {
     padding-right: 3rem;
   }
+  background: #27272756;
 `;
 
 const TextArea = styled('textarea')`
@@ -167,7 +168,7 @@ const InputField = (props) => {
             x: isFocused() || props.value ? -20 : 0,
             y: isFocused() || props.value ? -35 : 0,
             scale: isFocused() || props.value ? 0.8 : 1,
-            color: isFocused() ? (props['data-error'] ? 'var(--color-accent)' : 'var(--color-secondary)') : 'var(--color-secondary)',
+            color: isFocused() ? (props['data-error'] ? 'var(--color-accent)' : 'var(--color-secondary)') : 'var(--color-primary)',
           }}
           transition={{ duration: 0.3, easing: 'ease-in-out' }}
         >
@@ -222,7 +223,7 @@ const InputField = (props) => {
         {/* Eye icon for password */}
         {props.type === 'password' && !isMultiline() && (
           <EyeButton type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword() ? 'Nascondi password' : 'Mostra password'}>
-            <Fa icon={showPassword() ? faEyeSlash : faEye} color='var(--color-secondary)' />
+            <Fa icon={showPassword() ? faEyeSlash : faEye} color='var(--color-primary)' />
           </EyeButton>
         )}
       </InputFieldContainer>

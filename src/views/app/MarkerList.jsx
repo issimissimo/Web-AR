@@ -3,20 +3,16 @@ import { useFirebase } from "@hooks/useFirebase"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import Header from "./Header"
-import {
-  Container,
-  FitHeightScrollable,
-} from "@components/smallElements"
-import Button from "@components/button"
+import { Container, FitHeightScrollable } from "@components/smallElements"
+// import Button from "@components/button"
 import Message from "@components/Message"
 import Loader from "@components/Loader"
 import Fa from "solid-fa"
 import {
-  faPlus,
-  faEdit,
-  faEye,
-  faThumbsUp,
+    faEye,
 } from "@fortawesome/free-solid-svg-icons"
+// import ButtonCircle from "@components/ButtonCircle"
+import SvgIcon from "@components/SvgIcon"
 
 //
 // STATISTICS
@@ -40,12 +36,12 @@ const StatisticsContainer = styled("div")`
 `
 
 const Statistic = (props) => {
-  return (
-    <StatisticsContainer>
-      <Fa icon={props.icon} size="1x" translateX={-0.5} class="icon" />
-      {props.children}
-    </StatisticsContainer>
-  )
+    return (
+        <StatisticsContainer>
+            <Fa icon={props.icon} size="1x" translateX={-0.5} class="icon" />
+            {props.children}
+        </StatisticsContainer>
+    )
 }
 
 //
@@ -53,17 +49,22 @@ const Statistic = (props) => {
 //
 
 const MarkerContainer = styled(Motion.div)`
-    margin-top: 1rem;
-    margin-bottom: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    background: ${(props) =>
+        props.isClicked
+            ? "color-mix(in srgb, var(--color-secondary), transparent 85%)"
+            : "transparent"};
 `
 
 const TimestampContainer = styled("div")``
 
 const Timestamp = styled("p")`
     font-size: 0.7rem;
-    color: var(--color-secondary);
+    color: var(--color-primary);
     margin: 0;
     font-weight: 500;
+    opacity: 50%;
 `
 
 const NameContainer = styled("div")`
@@ -86,51 +87,59 @@ const BottomContainer = styled("div")`
     margin-top: 0.5rem;
 `
 
-const EditButtonContainer = styled("div")`
-    box-sizing: border-box;
-    display: flex;
-    width: 50%;
-`
+// const EditButtonContainer = styled("div")`
+//     box-sizing: border-box;
+//     display: flex;
+//     width: 50%;
+// `
 
 const Marker = (props) => {
-  return (
-    <MarkerContainer
-      animate={{ opacity: [0, 1] }}
-      transition={{
-        duration: 0.5,
-        easing: "ease-in-out",
-        delay: props.delay,
-      }}
-    >
-      <TimestampContainer>
-        <Timestamp>{`${props.marker.created
-          .toDate()
-          .toLocaleDateString()} ${props.marker.created
+    const [isClicked, setIsClicked] = createSignal(false)
+
+    const handleMarkerClicked = () => {
+        setIsClicked(true)
+        setTimeout(() => {
+            setIsClicked(false)
+            props.onClick()
+        }, 200)
+    }
+
+    return (
+        <MarkerContainer
+            onClick={handleMarkerClicked}
+            animate={{ opacity: [0, 1] }}
+            transition={{
+                duration: 0.5,
+                easing: "ease-in-out",
+                delay: props.delay,
+            }}
+            isClicked={isClicked()}
+        >
+            {/* <TimestampContainer>
+          <Timestamp>{`${props.marker.created
+            .toDate()
+            .toLocaleDateString()} ${props.marker.created
             .toDate()
             .toLocaleTimeString()}`}</Timestamp>
-      </TimestampContainer>
+        </TimestampContainer> */}
 
-      <NameContainer class="glass">
-        <Name>{props.marker.name}</Name>
-      </NameContainer>
+            <NameContainer class="glass">
+                <Name>{props.marker.name}</Name>
+            </NameContainer>
 
-      <BottomContainer>
-        <Statistic icon={faEye}>{props.marker.views}</Statistic>
-        <Statistic icon={faThumbsUp}>{props.marker.like}</Statistic>
-        <EditButtonContainer>
-          <Button active={true} small={true} onClick={props.onClick}>
-            Modifica
-            <Fa
-              icon={faEdit}
-              size="1x"
-              translateX={1}
-              class="icon"
-            />
-          </Button>
-        </EditButtonContainer>
-      </BottomContainer>
-    </MarkerContainer>
-  )
+            <BottomContainer>
+                
+                <TimestampContainer>
+                    <Timestamp>
+                        {props.marker.created.toDate().toLocaleDateString()}
+                        <br />
+                        {props.marker.created.toDate().toLocaleTimeString()}
+                    </Timestamp>
+                </TimestampContainer>
+                <Statistic icon={faEye}>{props.marker.views}</Statistic>
+            </BottomContainer>
+        </MarkerContainer>
+    )
 }
 
 //
@@ -145,94 +154,120 @@ const MarkersListContainer = styled("div")`
 `
 
 const MarkersList = (props) => {
-  const firebase = useFirebase()
-  const [markers, setMarkers] = createSignal([])
-  const [loading, setLoading] = createSignal(false)
+    const firebase = useFirebase()
+    const [markers, setMarkers] = createSignal([])
+    const [loading, setLoading] = createSignal(false)
 
-  createEffect(() => {
-    if (firebase.auth.authLoading() || !firebase.auth.user()) return
+    createEffect(() => {
+        if (firebase.auth.authLoading() || !firebase.auth.user()) return
 
-    setLoading(() => true)
-    loadMarkers()
-  })
+        setLoading(() => true)
+        loadMarkers()
+    })
 
-  /**
-   * Load all markers from Firestore
-   */
-  const loadMarkers = async () => {
-    let data = await firebase.firestore.fetchMarkers(
-      firebase.auth.user().uid
+    /**
+     * Load all markers from Firestore
+     */
+    const loadMarkers = async () => {
+        let data = await firebase.firestore.fetchMarkers(
+            firebase.auth.user().uid,
+        )
+
+        // reorder by timestamp (last is the new one)
+        data = data.sort((a, b) => {
+            return a.created.seconds - b.created.seconds
+        })
+
+        setMarkers(data)
+
+        // hide the spinner
+        setLoading(() => false)
+    }
+
+    return (
+        <Container>
+            {/* HEADER */}
+            <Header showBack={false} onClickUser={props.goToUserProfile}>
+                <span
+                    style={{
+                        color: "var(--color-primary)",
+                        "font-size": "var(--font-size-xxxlarge)",
+                    }}
+                >
+                    BeeAr
+                </span>
+            </Header>
+
+            {/* CONTENT */}
+            {loading() ? (
+                <Loader />
+            ) : (
+                <>
+                    <p
+                        style={{
+                            margin: 0,
+                            color: "var(--color-secondary)",
+                            "font-size": "var(--font-size-xlarge)",
+                        }}
+                    >
+                        I tuoi ambienti
+                    </p>
+                    <FitHeightScrollable
+                        id="FitHeight"
+                        style={{ "align-items": "center" }}
+                        animate={{ opacity: [0, 1] }}
+                        transition={{
+                            duration: 0.5,
+                            easing: "ease-in-out",
+                            delay: 0.25,
+                        }}
+                    >
+                        {markers().length === 0 ? (
+                            <Message>
+                                Non hai ancora nessun ambiente.<br></br> Inizia
+                                creandone uno<br></br>
+                                <br></br>
+                                Un ambiente AR è uno spazio fisico intorno a te
+                                in cui inserirai oggetti virtuali in realtà
+                                aumentata,
+                                <br></br>
+                                per essere visualizzati da altri nello stesso
+                                luogo.
+                            </Message>
+                        ) : (
+                            <MarkersListContainer>
+                                {markers().map((marker) => (
+                                    <Marker
+                                        marker={marker}
+                                        onClick={() =>
+                                            props.onMarkerClicked(marker)
+                                        }
+                                    />
+                                ))}
+                            </MarkersListContainer>
+                        )}
+
+                        <button
+                            onClick={() => props.onCreateNewMarker()}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                padding: 0,
+                            }}
+                        >
+                            <SvgIcon
+                                src={"icons/plus-circle.svg"}
+                                color={"var(--color-accent)"}
+                                size={55}
+                                translateY={0}
+                            />
+                        </button>
+                    </FitHeightScrollable>
+                </>
+            )}
+        </Container>
     )
-
-    // reorder by timestamp (last is the new one)
-    data = data.sort((a, b) => {
-      return a.created.seconds - b.created.seconds;
-    });
-
-    setMarkers(data)
-
-    // hide the spinner
-    setLoading(() => false)
-  }
-
-  return (
-    <Container>
-      {/* HEADER */}
-      <Header showBack={false} onClickUser={props.goToUserProfile}>
-        <span style={{ color: "var(--color-secondary)" }}>I tuoi ambienti AR</span>
-      </Header>
-
-      {/* CONTENT */}
-      {loading() ? (
-        <Loader />
-      ) : (
-        <FitHeightScrollable
-          id="FitHeight"
-          style={{"align-items": "center"}}
-          animate={{ opacity: [0, 1] }}
-          transition={{
-            duration: 0.5,
-            easing: "ease-in-out",
-            delay: 0.25,
-          }}
-        >
-          {markers().length === 0 ? (
-            <Message>
-              Non hai ancora nessun ambiente.<br></br> Inizia
-              creandone uno<br></br>
-              <br></br>
-              Un ambiente AR è uno spazio fisico intorno a te in
-              cui inserirai oggetti virtuali in realtà aumentata,
-              <br></br>
-              per essere visualizzati da altri nello stesso luogo.
-            </Message>
-          ) : (
-            <MarkersListContainer>
-              {markers().map((marker) => (
-                <Marker
-                  marker={marker}
-                  onClick={() =>
-                    props.onMarkerClicked(marker)
-                  }
-                />
-              ))}
-            </MarkersListContainer>
-          )}
-
-          {/* CREATE BUTTON */}
-          <Button
-            active={true}
-            icon={faPlus}
-            width={"100%"}
-            // border={markers().length === 0 ? true : false}
-            onClick={() => props.onCreateNewMarker()}
-          >
-            Crea nuovo
-          </Button>
-        </FitHeightScrollable>
-      )}
-    </Container>
-  )
 }
 
 export default MarkersList

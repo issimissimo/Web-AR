@@ -4,7 +4,7 @@ import { Motion } from 'solid-motionone';
 import ButtonCircle from '../../components/ButtonCircle';
 import Fa from 'solid-fa';
 import { faUser, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
-import { Title } from '@components/smallElements'
+import { Title, SubTitle } from '@components/smallElements'
 
 
 const HeaderContainer = styled('div')`
@@ -52,12 +52,12 @@ const Header = (props) => {
 
             </div>
 
-            <Title
+            <SubTitle
                 animate={{ opacity: [0, 1] }}
                 transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
             >
                 {props.children}
-            </Title>
+            </SubTitle>
 
             <div style="flex: 1;">
                 {

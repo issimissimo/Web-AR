@@ -73,6 +73,7 @@ const BorderBottomBar = styled(Motion.div)`
 const ArButtonContainer = styled("div")`
     z-index: 1000;
     display: ${(props) => (props.viewMode === VIEW_MODE.GAMES ? "flex" : "none")};
+    justify-content: center;
 `
 
 const QrCodeContainer = styled(Motion.div)`

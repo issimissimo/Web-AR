@@ -36,9 +36,9 @@ class Loader {
     const loader2 = document.createElement('span');
     loader2.className = 'loader2';
 
-    const loaderText = document.createElement('div');
-    loaderText.className = 'loader-text';
-    loaderText.textContent = 'Caricamento...';
+    // const loaderText = document.createElement('div');
+    // loaderText.className = 'loader-text';
+    // loaderText.textContent = 'Caricamento...';
 
     // Aggiungi gli elementi al container interno
     loaderInnerContainer.appendChild(loader1);
@@ -46,7 +46,7 @@ class Loader {
 
     // Aggiungi il container interno e il testo al container principale
     this.container.appendChild(loaderInnerContainer);
-    this.container.appendChild(loaderText);
+    // this.container.appendChild(loaderText);
 
     // Aggiungi il container al body (come primo elemento)
     document.body.insertBefore(this.container, document.body.firstChild);

@@ -7,7 +7,7 @@ class ARButton {
 
     const button = document.createElement("button");
     button.id = "ARButton";
-    button.style.width = "100%";
+    // button.style.width = "100%";
     // button.style.height = "40px";
     button.style.borderRadius = "90px";
     button.style.border = "3px solid";
@@ -25,6 +25,8 @@ class ARButton {
     button.style.color = "var(--color-accent)";
     button.style.fontFamily = "SebinoSoftBold";
     button.style.minWidth = "80%";
+
+    let buttonClickTimeout = null;
 
 
     navigator.xr
@@ -68,21 +70,46 @@ class ARButton {
 
 
       button.onclick = function () {
-        if (config.debugOnDesktop) {
-          // Function called on click when debug on desktop is enabled
-          TestGameOnDesktopFallback();
-        }
 
-        else {
-          // Regular AR session initialization
-          if (currentSession === null) {
-            navigator.xr
-              .requestSession("immersive-ar", sessionInit)
-              .then(onSessionStarted);
-          } else {
-            currentSession.end();
+        if (buttonClickTimeout !== null) return;
+
+        buttonClickTimeout = setTimeout(() => {
+
+          if (config.debugOnDesktop) {
+            // Function called on click when debug on desktop is enabled
+            TestGameOnDesktopFallback();
           }
-        }
+
+          else {
+            // Regular AR session initialization
+            if (currentSession === null) {
+              navigator.xr
+                .requestSession("immersive-ar", sessionInit)
+                .then(onSessionStarted);
+            } else {
+              currentSession.end();
+            }
+          }
+
+
+          buttonClickTimeout = null;
+        }, 500);
+
+        // if (config.debugOnDesktop) {
+        //   // Function called on click when debug on desktop is enabled
+        //   TestGameOnDesktopFallback();
+        // }
+
+        // else {
+        //   // Regular AR session initialization
+        //   if (currentSession === null) {
+        //     navigator.xr
+        //       .requestSession("immersive-ar", sessionInit)
+        //       .then(onSessionStarted);
+        //   } else {
+        //     currentSession.end();
+        //   }
+        // }
       };
     }
 

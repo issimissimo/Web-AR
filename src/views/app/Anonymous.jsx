@@ -3,7 +3,6 @@ import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import { Centered, Title, SubTitle } from "@components/smallElements"
 import Message from "@components/Message"
-
 import { faSadCry } from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
 
@@ -11,12 +10,13 @@ import { smartImageLoader } from "@tools/smartImageLoader"
 const Welcome = (props) => {
     const [allImagesLoaded, setAllImagesLoaded] = createSignal(false)
     const enterDelayIncrement = 0.4
+    const enterDuration = 0.8
     const enterDelay = {
         logo: 0,
         title: 0,
         subTitle: 0,
         hero: 0,
-        enterButton: 0,
+        ARButton: 0,
     }
 
     onMount(() => {
@@ -28,7 +28,7 @@ const Welcome = (props) => {
         if (props.cover?.images?.hero?.url) {
             enterDelay.hero += enterDelay.subTitle + enterDelayIncrement
         }
-        enterDelay.enterButton += enterDelay.hero
+        enterDelay.ARButton += enterDelay.hero
             ? enterDelay.hero + enterDelayIncrement * 4
             : enterDelay.subTitle + enterDelayIncrement * 4
 
@@ -105,14 +105,14 @@ const Welcome = (props) => {
         margin-top: 0.5rem;
     `
 
-    const ArButtonContainer = styled(Motion.div)`
+    const ArButtonStyled = styled(Motion.div)`
         /* width: 100%; */
         margin-top: 1.6rem;
         z-index: 1000;
     `
 
     const LogoImageStyled = styled(Motion.img)`
-        margin-bottom: ${(props) => props.marginBottom ?? "1rem"};
+        margin-bottom: ${(props) => props.marginBottom};
     `
 
     const HeroImageStyled = styled(Motion.img)`
@@ -145,7 +145,7 @@ const Welcome = (props) => {
         cursor: pointer;
         text-decoration-thickness: 1px;
         text-decoration-color: inherit;
-        font-size: var(--font-size-medium);
+        font-size: var(--font-size-small);
     `
 
     return (
@@ -160,10 +160,12 @@ const Welcome = (props) => {
                         style={{
                             width: props.cover.images.logo.width ?? "100px",
                         }}
-                        marginBottom={props.cover.images.logo.marginBottom}
+                        marginBottom={
+                            props.cover.images.logo.marginBottom ?? "1rem"
+                        }
                         animate={{ opacity: [0, 1], scale: [0.9, 1] }}
                         transition={{
-                            duration: 0.8,
+                            duration: enterDuration,
                             easing: "ease-in-out",
                             delay: enterDelay.logo,
                         }}
@@ -178,7 +180,7 @@ const Welcome = (props) => {
                             <TitleStyled
                                 animate={{ opacity: [0, 1] }}
                                 transition={{
-                                    duration: 0.5,
+                                    duration: enterDuration,
                                     easing: "ease-in-out",
                                     delay: enterDelay.title,
                                 }}
@@ -190,7 +192,7 @@ const Welcome = (props) => {
                             <SubTitleStyled
                                 animate={{ opacity: [0, 1] }}
                                 transition={{
-                                    duration: 0.5,
+                                    duration: enterDuration,
                                     easing: "ease-in-out",
                                     delay: enterDelay.subTitle,
                                 }}
@@ -209,7 +211,7 @@ const Welcome = (props) => {
                         }
                         animate={{ opacity: [0, 1] }}
                         transition={{
-                            duration: 1.5,
+                            duration: enterDuration,
                             easing: "ease-in-out",
                             delay: enterDelay.title,
                         }}
@@ -228,7 +230,7 @@ const Welcome = (props) => {
                         }
                         animate={{ opacity: [0, 1] }}
                         transition={{
-                            duration: 1.5,
+                            duration: enterDuration,
                             easing: "ease-in-out",
                             delay: enterDelay.subTitle,
                         }}
@@ -247,20 +249,23 @@ const Welcome = (props) => {
                         }}
                         animate={{ opacity: [0, 1] }}
                         transition={{
-                            duration: 0.8,
+                            duration: enterDuration,
                             easing: "ease-in-out",
                             delay: enterDelay.hero,
                         }}
                     />
                 </Show>
             </Show>
-            <ArButtonContainer
+            <ArButtonStyled
                 id="ArButtonContainer"
+                style={{
+                    "margin-top": props.cover?.ARButton?.marginTop ?? "1rem",
+                }}
                 animate={{ opacity: [0, 1] }}
                 transition={{
-                    duration: 1.5,
+                    duration: enterDuration,
                     easing: "ease-in-out",
-                    delay: enterDelay.enterButton,
+                    delay: enterDelay.ARButton,
                 }}
             />
             <DisclaimerStyled>

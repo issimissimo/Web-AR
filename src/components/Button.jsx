@@ -3,7 +3,7 @@ import { Motion } from "solid-motionone"
 import Fa from "solid-fa"
 
 const StyledButton = styled(Motion.button)`
-    font-family: 'SebinoSoftSemiBold';
+    font-family: 'SebinoSoftBold';
     position: relative;
     /* display: ${(props) => (props.visible ? "block" : "none")}; */
     visibility: ${(props) => (props.visible ? "visible" : "hidden")};
@@ -56,7 +56,7 @@ const Button = (props) => {
             active={props.active ?? true}
             visible={props.visible ?? true}
             grey={props.grey}
-            border={props.border ?? true}
+            border={props.border ?? props.active ? true : false}
             background={props.background}
             small={props.small ?? false}
             class={props.class}

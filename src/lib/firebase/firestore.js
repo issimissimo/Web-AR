@@ -109,7 +109,7 @@ export const addMarker = async (userId, name, coverTitle) => {
                 name,
                 created: serverTimestamp(),
                 views: 0,
-                like: 0,
+                // like: 0,
                 coverTitle: coverTitle,
             });
         return newMarkerRef.id;
@@ -145,17 +145,17 @@ export const updateMarkerViews = async (userId, markerId) => {
     }
 };
 
-export const updateMarkerLike = async (userId, markerId) => {
-    try {
-        const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
-        await updateDoc(markerRef, {
-            like: increment(1)
-        });
-    } catch (error) {
-        console.error("Errore nell'incremento like:", error);
-        throw error;
-    }
-};
+// export const updateMarkerLike = async (userId, markerId) => {
+//     try {
+//         const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
+//         await updateDoc(markerRef, {
+//             like: increment(1)
+//         });
+//     } catch (error) {
+//         console.error("Errore nell'incremento like:", error);
+//         throw error;
+//     }
+// };
 
 export const deleteMarker = async (userId, markerId) => {
     try {
