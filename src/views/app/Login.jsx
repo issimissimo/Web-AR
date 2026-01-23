@@ -8,6 +8,7 @@ import Button from "@components/button"
 import { Title, SubTitle } from "@components/smallElements"
 
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons"
+import { config } from "@js/config"
 
 const Container = styled(Motion.div)`
     box-sizing: border-box;
@@ -21,6 +22,10 @@ const Container = styled(Motion.div)`
 `
 const SubTitleStyled = styled(SubTitle)`
     text-align: center;
+    width: 90%;
+    margin-top: 0.5rem;
+    font-family: 'SebinoSoftLight';
+    color: var(--color-primary);
 `
 
 const Login = (props) => {
@@ -74,6 +79,15 @@ const Login = (props) => {
     const Form = styled(Motion.Form)`
         width: 100%;
         margin: 2rem auto;
+        margin-bottom: 1rem;
+    `
+
+    const ButtonsContainer = styled(Motion.div)`
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
     `
 
     // Clear error on any input focus
@@ -81,15 +95,33 @@ const Login = (props) => {
 
     return (
         <Container>
-            <Title>BeeAr</Title>
-            <SubTitleStyled>La tua Realtà Aumentata</SubTitleStyled>
+            <Title
+                animate={{ opacity: [0, 1] }}
+                transition={{
+                    duration: config.ui.enterDuration,
+                    easing: "ease-in-out",
+                    delay: 0,
+                }}
+            >
+                <span style={{"color": "var(--color-secondary)"}}>Bee</span><span>Ar</span>
+            </Title>
+            <SubTitleStyled
+                animate={{ opacity: [0, 1] }}
+                transition={{
+                    duration: config.ui.enterDuration,
+                    easing: "ease-in-out",
+                    delay: config.ui.enterDelay,
+                }}
+            >
+                Le tue idee<br></br>in <span style={{"color": "var(--color-secondary)"}}>AR</span> 
+            </SubTitleStyled>
             <Form
                 onSubmit={handleLogin}
                 animate={{ opacity: [0, 1] }}
                 transition={{
-                    duration: 0.5,
+                    duration: config.ui.enterDuration,
                     easing: "ease-in-out",
-                    delay: 0.25,
+                    delay: config.ui.enterDelay * 2,
                 }}
             >
                 <InputField
@@ -120,31 +152,41 @@ const Login = (props) => {
                 />
             </Form>
 
-            <Button
-                onClick={handleLogin}
-                // style={{ "margin-top": "2em" }}
-                active={isFormValid()}
-            >
-                {loading() ? "Accesso in corso..." : "Accedi"}
-            </Button>
-
-            <p
-                style={{
-                    "margin-top": "50px",
-                    "font-size": "var(--font-size-medium)",
-                    "font-family": "SebinoSoftLight"
+            <ButtonsContainer
+                animate={{ opacity: [0, 1] }}
+                transition={{
+                    duration: config.ui.enterDuration,
+                    easing: "ease-in-out",
+                    delay: config.ui.enterDelay * 3,
                 }}
             >
-                Non sei registrato?
-            </p>
+                <Button
+                    onClick={handleLogin}
+                    // style={{ "margin-top": "2em" }}
+                    active={isFormValid()}
+                >
+                    {loading() ? "Accesso in corso..." : "Accedi"}
+                </Button>
 
-            <Button
-                onClick={props.onGoToRegister}
-                icon={faChevronRight}
-                border={false}
-            >
-                Registrati
-            </Button>
+                <p
+                    style={{
+                        "margin-top": "50px",
+                        "font-size": "var(--font-size-medium)",
+                        "font-family": "SebinoSoftLight",
+                        // "color": "var(--color-secondary)"
+                    }}
+                >
+                    Non sei registrato?
+                </p>
+
+                <Button
+                    onClick={props.onGoToRegister}
+                    icon={faChevronRight}
+                    border={false}
+                >
+                    Registrati
+                </Button>
+            </ButtonsContainer>
         </Container>
     )
 }

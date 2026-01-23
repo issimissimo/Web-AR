@@ -1,9 +1,13 @@
 {
   "production": false,
-  "debugOnDesktop": true,
+  "debugOnDesktop": false,
   "showLogOnScreen": false,
   "debugLoadMode": false,
   "debugUserId": "ZCzf7sAVUrRKTEgp0Xp7iB8cB5w2",
-  "debugMarkerId": "x3alXUVROujczZg7eU8k",
-  "minimumFPS": 10
+  "debugMarkerId": "q5NCaQCGsQrlKtDhqQl4",
+  "minimumFPS": 10,
+  "ui": {
+    "enterDuration": 0.8,
+    "enterDelay": 0.4
+  }
 }

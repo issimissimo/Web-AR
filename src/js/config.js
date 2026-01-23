@@ -46,4 +46,7 @@ export const config = {
   get minimumFPS() {
     return appConfig.minimumFPS;
   },
+  get ui() {
+    return appConfig.ui;
+  }
 };

@@ -2,14 +2,11 @@ import { createSignal } from "solid-js"
 import { useFirebase } from "@hooks/useFirebase"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
-
-import Header from "./Header"
-
 import { Title, SubTitle } from "@components/smallElements"
 import InputField from "@components/inputField"
 import Button from "@components/button"
-
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons"
+import { config } from "@js/config"
 
 const Register = (props) => {
     const firebase = useFirebase()
@@ -103,10 +100,27 @@ const Register = (props) => {
         text-align: center;
     `
 
+    const ButtonsContainer = styled(Motion.div)`
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    `
+
     return (
         <Container>
-            <Title>BeeAr</Title>
-            <SubTitleStyled>Registrazione</SubTitleStyled>
+            <Title
+                animate={{ opacity: [0, 1] }}
+                transition={{
+                    duration: config.ui.enterDuration,
+                    easing: "ease-in-out",
+                    delay: 0,
+                }}
+            >
+                <span style={{"color": "var(--color-secondary)"}}>Bee</span><span>Ar</span>
+            </Title>
+            {/* <SubTitleStyled>Registrazione</SubTitleStyled> */}
 
             {/* Messaggio di errore */}
             {error() && (
@@ -115,7 +129,15 @@ const Register = (props) => {
                 </div>
             )}
 
-            <Form onSubmit={handleSubmit}>
+            <Form
+                animate={{ opacity: [0, 1] }}
+                transition={{
+                    duration: config.ui.enterDuration,
+                    easing: "ease-in-out",
+                    delay: config.ui.enterDelay * 2,
+                }}
+                onSubmit={handleSubmit}
+            >
                 <InputField
                     style={{ "margin-top": "1rem" }}
                     type="email"
@@ -171,6 +193,7 @@ const Register = (props) => {
                         "margin-top": "50px",
                         "font-size": "var(--font-size-medium)",
                         "font-family": "SebinoSoftLight",
+                        // "color": "var(--color-secondary)"
                     }}
                 >
                     Sei già registrato?

@@ -5,12 +5,13 @@ import { Centered, Title, SubTitle } from "@components/smallElements"
 import Message from "@components/Message"
 import { faSadCry } from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
+import { config } from "@js/config"
 
 //#region [Welcome]
 const Welcome = (props) => {
     const [allImagesLoaded, setAllImagesLoaded] = createSignal(false)
-    const enterDelayIncrement = 0.4
-    const enterDuration = 0.8
+    const enterDelayIncrement = config.ui.enterDelay
+    const enterDuration = config.ui.enterDuration
     const enterDelay = {
         logo: 0,
         title: 0,
