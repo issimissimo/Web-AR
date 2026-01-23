@@ -29,6 +29,15 @@ export const FitHeightScrollable = styled(FitHeight)`
     overflow-y: auto;
 `
 
+export const AdaptableHeightScrollable = styled(Motion.div)`
+    flex: 0 1 auto; 
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 0; 
+    margin-bottom: 0;
+`;
+
 export const BigTitle = styled(Motion.p)`
     font-size: var(--font-size-xxxlarge);
     font-family: ${(props) => props.fontFamily ?? "SebinoSoftBold"};

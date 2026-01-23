@@ -2,7 +2,7 @@
   "production": false,
   "debugOnDesktop": true,
   "showLogOnScreen": false,
-  "debugLoadMode": true,
+  "debugLoadMode": false,
   "debugUserId": "ZCzf7sAVUrRKTEgp0Xp7iB8cB5w2",
   "debugMarkerId": "x3alXUVROujczZg7eU8k",
   "minimumFPS": 10
