@@ -27,7 +27,7 @@ const baseInputStyles = `
   transition: all 0.3s ease;
   background: var(--color-dark-transparent);
   box-sizing: border-box;
-  color: var(--color-white);
+  color: var(--color-primary);
   padding-left: 1.5rem;
   position: relative;
   z-index: 1;

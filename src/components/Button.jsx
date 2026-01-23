@@ -19,13 +19,14 @@ const StyledButton = styled(Motion.button)`
     /* background: var(--color-background); */
     /* background: rgba(180, 21, 130, 0.4); */
     background: ${(props) => props.background || "var(--color-background)"};
-    border: ${(props) => (props.border ? (props.small ? "0px solid" : "3px solid") : "1px solid")};
+    border: ${(props) => props.small ? "2px solid" : "3px solid"};
     /* border: none; */
     border-color: ${(props) =>
         props.border ? (props.grey ? "var(--color-grey)" : "var(--color-accent)") : "transparent"};
     pointer-events: ${(props) => (props.active ? "auto" : "none")};
     color: ${(props) => (props.grey ? "var(--color-grey)" : "var(--color-accent)")};
     box-shadow: none;
+    box-sizing: border-box;
     outline: none;
     z-index: 1;
     -webkit-tap-highlight-color: transparent;

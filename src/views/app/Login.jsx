@@ -11,7 +11,6 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons"
 
 const Container = styled(Motion.div)`
     box-sizing: border-box;
-    /* width: 100%; */
     max-width: 500px;
     display: flex;
     flex-direction: column;
@@ -75,7 +74,6 @@ const Login = (props) => {
     const Form = styled(Motion.Form)`
         width: 100%;
         margin: 2rem auto;
-        /* flex: 1; */
     `
 
     // Clear error on any input focus
@@ -84,9 +82,7 @@ const Login = (props) => {
     return (
         <Container>
             <Title>BeeAr</Title>
-            <SubTitleStyled>
-                La tua Realtà Aumentata
-            </SubTitleStyled>
+            <SubTitleStyled>La tua Realtà Aumentata</SubTitleStyled>
             <Form
                 onSubmit={handleLogin}
                 animate={{ opacity: [0, 1] }}
@@ -132,10 +128,18 @@ const Login = (props) => {
                 {loading() ? "Accesso in corso..." : "Accedi"}
             </Button>
 
+            <p
+                style={{
+                    "margin-top": "50px",
+                    "font-size": "var(--font-size-medium)",
+                    "font-family": "SebinoSoftLight"
+                }}
+            >
+                Non sei registrato?
+            </p>
+
             <Button
                 onClick={props.onGoToRegister}
-                style={{ "margin-top": "30px" }}
-                // grey={true}
                 icon={faChevronRight}
                 border={false}
             >

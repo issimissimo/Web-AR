@@ -5,7 +5,7 @@ import { Motion } from "solid-motionone"
 
 import Header from "./Header"
 
-import { Container, Title } from "@components/smallElements"
+import { Title, SubTitle } from "@components/smallElements"
 import InputField from "@components/inputField"
 import Button from "@components/button"
 
@@ -26,7 +26,11 @@ const Register = (props) => {
 
     // Funzione per validare il form
     const isFormValid = () => {
-        return isValidEmail(email()) && password().length >= 6 && password() === confirmPassword()
+        return (
+            isValidEmail(email()) &&
+            password().length >= 6 &&
+            password() === confirmPassword()
+        )
     }
 
     // Logica di registrazione Firebase
@@ -54,7 +58,10 @@ const Register = (props) => {
 
         setLoading(true)
         try {
-            await firebase.auth.register({ email: email(), password: password() })
+            await firebase.auth.register({
+                email: email(),
+                password: password(),
+            })
             setError("")
             props.onSuccess()
         } catch (error) {
@@ -72,25 +79,40 @@ const Register = (props) => {
         setLoading(false)
     }
 
-    const Form = styled(Motion.Form)`
-        width: 100%;
-        margin: 2rem auto;
-    `
-
     // Clear error on any input focus
     const handleInputFocus = () => setError("")
 
+    const Container = styled(Motion.div)`
+        box-sizing: border-box;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        z-index: 1;
+    `
+
+    const Form = styled(Motion.Form)`
+        width: 100%;
+        margin: 2rem auto;
+        text-align: center;
+    `
+
+    const SubTitleStyled = styled(SubTitle)`
+        text-align: center;
+    `
+
     return (
         <Container>
-            {/* HEADER */}
-            <Header showBack={false} showUser={false}>
-                <span style={{ color: "var(--color-secondary)" }}>Registrati </span>
-                <span style={{ color: "var(--color-white)" }}>in AR</span>
-            </Header>
+            <Title>BeeAr</Title>
+            <SubTitleStyled>Registrazione</SubTitleStyled>
 
             {/* Messaggio di errore */}
             {error() && (
-                <div style={{ color: "var(--color-error)", margin: "1em 0" }}>{error()}</div>
+                <div style={{ color: "var(--color-error)", margin: "1em 0" }}>
+                    {error()}
+                </div>
             )}
 
             <Form onSubmit={handleSubmit}>
@@ -135,7 +157,7 @@ const Register = (props) => {
                 />
 
                 <Button
-                    style={{ "margin-top": "2em" }}
+                    // style={{ "margin-top": "2em" }}
                     active={isFormValid()}
                     disabled={loading()}
                     type="submit"
@@ -144,16 +166,51 @@ const Register = (props) => {
                     {loading() ? "Registrazione in corso..." : "Registrati"}
                 </Button>
 
+                <p
+                    style={{
+                        "margin-top": "50px",
+                        "font-size": "var(--font-size-medium)",
+                        "font-family": "SebinoSoftLight",
+                    }}
+                >
+                    Sei già registrato?
+                </p>
+
                 <Button
                     onClick={props.onGoToLogin}
-                    style={{ "margin-top": "30px" }}
-                    grey={true}
                     icon={faChevronRight}
                     border={false}
                 >
-                    Oppure accedi
+                    Accedi
                 </Button>
             </Form>
+            {/* <Button
+                // style={{ "margin-top": "2em" }}
+                active={isFormValid()}
+                disabled={loading()}
+                type="submit"
+                onClick={() => {}}
+            >
+                {loading() ? "Registrazione in corso..." : "Registrati"}
+            </Button>
+
+            <p
+                style={{
+                    "margin-top": "50px",
+                    "font-size": "var(--font-size-medium)",
+                    "font-family": "SebinoSoftLight",
+                }}
+            >
+                Sei già registrato?
+            </p>
+
+            <Button
+                onClick={props.onGoToLogin}
+                icon={faChevronRight}
+                border={false}
+            >
+                Accedi
+            </Button> */}
         </Container>
     )
 }
