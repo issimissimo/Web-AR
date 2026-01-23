@@ -71,45 +71,45 @@ class ARButton {
 
       button.onclick = function () {
 
-        if (buttonClickTimeout !== null) return;
+        // if (buttonClickTimeout !== null) return;
 
-        buttonClickTimeout = setTimeout(() => {
+        // buttonClickTimeout = setTimeout(() => {
 
-          if (config.debugOnDesktop) {
-            // Function called on click when debug on desktop is enabled
-            TestGameOnDesktopFallback();
-          }
-
-          else {
-            // Regular AR session initialization
-            if (currentSession === null) {
-              navigator.xr
-                .requestSession("immersive-ar", sessionInit)
-                .then(onSessionStarted);
-            } else {
-              currentSession.end();
-            }
-          }
-
-
-          buttonClickTimeout = null;
-        }, 500);
-
-        // if (config.debugOnDesktop) {
-        //   // Function called on click when debug on desktop is enabled
-        //   TestGameOnDesktopFallback();
-        // }
-
-        // else {
-        //   // Regular AR session initialization
-        //   if (currentSession === null) {
-        //     navigator.xr
-        //       .requestSession("immersive-ar", sessionInit)
-        //       .then(onSessionStarted);
-        //   } else {
-        //     currentSession.end();
+        //   if (config.debugOnDesktop) {
+        //     // Function called on click when debug on desktop is enabled
+        //     TestGameOnDesktopFallback();
         //   }
-        // }
+
+        //   else {
+        //     // Regular AR session initialization
+        //     if (currentSession === null) {
+        //       navigator.xr
+        //         .requestSession("immersive-ar", sessionInit)
+        //         .then(onSessionStarted);
+        //     } else {
+        //       currentSession.end();
+        //     }
+        //   }
+
+
+        //   buttonClickTimeout = null;
+        // }, 500);
+
+        if (config.debugOnDesktop) {
+          // Function called on click when debug on desktop is enabled
+          TestGameOnDesktopFallback();
+        }
+
+        else {
+          // Regular AR session initialization
+          if (currentSession === null) {
+            navigator.xr
+              .requestSession("immersive-ar", sessionInit)
+              .then(onSessionStarted);
+          } else {
+            currentSession.end();
+          }
+        }
       };
     }
 

@@ -37,6 +37,9 @@ import { LogOnScreen } from "@tools/SolidJS/LogOnScreen"
 // ===== CONTEXT =====
 export const Context = createContext()
 
+// ===== EXTRA =====
+import Toast from "@components/Toast"
+
 const LOCALIZATION_STATE = {
     NONE: "none",
     REQUIRED: "required",
@@ -50,7 +53,7 @@ export default function ArSession(props) {
         createSignal(false)
 
     const [localizationState, setLocalizationState] = createSignal(
-        LOCALIZATION_STATE.NONE
+        LOCALIZATION_STATE.NONE,
     )
     const [referenceMatrix, setReferenceMatrix] = createSignal(new Matrix4())
     const [modules, setModules] = createSignal([])
@@ -69,13 +72,27 @@ export default function ArSession(props) {
     let _modulesToLoad = 0
     let _gamesInitialized = 0
 
+    let toastRef
+
     //#region [lifeCycle]
     onMount(() => {
         // Link to app.jsx FPS monitor functions
         if (typeof props.ref === "function") {
-            props.ref({ onLowFps, onNormalFps, onHighMemory, onLowTracking, onNormalTracking })
+            props.ref({
+                onLowFps,
+                onNormalFps,
+                onHighMemory,
+                onLowTracking,
+                onNormalTracking,
+            })
         } else {
-            Object.assign(props.ref, { onLowFps, onNormalFps, onHighMemory, onLowTracking, onNormalTracking })
+            Object.assign(props.ref, {
+                onLowFps,
+                onNormalFps,
+                onHighMemory,
+                onLowTracking,
+                onNormalTracking,
+            })
         }
 
         // Initialize the DOM Observer for interactive elements
@@ -88,7 +105,7 @@ export default function ArSession(props) {
         // we need to do changes to the UI and not to have reload each time
         if (props.gamesRunning.length > 0) {
             console.warn(
-                "WARNING: I'm going to reset props.gamesRunning. If you are doing some changes on the scripts it's normal."
+                "WARNING: I'm going to reset props.gamesRunning. If you are doing some changes on the scripts it's normal.",
             )
             props.resetGamesRunning
         }
@@ -114,7 +131,7 @@ export default function ArSession(props) {
             // Skip init detection
             setInitDetectionCompleted(true)
             console.warn(
-                "We are DEBUGGING on desktop and Init detection is skipped!"
+                "We are DEBUGGING on desktop and Init detection is skipped!",
             )
         }
         // If not, we must set it to transparent for compatibility on iOS
@@ -138,7 +155,7 @@ export default function ArSession(props) {
             } else {
                 SceneManager.init()
                 console.warn(
-                    "WARNING: SceneManager is actually NOT initialized, and I have initialized it for you. If you are DEBUGGING on desktop AND you have made some changes it's normal, otherwise it's a problem!"
+                    "WARNING: SceneManager is actually NOT initialized, and I have initialized it for you. If you are DEBUGGING on desktop AND you have made some changes it's normal, otherwise it's a problem!",
                 )
             }
         } else {
@@ -181,10 +198,10 @@ export default function ArSession(props) {
                     const clickedElement = event.target
                     const isNonTappable =
                         clickedElement.matches(
-                            "#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]"
+                            "#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]",
                         ) ||
                         !!clickedElement.closest(
-                            "#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]"
+                            "#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]",
                         )
                     _tapEnabled = !isNonTappable
                     onTap()
@@ -199,7 +216,7 @@ export default function ArSession(props) {
             // Bypass all the check for initialization
             // and props.runningGames count
             console.log(
-                "=== ArSession: no games in this marker, let's set gamesInitialized = true"
+                "=== ArSession: no games in this marker, let's set gamesInitialized = true",
             )
             setGamesInitialized(true)
         }
@@ -223,13 +240,13 @@ export default function ArSession(props) {
                     locState !== LOCALIZATION_STATE.REQUIRED
                 ) {
                     console.log(
-                        "=== ArSession: all requirements to set gamesEnabled = true"
+                        "=== ArSession: all requirements to set gamesEnabled = true",
                     )
                     setGamesEnabled(true)
                     handleBlurredCover({ visible: false, priority: 1 })
                 }
-            }
-        )
+            },
+        ),
     )
 
     /** When the number of games running change
@@ -243,7 +260,7 @@ export default function ArSession(props) {
                 if (gamesRunning.length > 0) {
                     console.log(
                         "===>>>>> ArSession: Games running changed:",
-                        gamesRunning
+                        gamesRunning,
                     )
 
                     // Here we want to check if we need the initial detection
@@ -253,14 +270,14 @@ export default function ArSession(props) {
                     for (let i = 0; i < gamesRunning.length; i++) {
                         const _game = props.gamesRunning[i]
                         const gameSpecs = PLUGINS_LIST.find(
-                            (g) => g.fileName === _game.name
+                            (g) => g.fileName === _game.name,
                         )
                         const useInitial =
                             gameSpecs?.useInitialDetection ?? true
                         if (!useInitial && !initDetectionCompleted()) {
                             setInitDetectionCompleted(true)
                             console.log(
-                                "NON C'E' BISOGNO DI INITIAL DETECTION!!!"
+                                "NON C'E' BISOGNO DI INITIAL DETECTION!!!",
                             )
                         }
                     }
@@ -268,8 +285,8 @@ export default function ArSession(props) {
                     // Finally check if all games are ready
                     checkAllGamesReady()
                 }
-            }
-        )
+            },
+        ),
     )
 
     /** As soon as the Reticle find a surface
@@ -291,12 +308,12 @@ export default function ArSession(props) {
             (planeFound) => {
                 if (planeFound && !initDetectionCompleted()) {
                     console.log(
-                        "=== ArSession: plane is found, so we can set initDetectionCompleted = true"
+                        "=== ArSession: plane is found, so we can set initDetectionCompleted = true",
                     )
                     setInitDetectionCompleted(true)
                 }
-            }
-        )
+            },
+        ),
     )
 
     /**
@@ -320,7 +337,7 @@ export default function ArSession(props) {
     }
 
     //#region [handlers]
-    createEffect(()=>{
+    createEffect(() => {
         console.log("**************************")
         console.log("******** LO STATO di blurVisible è:", blurVisible())
     })
@@ -346,7 +363,7 @@ export default function ArSession(props) {
 
         console.log(
             "=== ArSession: LOCALIZATION COMPLETED! Matrix:",
-            referenceMatrix()
+            referenceMatrix(),
         )
         setLocalizationState(() => LOCALIZATION_STATE.COMPLETED)
     }
@@ -397,7 +414,7 @@ export default function ArSession(props) {
                 const _game = props.gamesRunning[i]
 
                 const gameSpecs = PLUGINS_LIST.find(
-                    (g) => g.fileName === _game.name
+                    (g) => g.fileName === _game.name,
                 )
                 if (
                     gameSpecs.localized &&
@@ -406,7 +423,7 @@ export default function ArSession(props) {
                     console.log(
                         "============= ",
                         _game.name,
-                        "RICHIEDE DI INIZIARE LA LOCALIZZAZIONE!!"
+                        "RICHIEDE DI INIZIARE LA LOCALIZZAZIONE!!",
                     )
 
                     // Hide all the meshes of all the games
@@ -473,7 +490,7 @@ export default function ArSession(props) {
     function updateClickableDomElements() {
         removeClickableDomElements()
         _clickableDomElements = document.querySelectorAll(
-            "#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]"
+            "#ar-overlay button, #ar-overlay a, #ar-overlay [data-interactive]",
         )
         _clickableDomElements.forEach((element) => {
             // Use passive listeners for touch/pointer to avoid scroll-blocking warnings
@@ -501,8 +518,14 @@ export default function ArSession(props) {
         _tapEnabled = false
         e.stopPropagation()
     }
+    /**
+     * Show the toast message
+     */
+    const handleShowToast = (message, options = {}) => {
+        toastRef.show(message, options)
+    }
 
-    function onLowTracking(){
+    function onLowTracking() {
         // Call onLowTracking function of all the gamesRunning
         props.gamesRunning.forEach((el) => {
             try {
@@ -525,7 +548,7 @@ export default function ArSession(props) {
         })
     }
 
-    function onNormalTracking(){
+    function onNormalTracking() {
         // Call onNormalTracking function of all the gamesRunning
         props.gamesRunning.forEach((el) => {
             try {
@@ -641,7 +664,7 @@ export default function ArSession(props) {
         const newGameId = await firebase.firestore.addGame(
             props.userId,
             props.marker.id,
-            pluginName
+            pluginName,
         )
 
         console.log("Creato in Firestore il game con ID:", newGameId)
@@ -706,22 +729,22 @@ export default function ArSession(props) {
                 const highestState = _blurredCoverStates.reduce(
                     (max, current) => {
                         return current.priority > max.priority ? current : max
-                    }
+                    },
                 )
 
                 // just for debugging
                 if (_blurredCoverStates.length > 1) {
                     console.log(
-                        ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`
+                        ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`,
                     )
                     console.log(
                         "now setting - visible:",
                         highestState.visible,
                         "showHole:",
-                        highestState.showHole
+                        highestState.showHole,
                     )
                     console.log(
-                        "********************************************************************"
+                        "********************************************************************",
                     )
                 }
 
@@ -764,9 +787,12 @@ export default function ArSession(props) {
                 userId: props.userId,
                 markerId: props.marker.id,
                 handleBlurredCover: (state) => handleBlurredCover(state),
+                handleShowToast: (message, options) => handleShowToast(message, options)
             }}
         >
             <ArSessionContainer id="ArSessionContainer">
+                {/* TOAST MESSAGE */}
+                <Toast ref={toastRef} />
                 {/* BLURRED COVER */}
                 <BlurredCover
                     visible={blurVisible()}

@@ -19,6 +19,8 @@ const Welcome = (props) => {
         ARButton: 0,
     }
 
+    console.log(props.name)
+
     onMount(() => {
         // setup delay
         if (props.cover?.images?.logo?.url) {
@@ -87,58 +89,35 @@ const Welcome = (props) => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        /* gap: 1.5rem; */
         text-align: center;
     `
-
     const Spacer = styled("div")`
         flex: 1;
     `
-
     const TitleStyled = styled(Title)`
         width: 80%;
         margin-top: 0.5rem;
     `
-
     const SubTitleStyled = styled(SubTitle)`
         width: 90%;
         margin-top: 0.5rem;
     `
-
     const ArButtonStyled = styled(Motion.div)`
-        /* width: 100%; */
         margin-top: 1.6rem;
         z-index: 1000;
     `
-
     const LogoImageStyled = styled(Motion.img)`
         margin-bottom: ${(props) => props.marginBottom};
     `
-
     const HeroImageStyled = styled(Motion.img)`
         margin-top: 1rem;
-        /* margin-bottom: 1rem; */
     `
-
-    const CoverTitle = styled(Motion.p)`
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-size: var(--font-size-xlarge);
-        font-family: "SebinoSoftMedium";
-        color: var(--color-secondary);
-        margin-bottom: 3rem;
-    `
-
     const DisclaimerStyled = styled(Motion.div)`
         flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
     `
-
     const DisclaimerLink = styled("p")`
         text-decoration: underline;
         text-underline-offset: 4px;
@@ -173,71 +152,38 @@ const Welcome = (props) => {
                 </Show>
 
                 {/* TITLE */}
-                <Show
-                    when={props.cover?.text?.title}
-                    fallback={
-                        <>
-                            <TitleStyled
-                                animate={{ opacity: [0, 1] }}
-                                transition={{
-                                    duration: enterDuration,
-                                    easing: "ease-in-out",
-                                    delay: enterDelay.title,
-                                }}
-                            >
-                                <span style={{ color: "var(--color-primary)" }}>
-                                    {props.coverTitle}
-                                </span>
-                            </TitleStyled>
-                            <SubTitleStyled
-                                animate={{ opacity: [0, 1] }}
-                                transition={{
-                                    duration: enterDuration,
-                                    easing: "ease-in-out",
-                                    delay: enterDelay.subTitle,
-                                }}
-                            >
-                                La tua esperienza<br></br> in Realtà Aumentata
-                            </SubTitleStyled>
-                        </>
-                    }
-                >
-                    <TitleStyled
-                        // style={{ fontSize: "var(--font-size-small)" }}
-                        color={
-                            props.cover.colors.primary ?? {
-                                color: "var(--color-primary)",
-                            }
+                <TitleStyled
+                    color={
+                        props.cover.colors.primary ?? {
+                            color: "var(--color-primary)",
                         }
-                        animate={{ opacity: [0, 1] }}
-                        transition={{
-                            duration: enterDuration,
-                            easing: "ease-in-out",
-                            delay: enterDelay.title,
-                        }}
-                    >
-                        {props.cover.text.title}
-                    </TitleStyled>
-                </Show>
+                    }
+                    animate={{ opacity: [0, 1] }}
+                    transition={{
+                        duration: enterDuration,
+                        easing: "ease-in-out",
+                        delay: enterDelay.title,
+                    }}
+                >
+                    {props.cover?.text?.title ?? props.name}
+                </TitleStyled>
 
                 {/* SUBTITLE */}
-                <Show when={props.cover?.text?.subTitle}>
-                    <SubTitleStyled
-                        color={
-                            props.cover.colors.secondary ?? {
-                                color: "var(--color-secondary)",
-                            }
+                <SubTitleStyled
+                    color={
+                        props.cover.colors.secondary ?? {
+                            color: "var(--color-secondary)",
                         }
-                        animate={{ opacity: [0, 1] }}
-                        transition={{
-                            duration: enterDuration,
-                            easing: "ease-in-out",
-                            delay: enterDelay.subTitle,
-                        }}
-                    >
-                        {props.cover.text.subTitle}
-                    </SubTitleStyled>
-                </Show>
+                    }
+                    animate={{ opacity: [0, 1] }}
+                    transition={{
+                        duration: enterDuration,
+                        easing: "ease-in-out",
+                        delay: enterDelay.subTitle,
+                    }}
+                >
+                    {props.cover?.text?.subTitle ?? "La tua esperienza in AR"}
+                </SubTitleStyled>
 
                 {/* HERO IMAGE */}
                 <Show when={props.cover?.images?.hero?.url}>
@@ -310,7 +256,7 @@ export default function Main(props) {
         <Centered>
             {markerValid() ? (
                 <Welcome
-                    coverTitle={props.marker.coverTitle}
+                    name={props.marker.name}
                     cover={props.marker.cover}
                 />
             ) : (

@@ -173,11 +173,18 @@ export function useGame(gameName, gameId, config = {}) {
     }
 
     const _onLowTrackingBase = () => {
-        // console.log(`${gameName} onLowTrackingBase`)
+        console.warn(`${gameName} onLowTrackingBase`)
+        // context.handleShowToast("Tracking lost. Please point the camera back to the marker.", true, 3000)
+        context.handleShowToast(
+            "Il tracking è instabile. Inquadra meglio l'ambiente.",
+            {
+                duration: 10000,
+            },
+        )
     }
 
     const _onNormalTrackingBase = () => {
-        // console.log(`${gameName} onNormalTrackingBase`)
+        console.log(`${gameName} onNormalTrackingBase`)
     }
 
     const _onLowFpsBase = () => {
@@ -202,7 +209,7 @@ export function useGame(gameName, gameId, config = {}) {
     const close = config.close || _closeBase
     const onLowTracking = config.onLowTracking || _onLowTrackingBase
     const onNormalTracking =
-        config.onNormalTracking || _onNormalTrackingBase   
+        config.onNormalTracking || _onNormalTrackingBase
     const onLowFps = config.onLowFps || _onLowFpsBase
     const onNormalFps = config.onNormalFps || _onNormalFpsBase
 
@@ -213,8 +220,9 @@ export function useGame(gameName, gameId, config = {}) {
         userId: context.userId,
         APP_MODE: AppMode,
         appMode: context.appMode,
-        setInitialized,
         handleBlurredCover: context.handleBlurredCover,
+        handleShowToast: context.handleShowToast,
+        setInitialized,
         getObjOffsetMatrix,
         getGlobalMatrixFromOffsetMatrix,
         onTap,

@@ -28,8 +28,8 @@ import MemoryMonitor from "@tools/three/MemoryMonitor"
 // Check Internet
 import { checkInternetConnection } from "@/tools/internetCheck"
 
-// ===== EXTRA =====
-import Toast from "@components/Toast"
+// // ===== EXTRA =====
+// import Toast from "@components/Toast"
 
 /*
  * This function is called by the "Enter AR" button
@@ -74,7 +74,7 @@ export default function App() {
     const [gamesRunning, setGamesRunning] = createSignal([])
     let arTrackingMonitor, fpsMonitor, memoryMonitor
     let arSessionRef
-    let toastRef
+    // let toastRef
 
     //#region [lifeCycle]
     onMount(async () => {
@@ -345,12 +345,12 @@ export default function App() {
 
     //#region [handlers]
 
-    /**
-     * Show the toast message
-     */
-    const handleShowToast = (message, options = {}) => {
-        toastRef.show(message, options)
-    }
+    // /**
+    //  * Show the toast message
+    //  */
+    // const handleShowToast = (message, options = {}) => {
+    //     toastRef.show(message, options)
+    // }
 
     /**
      * Initialize Three Scene, with AR Button
@@ -366,6 +366,7 @@ export default function App() {
 
         // Initialize AR Tracking Monitor
         arTrackingMonitor = new ARTrackingMonitor(30) // Campiona 30 frame
+        arTrackingMonitor.reset()
         arTrackingMonitor.on("lowtracking", () => {
             console.warn("Accuratezza tracking degradata (3DoF/Emulated)")
             // handleShowToast(
@@ -386,9 +387,9 @@ export default function App() {
         fpsMonitor = new FPSMonitor(config.minimumFPS, 60) // soglia 15fps, campiona 60 frame
         fpsMonitor.on("lowfps", (e) => {
             console.warn(`FPS bassi: ${e.detail.fps.toFixed(2)}`)
-            handleShowToast("Il tuo dispositivo ha basse prestazioni", {
-                duration: 10000,
-            })
+            // handleShowToast("Il tuo dispositivo ha basse prestazioni", {
+            //     duration: 10000,
+            // })
             if (arSessionRef) arSessionRef.onLowFps()
         })
         fpsMonitor.on("normalfps", (e) => {
@@ -399,9 +400,9 @@ export default function App() {
         memoryMonitor = new MemoryMonitor(90, 2000) // 90% soglia, check ogni 2 secondi
         memoryMonitor.on("highmemory", (e) => {
             console.warn(`Memoria al ${e.detail.usagePercent}%!`)
-            handleShowToast("Il tuo dispositivo sta esaurendo la memoria", {
-                duration: 10000,
-            })
+            // handleShowToast("Il tuo dispositivo sta esaurendo la memoria", {
+            //     duration: 10000,
+            // })
             if (arSessionRef) arSessionRef.onHighMemory()
         })
     }
@@ -532,7 +533,7 @@ export default function App() {
                 return (
                     <Portal mount={document.getElementById("ar-overlay")}>
                         {/* We MUST KEEP the toast here because on iOS will be just leaved ar-overlay*/}
-                        <Toast ref={toastRef} />
+                        {/* <Toast ref={toastRef} /> */}
                         <ArSession
                             ref={arSessionRef}
                             appMode={currentAppMode()}
@@ -569,12 +570,5 @@ export default function App() {
         }
     }
 
-    return (
-        <Container>
-            <Show when={currentView() !== VIEWS.AR_SESSION}>
-                <Toast ref={toastRef} />
-            </Show>
-            {renderView()}
-        </Container>
-    )
+    return <Container>{renderView()}</Container>
 }

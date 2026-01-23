@@ -15,7 +15,12 @@ export default function basicCube(props) {
         onTap: () => {
         },
 
-        renderLoop: () => loop()
+        // renderLoop: () => loop(),
+
+        onLowTracking: () => {
+            console.warn('STO BYPASSANDO LOW TRACKING DA BASIC CUBE...')
+            game.handleShowToast("STO BYPASSANDO LOW TRACKING DA BASIC CUBE...")
+        }
 
     });
 

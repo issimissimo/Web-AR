@@ -180,8 +180,8 @@ const Marker = (props) => {
         setIsClicked(true)
         setTimeout(() => {
             setIsClicked(false)
-            console.log(props.marker)
-            // props.onClick()
+            // console.log(props.marker)
+            props.onClick()
         }, 200)
     }
 
