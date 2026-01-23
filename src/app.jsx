@@ -244,7 +244,7 @@ export default function App() {
             id: marker.id ?? null,
             created: marker?.data?.created ?? null,
             name: marker?.data?.name ?? null,
-            coverTitle: marker?.data?.coverTitle ?? null,
+            // coverTitle: marker?.data?.coverTitle ?? null,
             cover: marker?.data?.cover ?? null,
             views: marker?.data?.views ?? null,
             lastSee: marker?.data?.lastSee ?? null,
@@ -467,7 +467,7 @@ export default function App() {
                         onMarkerClicked={(marker) => {
                             const markerData = {
                                 name: marker.name,
-                                coverTitle: marker.coverTitle,
+                                // coverTitle: marker.coverTitle,
                                 created: marker.created,
                                 lastSee: marker.lastSee,
                                 views: marker.views,

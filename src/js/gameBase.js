@@ -163,15 +163,12 @@ export function useGame(gameName, gameId, config = {}) {
     const _onTapBase = () => {
         sounds.tap.play()
     }
-
     const _renderLoopBase = () => {
         // console.log(`${gameName} renderLoopBase`)
     }
-
     const _closeBase = () => {
         console.log(`${gameName} closeBase`)
     }
-
     const _onLowTrackingBase = () => {
         console.warn(`${gameName} onLowTrackingBase`)
         // context.handleShowToast("Tracking lost. Please point the camera back to the marker.", true, 3000)
@@ -182,23 +179,18 @@ export function useGame(gameName, gameId, config = {}) {
             }
         )
     }
-
     const _onNormalTrackingBase = () => {
         console.log(`${gameName} onNormalTrackingBase`)
     }
-
     const _onLowFpsBase = () => {
         // console.log(`${gameName} onLowFpsBase`)
     }
-
     const _onNormalFpsBase = () => {
         // console.log(`${gameName} onNormalFpsBase`)
     }
-
     const onUndo = () => {
         sounds.undo.play()
     }
-
     const onClick = () => {
         sounds.click.play()
     }

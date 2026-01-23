@@ -61,7 +61,7 @@ export const useFirebase = () => {
             fetchUserData: () => user() ? fetchUserData(user().uid) : Promise.resolve(null),
             fetchMarkers: (userId) => fetchMarkers(userId),
             fetchMarker: (userId, markerId) => fetchMarker(userId, markerId),
-            addMarker: (userId, name, coverTitle) => addMarker(userId, name, coverTitle),
+            addMarker: (userId, name) => addMarker(userId, name),
             updateMarker: (userId, markerId, name) => updateMarker(userId, markerId, name),
             updateMarkerViews: (userId, markerId) => updateMarkerViews(userId, markerId),
             // updateMarkerLike: (userId, markerId) => updateMarkerLike(userId, markerId),

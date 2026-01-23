@@ -95,7 +95,7 @@ const EditMarker = (props) => {
     const firebase = useFirebase()
     const [id, setId] = createSignal(props.marker.id ?? null)
     const [name, setName] = createSignal(props.marker.name ?? null)
-    const [coverTitle, setCoverTitle] = createSignal(null)
+    // const [coverTitle, setCoverTitle] = createSignal(null)
     const [games, setGames] = createSignal(props.marker.games ?? [])
     const [currentViewMode, setCurrentViewMode] = createSignal(VIEW_MODE.GAMES)
 
@@ -132,7 +132,7 @@ const EditMarker = (props) => {
      */
     const handleSaveMarker = async () => {
         // create new marker on Firestore
-        const newMarkerId = await firebase.firestore.addMarker(props.userId, name(), coverTitle())
+        const newMarkerId = await firebase.firestore.addMarker(props.userId, name())
 
         // update current marker (app.jsx)
         props.onNewMarkerCreated(newMarkerId, name())
@@ -484,14 +484,14 @@ const EditMarker = (props) => {
                 o alla scena in AR che implementarai, ad esempio 'ping pong da tavolo'.<br></br><br></br>
                 Il nome è totalmente arbitrario, ma ti auiterà a ricordare a cosa si riferisce.
               </Message> */}
-                        <InputField
+                        {/* <InputField
                             label="Testo di benvenuto"
                             multiline={true}
                             rows={4}
                             resize="vertical"
                             value={coverTitle()}
                             onInput={(e) => setCoverTitle(e.target.value)}
-                        />
+                        /> */}
                         <Button
                             animate={{ opacity: [0, 1] }}
                             transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}

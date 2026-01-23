@@ -19,7 +19,7 @@ const Welcome = (props) => {
         ARButton: 0,
     }
 
-    console.log(props.name)
+    console.log(enterDelay)
 
     onMount(() => {
         // setup delay
@@ -31,8 +31,8 @@ const Welcome = (props) => {
             enterDelay.hero += enterDelay.subTitle + enterDelayIncrement
         }
         enterDelay.ARButton += enterDelay.hero
-            ? enterDelay.hero + enterDelayIncrement * 4
-            : enterDelay.subTitle + enterDelayIncrement * 4
+            ? enterDelay.hero + enterDelayIncrement * 3
+            : enterDelay.subTitle + enterDelayIncrement * 3
 
         changeColors()
 
@@ -153,11 +153,7 @@ const Welcome = (props) => {
 
                 {/* TITLE */}
                 <TitleStyled
-                    color={
-                        props.cover.colors.primary ?? {
-                            color: "var(--color-primary)",
-                        }
-                    }
+                    color={props.cover?.color?.primary ?? "var(--color-primary)"}
                     animate={{ opacity: [0, 1] }}
                     transition={{
                         duration: enterDuration,
@@ -170,11 +166,7 @@ const Welcome = (props) => {
 
                 {/* SUBTITLE */}
                 <SubTitleStyled
-                    color={
-                        props.cover.colors.secondary ?? {
-                            color: "var(--color-secondary)",
-                        }
-                    }
+                    color={props.cover?.color?.secondary ?? "var(--color-secondary)"}
                     animate={{ opacity: [0, 1] }}
                     transition={{
                         duration: enterDuration,
