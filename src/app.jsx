@@ -249,7 +249,7 @@ export default function App() {
             coverTitle: marker?.data?.coverTitle ?? null,
             cover: marker?.data?.cover ?? null,
             views: marker?.data?.views ?? null,
-            // like: marker?.data?.like ?? null,
+            lastSee: marker?.data?.lastSee ?? null,
             games: marker?.data?.games ?? null,
         }
 
@@ -482,7 +482,7 @@ export default function App() {
                                 name: marker.name,
                                 coverTitle: marker.coverTitle,
                                 created: marker.created,
-                                // like: marker.like,
+                                lastSee: marker.lastSee,
                                 views: marker.views,
                             }
                             setupMarker(

@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js"
+import { createEffect, createSignal, Show } from "solid-js"
 import { useFirebase } from "@hooks/useFirebase"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
@@ -8,9 +8,7 @@ import { Container, FitHeightScrollable } from "@components/smallElements"
 import Message from "@components/Message"
 import Loader from "@components/Loader"
 import Fa from "solid-fa"
-import {
-    faEye,
-} from "@fortawesome/free-solid-svg-icons"
+import { faEye, faClock, faPen } from "@fortawesome/free-solid-svg-icons"
 // import ButtonCircle from "@components/ButtonCircle"
 import SvgIcon from "@components/SvgIcon"
 
@@ -18,10 +16,9 @@ import SvgIcon from "@components/SvgIcon"
 // STATISTICS
 //
 
-const StatisticsContainer = styled("div")`
+const InfoContainer = styled("div")`
     box-sizing: border-box;
     display: flex;
-    width: 20%;
     border: none;
     background: #458dfa28;
     border-color: var(--color-secondary);
@@ -29,18 +26,100 @@ const StatisticsContainer = styled("div")`
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 20px;
+    border-radius: 0px 90px 90px 0px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.5rem;
+    gap: 0.5rem;
+`
+
+const StatisticsContainer = styled("div")`
+    box-sizing: border-box;
+    display: flex;
+    /* width: 20%; */
+    border: none;
+    background: #458dfa28;
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 90px;
     font-size: 0.7rem;
     font-weight: 500;
     padding: 0.5rem;
 `
 
-const Statistic = (props) => {
+
+
+const StaticText = styled("p")`
+    margin: 0;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+`
+
+
+const Stats = (props) => {
     return (
-        <StatisticsContainer>
-            <Fa icon={props.icon} size="1x" translateX={-0.5} class="icon" />
-            {props.children}
-        </StatisticsContainer>
+        <>
+            <InfoContainer class="glass">
+                <>
+                    <Fa icon={faPen} size="1x" translateX={0} class="icon" />
+                    <StaticText>
+                        {props.created.toDate().toLocaleDateString()}
+                    </StaticText>
+                </>
+                <>
+                    <Fa icon={faClock} size="1x" translateX={0} class="icon" />
+                    <Show
+                        when={props.lastSee}
+                        fallback={<StaticText>n/a</StaticText>}
+                    >
+                        <StaticText>
+                            {`${props.lastSee.toDate().toLocaleDateString()} ${props.lastSee
+                                .toDate()
+                                .toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}`}
+                        </StaticText>
+                    </Show>
+                </>
+                <>
+                    <StatisticsContainer class="glass">
+                        <Fa
+                            icon={faEye}
+                            size="1x"
+                            translateX={0}
+                            class="icon"
+                        />
+                        <StaticText>{props.views}</StaticText>
+                    </StatisticsContainer>
+                </>
+            </InfoContainer>
+
+            {/* <StatisticsContainer class="glass">
+                <Fa icon={faClock} size="1x" translateX={0} class="icon" />
+                <Show
+                    when={props.lastSee}
+                    fallback={<StaticText>n/a</StaticText>}
+                >
+                    <StaticText>
+                        {`${props.lastSee.toDate().toLocaleDateString()} ${props.lastSee
+                            .toDate()
+                            .toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}`}
+                    </StaticText>
+                </Show>
+            </StatisticsContainer> */}
+
+            {/* <StatisticsContainer class="glass">
+                <Fa icon={faEye} size="1x" translateX={0} class="icon" />
+                <StaticText>{props.views}</StaticText>
+            </StatisticsContainer> */}
+        </>
     )
 }
 
@@ -82,9 +161,10 @@ const Name = styled("p")`
 const BottomContainer = styled("div")`
     box-sizing: border-box;
     display: flex;
-    justify-content: space-between;
+    /* justify-content: flex-end; */
     width: 100%;
     margin-top: 0.5rem;
+    gap: 0.75rem;
 `
 
 // const EditButtonContainer = styled("div")`
@@ -100,7 +180,8 @@ const Marker = (props) => {
         setIsClicked(true)
         setTimeout(() => {
             setIsClicked(false)
-            props.onClick()
+            console.log(props.marker)
+            // props.onClick()
         }, 200)
     }
 
@@ -128,15 +209,16 @@ const Marker = (props) => {
             </NameContainer>
 
             <BottomContainer>
-                
-                <TimestampContainer>
+                {/* <TimestampContainer>
                     <Timestamp>
                         {props.marker.created.toDate().toLocaleDateString()}
-                        <br />
-                        {props.marker.created.toDate().toLocaleTimeString()}
                     </Timestamp>
-                </TimestampContainer>
-                <Statistic icon={faEye}>{props.marker.views}</Statistic>
+                </TimestampContainer> */}
+                <Stats
+                    views={props.marker.views}
+                    lastSee={props.marker.lastSee}
+                    created={props.marker.created}
+                ></Stats>
             </BottomContainer>
         </MarkerContainer>
     )

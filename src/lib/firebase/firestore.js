@@ -109,7 +109,7 @@ export const addMarker = async (userId, name, coverTitle) => {
                 name,
                 created: serverTimestamp(),
                 views: 0,
-                // like: 0,
+                lastSee: null,
                 coverTitle: coverTitle,
             });
         return newMarkerRef.id;
@@ -118,6 +118,9 @@ export const addMarker = async (userId, name, coverTitle) => {
         throw error;
     }
 };
+
+
+
 
 export const updateMarker = async (userId, markerId, name) => {
     try {
@@ -135,15 +138,35 @@ export const updateMarker = async (userId, markerId, name) => {
 export const updateMarkerViews = async (userId, markerId) => {
     try {
         const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
-        await updateDoc(markerRef, {
-            views: increment(1)
-        });
-        console.log("Views incrementate con successo");
+        // Use setDoc with merge to ensure the document and the `lastSee` field
+        // are created on the fly if they don't exist. `increment` and
+        // `serverTimestamp` work with setDoc when using merge.
+        await setDoc(
+            markerRef,
+            {
+                views: increment(1),
+                lastSee: serverTimestamp()
+            },
+            { merge: true }
+        );
+        console.log("Views incrementate con successo (setDoc merge fallback)");
     } catch (error) {
         console.error("Errore nell'incremento views:", error);
         throw error;
     }
 };
+
+// export const updateMarkerLastSee = async (userId, markerId) => {
+//     try {
+//         const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
+//         await updateDoc(markerRef, {
+//             lastSee: serverTimestamp()
+//         });
+//     } catch (error) {
+//         console.error("Errore nell'aggiornamento lastSee:", error);
+//         throw error;
+//     }
+// };
 
 // export const updateMarkerLike = async (userId, markerId) => {
 //     try {
