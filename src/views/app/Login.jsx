@@ -3,9 +3,6 @@ import { useFirebase } from "@hooks/useFirebase"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 
-// import Header from './Header';
-
-// import { Container } from '@components/smallElements'
 import InputField from "@components/inputField"
 import Button from "@components/button"
 import { Title, SubTitle } from "@components/smallElements"
@@ -86,17 +83,9 @@ const Login = (props) => {
 
     return (
         <Container>
-            {/* HEADER */}
-            {/* <Header
-        showBack={false}
-        showUser={false}
-      >
-        <span style={{ color: 'var(--color-secondary)' }}>Accedi </span>
-        <span style={{ color: 'var(--color-white)' }}>al tuo spazio AR</span>
-      </Header> */}
             <Title>BeeAr</Title>
             <SubTitleStyled>
-                La Realtà Aumentata <br></br> semplice
+                La tua Realtà Aumentata
             </SubTitleStyled>
             <Form
                 onSubmit={handleLogin}

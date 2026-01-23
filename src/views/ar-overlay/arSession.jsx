@@ -519,10 +519,13 @@ export default function ArSession(props) {
         e.stopPropagation()
     }
     /**
-     * Show the toast message
+     * Manage the toast message
      */
     const handleShowToast = (message, options = {}) => {
         toastRef.show(message, options)
+    }
+    const handleHideToast = () => {
+        toastRef.hide()
     }
 
     function onLowTracking() {
@@ -787,7 +790,9 @@ export default function ArSession(props) {
                 userId: props.userId,
                 markerId: props.marker.id,
                 handleBlurredCover: (state) => handleBlurredCover(state),
-                handleShowToast: (message, options) => handleShowToast(message, options)
+                handleShowToast: (message, options) =>
+                    handleShowToast(message, options),
+                handleHideToast: () => handleHideToast(),
             }}
         >
             <ArSessionContainer id="ArSessionContainer">

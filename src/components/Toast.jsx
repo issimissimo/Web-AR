@@ -44,8 +44,8 @@ function Toast(props) {
   let hideTimeoutId;
 
   const show = (text, options = {}) => {
-    // Opzioni: { duration: 3000, isError: false }
-    const duration = options.duration || 3000;
+    // Opzioni: { duration: 3000, isError: false, infinite }
+    const duration = options.duration ? options.duration : (options.infinite ? 1000000 : 3000);
     const error = options.isError || false;
     
     // ✅ GESTIONE CHIAMATE MULTIPLE

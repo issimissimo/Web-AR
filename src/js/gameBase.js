@@ -178,8 +178,8 @@ export function useGame(gameName, gameId, config = {}) {
         context.handleShowToast(
             "Il tracking è instabile. Inquadra meglio l'ambiente.",
             {
-                duration: 10000,
-            },
+                duration: 8000,
+            }
         )
     }
 
@@ -222,6 +222,7 @@ export function useGame(gameName, gameId, config = {}) {
         appMode: context.appMode,
         handleBlurredCover: context.handleBlurredCover,
         handleShowToast: context.handleShowToast,
+        handleHideToast: context.handleHideToast,
         setInitialized,
         getObjOffsetMatrix,
         getGlobalMatrixFromOffsetMatrix,
