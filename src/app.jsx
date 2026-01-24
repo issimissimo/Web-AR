@@ -28,7 +28,6 @@ import MemoryMonitor from "@tools/three/MemoryMonitor"
 // Check Internet
 import { checkInternetConnection } from "@/tools/internetCheck"
 
-
 /*
  * This function is called by the "Enter AR" button
  * only when we have debugOnDesktop=true in the configuration file
@@ -260,7 +259,7 @@ export default function App() {
     }
 
     /**
-     * Toggle background visibility
+     * UI
      */
     const setBackgroundVisible = (value) => {
         document.getElementById("backgroundContainer").style.display = value
@@ -342,14 +341,6 @@ export default function App() {
     }
 
     //#region [handlers]
-
-    // /**
-    //  * Show the toast message
-    //  */
-    // const handleShowToast = (message, options = {}) => {
-    //     toastRef.show(message, options)
-    // }
-
     /**
      * Initialize Three Scene, with AR Button
      * and go to ARSession

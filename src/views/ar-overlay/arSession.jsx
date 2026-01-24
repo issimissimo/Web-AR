@@ -37,8 +37,9 @@ import { LogOnScreen } from "@tools/SolidJS/LogOnScreen"
 // ===== CONTEXT =====
 export const Context = createContext()
 
-// ===== EXTRA =====
+// ===== UI =====
 import Toast from "@components/Toast"
+import { restoreColors } from "@tools/UIcolorManager"
 
 const LOCALIZATION_STATE = {
     NONE: "none",
@@ -76,6 +77,11 @@ export default function ArSession(props) {
 
     //#region [lifeCycle]
     onMount(() => {
+        // Reset last stored colors
+        // because previously all them have been set to transparent
+        // in Anonymous.jsx
+        restoreColors()
+
         // Link to app.jsx FPS monitor functions
         if (typeof props.ref === "function") {
             props.ref({

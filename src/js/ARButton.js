@@ -131,7 +131,7 @@ class ARButton {
               }
             }
           }, 1000); // Wait for exit animations to complete
-        }, 150); // Duration of the button active state
+        }, 200); // Duration of the button active state
 
 
         // if (config.debugOnDesktop) {

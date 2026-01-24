@@ -7,6 +7,9 @@ import { faSadCry } from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
 import { config } from "@js/config"
 import { opacityTransition } from "@tools/opacityTransition"
+
+// UI management
+import { storeColors, setColors, restoreColors } from "@tools/UIcolorManager"
 import { fadeOut } from "@tools/opacityTransition"
 
 //#region [Welcome]
@@ -37,6 +40,7 @@ const Welcome = (props) => {
             ? enterDelay.hero + enterDelayIncrement * 3
             : enterDelay.subTitle + enterDelayIncrement * 3
 
+        // TODO --- usare funzione nuova
         changeColors()
 
         //preload all images before to render the page
@@ -53,13 +57,17 @@ const Welcome = (props) => {
         const handleARButtonClick = (e) => {
             console.log("AR button clicked!")
 
+            // Store the custom colors
+            // before to set all them to transparent
+            storeColors()
+
             // Trigger your exit animations here
             const logo = document.getElementById("logo")
             if (logo) fadeOut(logo)
             const hero = document.getElementById("hero")
             if (hero) fadeOut(hero)
 
-            changeSomeColors([
+            setColors([
                 {
                     colorName: "--color-primary",
                     colorValue: "transparent",
@@ -123,16 +131,16 @@ const Welcome = (props) => {
         }
     }
 
-    const changeSomeColors = (colors = [{}]) => {
-        colors.forEach((el) => {
-            setTimeout(() => {
-                document.documentElement.style.setProperty(
-                    el.colorName,
-                    el.colorValue,
-                )
-            }, el.delay ?? 0)
-        })
-    }
+    // const changeSomeColors = (colors = [{}]) => {
+    //     colors.forEach((el) => {
+    //         setTimeout(() => {
+    //             document.documentElement.style.setProperty(
+    //                 el.colorName,
+    //                 el.colorValue,
+    //             )
+    //         }, el.delay ?? 0)
+    //     })
+    // }
 
     const Container = styled("div")`
         height: 100%;
@@ -305,7 +313,11 @@ export default function Main(props) {
     return (
         <Centered>
             {markerValid() ? (
-                <Welcome name={props.marker.name} cover={props.marker.cover} />
+                <Welcome
+                    name={props.marker.name}
+                    cover={props.marker.cover}
+                    setUIColors={props.setUIColors}
+                />
             ) : (
                 <Unavailable />
             )}
