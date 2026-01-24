@@ -13,7 +13,7 @@ import { useFirebase } from "@hooks/useFirebase"
 import { config } from "@js/config"
 import { Matrix4 } from "three"
 import { styled } from "solid-styled-components"
-import useOnce from "@hooks/SolidJS/useOnce"
+// import useOnce from "@hooks/SolidJS/useOnce"
 
 // Main components
 import InitialDetection from "./InitialDetection"
@@ -735,21 +735,21 @@ export default function ArSession(props) {
                     },
                 )
 
-                // just for debugging
-                if (_blurredCoverStates.length > 1) {
-                    console.log(
-                        ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`,
-                    )
-                    console.log(
-                        "now setting - visible:",
-                        highestState.visible,
-                        "showHole:",
-                        highestState.showHole,
-                    )
-                    console.log(
-                        "********************************************************************",
-                    )
-                }
+                // // just for debugging
+                // if (_blurredCoverStates.length > 1) {
+                //     console.log(
+                //         ` ***************************** Processed ${_blurredCoverStates.length} blur states, using priority ${highestState.priority}`,
+                //     )
+                //     console.log(
+                //         "now setting - visible:",
+                //         highestState.visible,
+                //         "showHole:",
+                //         highestState.showHole,
+                //     )
+                //     console.log(
+                //         "********************************************************************",
+                //     )
+                // }
 
                 setBlurVisible(highestState.visible)
                 setBlurShowHole(highestState.showHole)

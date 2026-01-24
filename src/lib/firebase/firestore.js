@@ -155,30 +155,6 @@ export const updateMarkerViews = async (userId, markerId) => {
     }
 };
 
-// export const updateMarkerLastSee = async (userId, markerId) => {
-//     try {
-//         const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
-//         await updateDoc(markerRef, {
-//             lastSee: serverTimestamp()
-//         });
-//     } catch (error) {
-//         console.error("Errore nell'aggiornamento lastSee:", error);
-//         throw error;
-//     }
-// };
-
-// export const updateMarkerLike = async (userId, markerId) => {
-//     try {
-//         const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);
-//         await updateDoc(markerRef, {
-//             like: increment(1)
-//         });
-//     } catch (error) {
-//         console.error("Errore nell'incremento like:", error);
-//         throw error;
-//     }
-// };
-
 export const deleteMarker = async (userId, markerId) => {
     try {
         const markerRef = doc(firestore, `users/${userId}/markers/${markerId}`);

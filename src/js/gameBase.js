@@ -184,6 +184,12 @@ export function useGame(gameName, gameId, config = {}) {
     }
     const _onLowFpsBase = () => {
         // console.log(`${gameName} onLowFpsBase`)
+        context.handleShowToast(
+            "Il tuo dispositivo ha basse prestazioni.",
+            {
+                duration: 8000,
+            }
+        )
     }
     const _onNormalFpsBase = () => {
         // console.log(`${gameName} onNormalFpsBase`)
