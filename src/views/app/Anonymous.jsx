@@ -6,6 +6,8 @@ import Message from "@components/Message"
 import { faSadCry } from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
 import { config } from "@js/config"
+import { opacityTransition } from "@tools/opacityTransition"
+import { fadeOut } from "@tools/opacityTransition"
 
 //#region [Welcome]
 const Welcome = (props) => {
@@ -50,24 +52,30 @@ const Welcome = (props) => {
 
         const handleARButtonClick = (e) => {
             console.log("AR button clicked!")
+
             // Trigger your exit animations here
+            const logo = document.getElementById("logo")
+            if (logo) fadeOut(logo)
+            const hero = document.getElementById("hero")
+            if (hero) fadeOut(hero)
+
             changeSomeColors([
                 {
                     colorName: "--color-primary",
-                    newColor: "transparent",
+                    colorValue: "transparent",
                 },
                 {
                     colorName: "--color-secondary",
-                    newColor: "transparent",
+                    colorValue: "transparent",
                 },
                 {
                     colorName: "--color-accent",
-                    newColor: "transparent",
+                    colorValue: "transparent",
                 },
                 {
                     colorName: "--color-background",
-                    newColor: "transparent",
-                }
+                    colorValue: "transparent",
+                },
             ])
         }
 
@@ -120,7 +128,7 @@ const Welcome = (props) => {
             setTimeout(() => {
                 document.documentElement.style.setProperty(
                     el.colorName,
-                    el.newColor,
+                    el.colorValue,
                 )
             }, el.delay ?? 0)
         })
@@ -171,12 +179,13 @@ const Welcome = (props) => {
     `
 
     return (
-        <Container id="0001">
+        <Container>
             <Show when={allImagesLoaded()}>
-                <Spacer></Spacer>
+                <Spacer />
                 {/* LOGO */}
                 <Show when={props.cover?.images?.logo?.url}>
                     <LogoImageStyled
+                        id="logo"
                         src={props.cover.images.logo.url}
                         alt={props.cover.images.logo.alt ?? "Cover logo"}
                         style={{
@@ -228,6 +237,7 @@ const Welcome = (props) => {
                 {/* HERO IMAGE */}
                 <Show when={props.cover?.images?.hero?.url}>
                     <HeroImageStyled
+                        id="hero"
                         src={props.cover.images.hero.url}
                         alt={props.cover.images.hero.alt ?? "Cover hero"}
                         style={{

@@ -23,7 +23,6 @@ const Container = styled(Motion.div)`
 const SubTitleStyled = styled(SubTitle)`
     text-align: center;
     width: 90%;
-    margin-top: 0.5rem;
     font-family: 'SebinoSoftLight';
     color: var(--color-primary);
 `

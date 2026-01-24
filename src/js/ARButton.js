@@ -1,5 +1,6 @@
 import { config } from "./config";
 import { TestGameOnDesktopFallback } from "../app";
+import { set } from "firebase/database";
 
 
 class ARButton {
@@ -110,45 +111,27 @@ class ARButton {
           button.style.background = originalBackground;
           button.style.color = originalColor;
 
-          // HERE, BEFORE TO PROCEED WITH AR SESSION, I SHOULD CALL AN EVENT
-          // OR SOMETHING LIKE THAT, TO CALL A FUNZTION INSIDE ANUNIMOUS.JSX
-          // FOR EXIT ANIMATIONS
-
           // Dispatch custom event
           document.dispatchEvent(new CustomEvent('arButtonClicked'));
 
-          return;
-
-          if (config.debugOnDesktop) {
-            // Function called on click when debug on desktop is enabled
-            TestGameOnDesktopFallback();
-          }
-
-          else {
-            // Regular AR session initialization
-            if (currentSession === null) {
-              navigator.xr
-                .requestSession("immersive-ar", sessionInit)
-                .then(onSessionStarted);
-            } else {
-              currentSession.end();
+          setTimeout(() => {
+            // Proceed with AR session initialization after animations
+            if (config.debugOnDesktop) {
+              // Function called on click when debug on desktop is enabled
+              TestGameOnDesktopFallback();
             }
-          }
-
-
-
-        }, 150);
-
-
-
-
-
-
-
-
-
-
-
+            else {
+              // Regular AR session initialization
+              if (currentSession === null) {
+                navigator.xr
+                  .requestSession("immersive-ar", sessionInit)
+                  .then(onSessionStarted);
+              } else {
+                currentSession.end();
+              }
+            }
+          }, 1000); // Wait for exit animations to complete
+        }, 150); // Duration of the button active state
 
 
         // if (config.debugOnDesktop) {
