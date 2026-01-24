@@ -6,11 +6,10 @@ import Message from "@components/Message"
 import { faSadCry } from "@fortawesome/free-solid-svg-icons"
 import { smartImageLoader } from "@tools/smartImageLoader"
 import { config } from "@js/config"
-import { opacityTransition } from "@tools/opacityTransition"
 
 // UI management
-import { storeColors, setColors, restoreColors } from "@tools/UIcolorManager"
-import { fadeOut } from "@tools/opacityTransition"
+import { storeColors, setColors } from "@tools/UIcolorManager"
+import { fadeOut } from "@tools/UIopacityManager"
 
 //#region [Welcome]
 const Welcome = (props) => {

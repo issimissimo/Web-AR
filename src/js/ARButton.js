@@ -72,31 +72,8 @@ class ARButton {
 
       button.onclick = function () {
 
-        // if (buttonClickTimeout !== null) return;
-
-        // buttonClickTimeout = setTimeout(() => {
-
-        //   if (config.debugOnDesktop) {
-        //     // Function called on click when debug on desktop is enabled
-        //     TestGameOnDesktopFallback();
-        //   }
-
-        //   else {
-        //     // Regular AR session initialization
-        //     if (currentSession === null) {
-        //       navigator.xr
-        //         .requestSession("immersive-ar", sessionInit)
-        //         .then(onSessionStarted);
-        //     } else {
-        //       currentSession.end();
-        //     }
-        //   }
-
-
-        //   buttonClickTimeout = null;
-        // }, 500);
-
-
+        // THIS BUTTON IS SPECIAL!!!
+        // SO WE NEED TO MODIFY IT SLIGHTLY TO ADD ANIMATION AND EVENT DISPATCHING
 
         // Store original colors
         const originalBackground = button.style.background;
@@ -132,23 +109,6 @@ class ARButton {
             }
           }, 1000); // Wait for exit animations to complete
         }, 200); // Duration of the button active state
-
-
-        // if (config.debugOnDesktop) {
-        //   // Function called on click when debug on desktop is enabled
-        //   TestGameOnDesktopFallback();
-        // }
-
-        // else {
-        //   // Regular AR session initialization
-        //   if (currentSession === null) {
-        //     navigator.xr
-        //       .requestSession("immersive-ar", sessionInit)
-        //       .then(onSessionStarted);
-        //   } else {
-        //     currentSession.end();
-        //   }
-        // }
       };
     }
 
