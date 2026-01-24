@@ -39,8 +39,32 @@ const Welcome = (props) => {
             ? enterDelay.hero + enterDelayIncrement * 3
             : enterDelay.subTitle + enterDelayIncrement * 3
 
-        // TODO --- usare funzione nuova
-        changeColors()
+        // Store original colors FIRST (get actual computed values, not var() references)
+        storeColors()
+
+        // Setup UI colors with fallback to stored originals
+        const colorsToSet = [
+            {
+                colorName: "--color-primary",
+                colorValue: props.cover?.colors?.primary,
+            },
+            {
+                colorName: "--color-secondary",
+                colorValue: props.cover?.colors?.secondary,
+            },
+            {
+                colorName: "--color-accent",
+                colorValue: props.cover?.colors?.accent,
+            },
+            {
+                colorName: "--color-background",
+                colorValue: props.cover?.colors?.background,
+            },
+        ].filter((c) => c.colorValue) // Only set colors that have actual values
+
+        if (colorsToSet.length > 0) {
+            setColors(colorsToSet)
+        }
 
         //preload all images before to render the page
         if (props.cover?.images) {
@@ -60,7 +84,7 @@ const Welcome = (props) => {
             // before to set all them to transparent
             storeColors()
 
-            // Trigger your exit animations here
+            // Trigger exit animations
             const logo = document.getElementById("logo")
             if (logo) fadeOut(logo)
             const hero = document.getElementById("hero")
@@ -74,14 +98,17 @@ const Welcome = (props) => {
                 {
                     colorName: "--color-secondary",
                     colorValue: "transparent",
+                    // delay: 400
                 },
                 {
                     colorName: "--color-accent",
                     colorValue: "transparent",
+                    // delay: 800
                 },
                 {
                     colorName: "--color-background",
                     colorValue: "transparent",
+                    // delay: 1200
                 },
             ])
         }

@@ -80,16 +80,18 @@ class ARButton {
         const originalColor = button.style.color;
 
         // Change to active state colors
-        button.style.background = "var(--color-primary)";
+        button.style.background = "var(--color-accent)";
         button.style.color = "var(--color-background)";
 
-        // Revert colors after 200ms
+        // Revert colors after 150ms
         setTimeout(() => {
           button.style.background = originalBackground;
           button.style.color = originalColor;
 
           // Dispatch custom event
           document.dispatchEvent(new CustomEvent('arButtonClicked'));
+
+          return
 
           setTimeout(() => {
             // Proceed with AR session initialization after animations
@@ -108,7 +110,7 @@ class ARButton {
               }
             }
           }, 1000); // Wait for exit animations to complete
-        }, 200); // Duration of the button active state
+        }, 150); // Duration of the button active state
       };
     }
 
