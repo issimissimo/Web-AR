@@ -95,21 +95,77 @@ class ARButton {
         //   buttonClickTimeout = null;
         // }, 500);
 
-        if (config.debugOnDesktop) {
-          // Function called on click when debug on desktop is enabled
-          TestGameOnDesktopFallback();
-        }
 
-        else {
-          // Regular AR session initialization
-          if (currentSession === null) {
-            navigator.xr
-              .requestSession("immersive-ar", sessionInit)
-              .then(onSessionStarted);
-          } else {
-            currentSession.end();
+
+        // Store original colors
+        const originalBackground = button.style.background;
+        const originalColor = button.style.color;
+
+        // Change to active state colors
+        button.style.background = "var(--color-primary)";
+        button.style.color = "var(--color-background)";
+
+        // Revert colors after 200ms
+        setTimeout(() => {
+          button.style.background = originalBackground;
+          button.style.color = originalColor;
+
+          // HERE, BEFORE TO PROCEED WITH AR SESSION, I SHOULD CALL AN EVENT
+          // OR SOMETHING LIKE THAT, TO CALL A FUNZTION INSIDE ANUNIMOUS.JSX
+          // FOR EXIT ANIMATIONS
+
+          // Dispatch custom event
+          document.dispatchEvent(new CustomEvent('arButtonClicked'));
+
+          return;
+
+          if (config.debugOnDesktop) {
+            // Function called on click when debug on desktop is enabled
+            TestGameOnDesktopFallback();
           }
-        }
+
+          else {
+            // Regular AR session initialization
+            if (currentSession === null) {
+              navigator.xr
+                .requestSession("immersive-ar", sessionInit)
+                .then(onSessionStarted);
+            } else {
+              currentSession.end();
+            }
+          }
+
+
+
+        }, 150);
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // if (config.debugOnDesktop) {
+        //   // Function called on click when debug on desktop is enabled
+        //   TestGameOnDesktopFallback();
+        // }
+
+        // else {
+        //   // Regular AR session initialization
+        //   if (currentSession === null) {
+        //     navigator.xr
+        //       .requestSession("immersive-ar", sessionInit)
+        //       .then(onSessionStarted);
+        //   } else {
+        //     currentSession.end();
+        //   }
+        // }
       };
     }
 

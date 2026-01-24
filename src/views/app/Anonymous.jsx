@@ -47,6 +47,37 @@ const Welcome = (props) => {
             setAllImagesLoaded(isLoaded)
             console.log("Tutte le immagini caricate:", isLoaded)
         })
+
+        const handleARButtonClick = (e) => {
+            console.log("AR button clicked!")
+            // Trigger your exit animations here
+            changeSomeColors([
+                {
+                    colorName: "--color-primary",
+                    newColor: "transparent",
+                },
+                {
+                    colorName: "--color-secondary",
+                    newColor: "transparent",
+                },
+                {
+                    colorName: "--color-accent",
+                    newColor: "transparent",
+                },
+                {
+                    colorName: "--color-background",
+                    newColor: "transparent",
+                }
+            ])
+        }
+
+        // Listener for AR Button clicked
+        document.addEventListener("arButtonClicked", handleARButtonClick)
+
+        // Cleanup
+        return () => {
+            document.removeEventListener("arButtonClicked", handleARButtonClick)
+        }
     })
 
     const loadImages = async () => {
@@ -82,6 +113,17 @@ const Welcome = (props) => {
                 props.cover.colors.background,
             )
         }
+    }
+
+    const changeSomeColors = (colors = [{}]) => {
+        colors.forEach((el) => {
+            setTimeout(() => {
+                document.documentElement.style.setProperty(
+                    el.colorName,
+                    el.newColor,
+                )
+            }, el.delay ?? 0)
+        })
     }
 
     const Container = styled("div")`
@@ -154,7 +196,9 @@ const Welcome = (props) => {
 
                 {/* TITLE */}
                 <TitleStyled
-                    color={props.cover?.color?.primary ?? "var(--color-primary)"}
+                    color={
+                        props.cover?.color?.primary ?? "var(--color-primary)"
+                    }
                     animate={{ opacity: [0, 1] }}
                     transition={{
                         duration: enterDuration,
@@ -167,7 +211,10 @@ const Welcome = (props) => {
 
                 {/* SUBTITLE */}
                 <SubTitleStyled
-                    color={props.cover?.color?.secondary ?? "var(--color-secondary)"}
+                    color={
+                        props.cover?.color?.secondary ??
+                        "var(--color-secondary)"
+                    }
                     animate={{ opacity: [0, 1] }}
                     transition={{
                         duration: enterDuration,
@@ -248,10 +295,7 @@ export default function Main(props) {
     return (
         <Centered>
             {markerValid() ? (
-                <Welcome
-                    name={props.marker.name}
-                    cover={props.marker.cover}
-                />
+                <Welcome name={props.marker.name} cover={props.marker.cover} />
             ) : (
                 <Unavailable />
             )}
