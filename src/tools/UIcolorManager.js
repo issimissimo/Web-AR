@@ -27,12 +27,17 @@ export const storeColors = () => {
 };
 
 /**
- * Set new UI colors
+ * Set new UI colors with optional smooth transitions
  * @param {Object[]} colors - Array of color objects with properties: {colorName, colorValue, delay?}
+ * @param {number} duration - Optional CSS transition duration in milliseconds (default: 0 for instant)
  * @returns {Promise} - Resolves when all colors are set
  */
-export const setColors = (colors = []) => {
+export const setColors = (colors = [], duration = 0) => {
     return new Promise((resolve) => {
+        const root = document.documentElement;
+
+        console.log("setColors duration:", duration);
+
         // Store colors if not already stored
         if (originalColors.size === 0) {
             storeColors();
@@ -40,6 +45,11 @@ export const setColors = (colors = []) => {
 
         // Save current state to history before changing
         colorHistory.push(new Map(originalColors));
+
+        // Apply transition if duration is specified
+        if (duration > 0) {
+            root.style.transition = `all ${duration}ms ease-in-out`;
+        }
 
         // Apply new colors with delays
         const maxDelay = Math.max(...colors.map((el) => el.delay ?? 0), 0);
@@ -53,10 +63,11 @@ export const setColors = (colors = []) => {
             }, el.delay ?? 0);
         });
 
-        // Resolve when all timeouts are done
+        // Remove transition style and resolve
         setTimeout(() => {
+            root.style.transition = '';
             resolve();
-        }, maxDelay + 50);
+        }, maxDelay + duration + 50);
     });
 };
 

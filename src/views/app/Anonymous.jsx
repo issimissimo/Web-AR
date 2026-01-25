@@ -24,7 +24,34 @@ const Welcome = (props) => {
         ARButton: 0,
     }
 
+    const ArButtonThemes = {
+        default: {
+            background: "var(--color-background)",
+            color: "var(--color-accent)",
+            borderColor: "var(--color-accent)",
+            activeBackground: "var(--color-accent)",
+            activeColor: "var(--color-background)",
+            activeBorderColor: "var(--color-accent)",
+        },
+        reverse: {
+            background: "var(--color-accent)",
+            color: "var(--color-background)",
+            orderColor: "var(--color-background)",
+            activeBackground: "var(--color-background)",
+            activeColor: "var(--color-accent)",
+            activeBorderColor: "var(--color-background)",
+        },
+    }
+
+    let ARButtonTheme
+
     console.log(enterDelay)
+
+    // setup ARButton theme
+    const newTheme = props.cover?.ARButton?.theme ?? "default"
+    ARButtonTheme = ArButtonThemes[newTheme]
+
+    console.log(ARButtonTheme)
 
     onMount(() => {
         // setup delay
@@ -36,8 +63,8 @@ const Welcome = (props) => {
             enterDelay.hero += enterDelay.subTitle + enterDelayIncrement
         }
         enterDelay.ARButton += enterDelay.hero
-            ? enterDelay.hero + enterDelayIncrement * 3
-            : enterDelay.subTitle + enterDelayIncrement * 3
+            ? enterDelay.hero + enterDelayIncrement
+            : enterDelay.subTitle + enterDelayIncrement
 
         // Store original colors FIRST (get actual computed values, not var() references)
         storeColors()
@@ -85,32 +112,51 @@ const Welcome = (props) => {
             storeColors()
 
             // Trigger exit animations
+            const exitDuration = enterDuration * 1000
             const logo = document.getElementById("logo")
-            if (logo) fadeOut(logo)
+            if (logo) fadeOut(logo, exitDuration, enterDelay.logo * 1000)
+            const title = document.getElementById("title")
+            if (title) fadeOut(title, exitDuration, enterDelay.title * 1000)
+            const subtitle = document.getElementById("subtitle")
+            if (subtitle)
+                fadeOut(subtitle, exitDuration, enterDelay.subTitle * 1000)
             const hero = document.getElementById("hero")
-            if (hero) fadeOut(hero)
+            if (hero) fadeOut(hero, exitDuration, enterDelay.hero * 1000)
+            const arButton = document.getElementById("ArButtonContainer")
+            if (arButton)
+                fadeOut(arButton, exitDuration, enterDelay.ARButton * 1000)
 
-            setColors([
-                {
-                    colorName: "--color-primary",
-                    colorValue: "transparent",
+            setTimeout(
+                () => {
+                    setColors(
+                        [
+                            {
+                                colorName: "--color-primary",
+                                colorValue: "transparent",
+                            },
+                            {
+                                colorName: "--color-secondary",
+                                colorValue: "transparent",
+                            },
+                            {
+                                colorName: "--color-accent",
+                                colorValue: "transparent",
+                            },
+                            {
+                                colorName: "--color-background",
+                                colorValue: "transparent",
+                            },
+                        ],
+                        10000,
+                    ) // 300ms smooth transition
                 },
-                {
-                    colorName: "--color-secondary",
-                    colorValue: "transparent",
-                    // delay: 400
-                },
-                {
-                    colorName: "--color-accent",
-                    colorValue: "transparent",
-                    // delay: 800
-                },
-                {
-                    colorName: "--color-background",
-                    colorValue: "transparent",
-                    // delay: 1200
-                },
-            ])
+                (enterDelay.logo +
+                    enterDelay.title +
+                    enterDelay.subTitle +
+                    enterDelay.hero +
+                    enterDelay.ARButton) *
+                    1000,
+            )
         }
 
         // Listener for AR Button clicked
@@ -130,32 +176,32 @@ const Welcome = (props) => {
         await smartImageLoader.load(images)
     }
 
-    const changeColors = () => {
-        if (props.cover?.colors?.primary) {
-            document.documentElement.style.setProperty(
-                "--color-primary",
-                props.cover.colors.primary,
-            )
-        }
-        if (props.cover?.colors?.secondary) {
-            document.documentElement.style.setProperty(
-                "--color-secondary",
-                props.cover.colors.secondary,
-            )
-        }
-        if (props.cover?.colors?.accent) {
-            document.documentElement.style.setProperty(
-                "--color-accent",
-                props.cover.colors.accent,
-            )
-        }
-        if (props.cover?.colors?.background) {
-            document.documentElement.style.setProperty(
-                "--color-background",
-                props.cover.colors.background,
-            )
-        }
-    }
+    // const changeColors = () => {
+    //     if (props.cover?.colors?.primary) {
+    //         document.documentElement.style.setProperty(
+    //             "--color-primary",
+    //             props.cover.colors.primary,
+    //         )
+    //     }
+    //     if (props.cover?.colors?.secondary) {
+    //         document.documentElement.style.setProperty(
+    //             "--color-secondary",
+    //             props.cover.colors.secondary,
+    //         )
+    //     }
+    //     if (props.cover?.colors?.accent) {
+    //         document.documentElement.style.setProperty(
+    //             "--color-accent",
+    //             props.cover.colors.accent,
+    //         )
+    //     }
+    //     if (props.cover?.colors?.background) {
+    //         document.documentElement.style.setProperty(
+    //             "--color-background",
+    //             props.cover.colors.background,
+    //         )
+    //     }
+    // }
 
     // const changeSomeColors = (colors = [{}]) => {
     //     colors.forEach((el) => {
@@ -187,10 +233,37 @@ const Welcome = (props) => {
         width: 90%;
         margin-top: 0.5rem;
     `
+
+    // const ArButtonStyled = styled(Motion.div)`
+    //     margin-top: 1.6rem;
+    //     z-index: 1000;
+
+    //     & button {
+    //         background-color: #007bff !important; /* Colore base */
+    //         color: white !important; /* Colore font base */
+    //     }
+
+    //     & button:active {
+    //         background-color: #ff0000 !important; /* Colore al click */
+    //         color: #000000 !important; /* Colore font al click */
+    //     }
+    // `
+
     const ArButtonStyled = styled(Motion.div)`
         margin-top: 1.6rem;
         z-index: 1000;
+
+        & button {
+            background: ${(props) => props.theme.background} !important;
+            color: ${(props) => props.theme.color} !important;
+        }
+
+        & button:active {
+            background: ${(props) => props.theme.activeBackground} !important;
+            color:  ${(props) => props.theme.activeColor} !important;
+        }
     `
+
     const LogoImageStyled = styled(Motion.img)`
         margin-bottom: ${(props) => props.marginBottom};
     `
@@ -239,6 +312,7 @@ const Welcome = (props) => {
 
                 {/* TITLE */}
                 <TitleStyled
+                    id="title"
                     color={
                         props.cover?.color?.primary ?? "var(--color-primary)"
                     }
@@ -254,6 +328,7 @@ const Welcome = (props) => {
 
                 {/* SUBTITLE */}
                 <SubTitleStyled
+                    id="subtitle"
                     color={
                         props.cover?.color?.secondary ??
                         "var(--color-secondary)"
@@ -288,6 +363,7 @@ const Welcome = (props) => {
             </Show>
             <ArButtonStyled
                 id="ArButtonContainer"
+                theme={ARButtonTheme}
                 style={{
                     "margin-top": props.cover?.ARButton?.marginTop ?? "1rem",
                 }}
@@ -295,7 +371,7 @@ const Welcome = (props) => {
                 transition={{
                     duration: enterDuration,
                     easing: "ease-in-out",
-                    delay: enterDelay.ARButton,
+                    delay: enterDelay.ARButton * 2,
                 }}
             />
             <DisclaimerStyled>

@@ -75,18 +75,18 @@ class ARButton {
         // THIS BUTTON IS SPECIAL!!!
         // SO WE NEED TO MODIFY IT SLIGHTLY TO ADD ANIMATION AND EVENT DISPATCHING
 
-        // Store original colors
-        const originalBackground = button.style.background;
-        const originalColor = button.style.color;
+        // // Store original colors
+        // const originalBackground = button.style.background;
+        // const originalColor = button.style.color;
 
-        // Change to active state colors
-        button.style.background = "var(--color-accent)";
-        button.style.color = "var(--color-background)";
+        // // Change to active state colors
+        // button.style.background = "var(--color-accent)";
+        // button.style.color = "var(--color-background)";
 
         // Revert colors after 150ms
         setTimeout(() => {
-          button.style.background = originalBackground;
-          button.style.color = originalColor;
+          // button.style.background = originalBackground;
+          // button.style.color = originalColor;
 
           // Dispatch custom event
           document.dispatchEvent(new CustomEvent('arButtonClicked'));

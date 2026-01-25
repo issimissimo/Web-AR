@@ -4,10 +4,10 @@
   "showLogOnScreen": false,
   "debugLoadMode": true,
   "debugUserId": "ZCzf7sAVUrRKTEgp0Xp7iB8cB5w2",
-  "debugMarkerId": "q5NCaQCGsQrlKtDhqQl4",
+  "debugMarkerId": "nQ2NSSK0nMA8rPDkQBHI",
   "minimumFPS": 10,
   "ui": {
     "enterDuration": 0.8,
-    "enterDelay": 0.4
+    "enterDelay": 0.2
   }
 }

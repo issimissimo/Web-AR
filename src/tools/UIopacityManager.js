@@ -46,7 +46,7 @@ export const opacityTransition = (elements, targetOpacity, duration, delay = 0) 
  * @param {number} delay - Optional delay in milliseconds
  * @returns {Promise}
  */
-export const fadeOut = (elements, duration = 300, delay = 0) => {
+export const fadeOut = (elements, duration = 500, delay = 0) => {
     return opacityTransition(elements, 0, duration, delay);
 };
 
@@ -57,6 +57,6 @@ export const fadeOut = (elements, duration = 300, delay = 0) => {
  * @param {number} delay - Optional delay in milliseconds
  * @returns {Promise}
  */
-export const fadeIn = (elements, duration = 300, delay = 0) => {
+export const fadeIn = (elements, duration = 500, delay = 0) => {
     return opacityTransition(elements, 1, duration, delay);
 };
