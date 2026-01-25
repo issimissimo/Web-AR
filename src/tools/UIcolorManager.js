@@ -36,8 +36,6 @@ export const setColors = (colors = [], duration = 0) => {
     return new Promise((resolve) => {
         const root = document.documentElement;
 
-        console.log("setColors duration:", duration);
-
         // Store colors if not already stored
         if (originalColors.size === 0) {
             storeColors();

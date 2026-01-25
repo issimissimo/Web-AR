@@ -269,9 +269,7 @@ export default function App() {
 
     const setBodyColor = () => {
         const body = document.getElementsByTagName("body")[0]
-        const bgColor =
-            getComputedStyle(body).getPropertyValue("--color-background")
-        body.style.backgroundColor = bgColor
+        body.style.backgroundColor = '#000000'
     }
 
     /**
