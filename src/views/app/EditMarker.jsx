@@ -1,4 +1,4 @@
-import { createSignal, onMount } from "solid-js"
+import { createSignal, onMount, onCleanup } from "solid-js"
 import { useFirebase } from "@hooks/useFirebase"
 import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
@@ -72,8 +72,14 @@ const BorderBottomBar = styled(Motion.div)`
 
 const ArButtonContainer = styled("div")`
     z-index: 1000;
-    display: ${(props) => (props.viewMode === VIEW_MODE.GAMES ? "flex" : "none")};
+    display: ${(props) =>
+        props.viewMode === VIEW_MODE.GAMES ? "flex" : "none"};
     justify-content: center;
+
+    & button:active {
+        background: var(--color-accent) !important;
+        color: var(--color-background) !important;
+    }
 `
 
 const QrCodeContainer = styled(Motion.div)`
@@ -95,11 +101,24 @@ const EditMarker = (props) => {
     const firebase = useFirebase()
     const [id, setId] = createSignal(props.marker.id ?? null)
     const [name, setName] = createSignal(props.marker.name ?? null)
-    // const [coverTitle, setCoverTitle] = createSignal(null)
     const [games, setGames] = createSignal(props.marker.games ?? [])
     const [currentViewMode, setCurrentViewMode] = createSignal(VIEW_MODE.GAMES)
 
     let animateOnMount = true
+
+    onMount(() => {
+        // Listener for AR Button clicked
+        document.addEventListener("arButtonClicked", handleARButtonClick)
+    })
+    onCleanup(() => {
+        document.removeEventListener("arButtonClicked", handleARButtonClick)
+    })
+
+    const handleARButtonClick = (e) => {
+        setTimeout(() => {
+            document.dispatchEvent(new CustomEvent("exitAnimationsEnded"))
+        }, 200)
+    }
 
     // update current marker (app.jsx)
     // --> it will cause a refresh of the page!
@@ -121,7 +140,11 @@ const EditMarker = (props) => {
 
         // update marker name on firestore
         if (name() !== props.marker.name) {
-            await firebase.firestore.updateMarker(props.userId, props.marker.id, name())
+            await firebase.firestore.updateMarker(
+                props.userId,
+                props.marker.id,
+                name(),
+            )
         }
 
         refreshPage()
@@ -132,7 +155,10 @@ const EditMarker = (props) => {
      */
     const handleSaveMarker = async () => {
         // create new marker on Firestore
-        const newMarkerId = await firebase.firestore.addMarker(props.userId, name())
+        const newMarkerId = await firebase.firestore.addMarker(
+            props.userId,
+            name(),
+        )
 
         // update current marker (app.jsx)
         props.onNewMarkerCreated(newMarkerId, name())
@@ -171,7 +197,12 @@ const EditMarker = (props) => {
      */
     const handleUpdateGame = async (game) => {
         // update game on Firestore
-        await firebase.firestore.updateGame(props.userId, props.marker.id, game.id, game.enabled)
+        await firebase.firestore.updateGame(
+            props.userId,
+            props.marker.id,
+            game.id,
+            game.enabled,
+        )
 
         // refresh games()
         const updatedGames = []
@@ -192,7 +223,11 @@ const EditMarker = (props) => {
      */
     const handleDeleteGame = async (game) => {
         // delete game on Firestore
-        await firebase.firestore.deleteGame(props.userId, props.marker.id, game.id)
+        await firebase.firestore.deleteGame(
+            props.userId,
+            props.marker.id,
+            game.id,
+        )
 
         // delete game on Realtime Database
         const path = `${props.userId}/markers/${props.marker.id}/games/${game.id}`
@@ -233,30 +268,62 @@ const EditMarker = (props) => {
             >
                 <NavigationButtonContainer>
                     <NavigationButton
-                        selected={currentViewMode() === VIEW_MODE.GAMES ? true : false}
+                        selected={
+                            currentViewMode() === VIEW_MODE.GAMES ? true : false
+                        }
                         onClick={() => setCurrentViewMode(VIEW_MODE.GAMES)}
-                        animate={{ scale: currentViewMode() === VIEW_MODE.GAMES ? 1.1 : 0.9 }}
+                        animate={{
+                            scale:
+                                currentViewMode() === VIEW_MODE.GAMES
+                                    ? 1.1
+                                    : 0.9,
+                        }}
                         transition={{ duration: 0.3, easing: "ease-in-out" }}
                     >
                         <Fa icon={faPuzzlePiece} size="1.4x" class="icon" />
                         <BorderBottomBar
-                            animate={{ scaleX: currentViewMode() === VIEW_MODE.GAMES ? 1 : 0 }}
-                            transition={{ duration: 0.3, easing: "ease-in-out" }}
+                            animate={{
+                                scaleX:
+                                    currentViewMode() === VIEW_MODE.GAMES
+                                        ? 1
+                                        : 0,
+                            }}
+                            transition={{
+                                duration: 0.3,
+                                easing: "ease-in-out",
+                            }}
                             initial={false}
                         />
                     </NavigationButton>
                 </NavigationButtonContainer>
                 <NavigationButtonContainer>
                     <NavigationButton
-                        selected={currentViewMode() === VIEW_MODE.QRCODE ? true : false}
+                        selected={
+                            currentViewMode() === VIEW_MODE.QRCODE
+                                ? true
+                                : false
+                        }
                         onClick={() => setCurrentViewMode(VIEW_MODE.QRCODE)}
-                        animate={{ scale: currentViewMode() === VIEW_MODE.QRCODE ? 1.1 : 0.9 }}
+                        animate={{
+                            scale:
+                                currentViewMode() === VIEW_MODE.QRCODE
+                                    ? 1.1
+                                    : 0.9,
+                        }}
                         transition={{ duration: 0.3, easing: "ease-in-out" }}
                     >
                         <Fa icon={faLink} size="1.4x" class="icon" />
                         <BorderBottomBar
-                            animate={{ scaleX: currentViewMode() === VIEW_MODE.QRCODE ? 1 : 0 }}
-                            transition={{ duration: 0.3, easing: "ease-in-out" }}
+                            animate={{
+                                scaleX:
+                                    currentViewMode() === VIEW_MODE.QRCODE
+                                        ? 1
+                                        : 0,
+                            }}
+                            transition={{
+                                duration: 0.3,
+                                easing: "ease-in-out",
+                            }}
                             initial={false}
                         />
                     </NavigationButton>
@@ -264,7 +331,12 @@ const EditMarker = (props) => {
                 <NavigationButtonContainer>
                     <ButtonSecondary onClick={handleDeleteMarker}>
                         Elimina
-                        <Fa icon={faTrash} size="1x" translateX={0.5} class="icon" />
+                        <Fa
+                            icon={faTrash}
+                            size="1x"
+                            translateX={0.5}
+                            class="icon"
+                        />
                     </ButtonSecondary>
                 </NavigationButtonContainer>
             </NavigationContainer>
@@ -320,9 +392,13 @@ const EditMarker = (props) => {
             font-size: small;
             padding-left: 1rem;
             margin: 0;
-            color: ${(props) => (props.enabled ? "var(--color-white)" : "var(--color-grey-dark)")};
+            color: ${(props) =>
+                props.enabled
+                    ? "var(--color-white)"
+                    : "var(--color-grey-dark)"};
             flex: 1;
-            text-decoration: ${(props) => (props.exist ? "none" : "line-through")};
+            text-decoration: ${(props) =>
+                props.exist ? "none" : "line-through"};
         `
 
         return (
@@ -334,7 +410,10 @@ const EditMarker = (props) => {
                         : "var(--color-dark-transparent-dark)",
                 }}
                 transition={{
-                    backgroundColor: { duration: animateOnMount ? 0.25 : 0, easing: "ease-in-out" },
+                    backgroundColor: {
+                        duration: animateOnMount ? 0.25 : 0,
+                        easing: "ease-in-out",
+                    },
                 }}
             >
                 <ButtonSecondary onClick={() => handleDeleteGame(game())}>
@@ -364,7 +443,10 @@ const EditMarker = (props) => {
                 // initialize 3D scene and AR button
                 props.initScene()
 
-                if (currentViewMode() === VIEW_MODE.QRCODE && games().length > 0) {
+                if (
+                    currentViewMode() === VIEW_MODE.QRCODE &&
+                    games().length > 0
+                ) {
                     // create qr code
                     console.log("genero QR Code....")
                     generateQRCodeForMarker(props.userId, id())
@@ -376,14 +458,18 @@ const EditMarker = (props) => {
             case VIEW_MODE.GAMES:
                 return props.marker.games?.length === 0 ? (
                     <Message>
-                        Entra in AR e aggiungi dei componenti a questo ambiente. <br></br> <br></br>
-                        I componenti sono elementi 3D che scegli per costruire l'ambiente AR a tuo
-                        piacimento. Una volta ggiunti li vedrai elencati qui!
+                        Entra in AR e aggiungi dei componenti a questo ambiente.{" "}
+                        <br></br> <br></br>I componenti sono elementi 3D che
+                        scegli per costruire l'ambiente AR a tuo piacimento. Una
+                        volta ggiunti li vedrai elencati qui!
                     </Message>
                 ) : (
                     // THE LIST OF THE GAMES
                     <FitHeightScrollable
-                        style={{ "margin-top": "2rem", "margin-bottom": "1rem" }}
+                        style={{
+                            "margin-top": "2rem",
+                            "margin-bottom": "1rem",
+                        }}
                         animate={{ opacity: [0, 1] }}
                         transition={{
                             duration: animateOnMount ? 0.5 : 0,
@@ -400,20 +486,29 @@ const EditMarker = (props) => {
             case VIEW_MODE.QRCODE:
                 return props.marker.games?.length === 0 ? (
                     <Message>
-                        Non posso darti un QR Code per questo ambiente perchè non hai ancora
-                        aggiunto nulla in AR.<br></br> Entra in AR e aggiungi qualcosa!
+                        Non posso darti un QR Code per questo ambiente perchè
+                        non hai ancora aggiunto nulla in AR.<br></br> Entra in
+                        AR e aggiungi qualcosa!
                     </Message>
                 ) : (
                     <FitHeight>
                         <QrCodeContainer
                             animate={{ opacity: [0, 1] }}
-                            transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
+                            transition={{
+                                duration: 0.5,
+                                easing: "ease-in-out",
+                                delay: 0,
+                            }}
                         >
                             <QrCodeImg id="qr-code" />
                         </QrCodeContainer>
-                        <Centered id="CENTER" style={{ "justify-content": "center" }}>
+                        <Centered
+                            id="CENTER"
+                            style={{ "justify-content": "center" }}
+                        >
                             <Message style={{ height: "auto" }}>
-                                Scarica e stampa il QR Code, o in alternativa condividi il link.
+                                Scarica e stampa il QR Code, o in alternativa
+                                condividi il link.
                             </Message>
                             <Button
                                 onClick={copyLinkToClipboard}
@@ -433,7 +528,10 @@ const EditMarker = (props) => {
     return (
         <Container>
             {/* HEADER */}
-            <Header onClickBack={props.onBack} onClickUser={props.goToUserProfile}>
+            <Header
+                onClickBack={props.onBack}
+                onClickUser={props.goToUserProfile}
+            >
                 <span style={{ color: "var(--color-secondary)" }}>
                     {id() ? "Modifica " : "Nuovo "}
                 </span>
@@ -465,12 +563,21 @@ const EditMarker = (props) => {
                         {dynamicView()}
 
                         {/* ENTER AR BUTTON */}
-                        <ArButtonContainer id="ArButtonContainer" viewMode={currentViewMode()} />
+                        <ArButtonContainer
+                            id="ArButtonContainer"
+                            viewMode={currentViewMode()}
+                        />
 
                         {/* DOWNLOAD QR CODE BUTTON */}
                         <Button
-                            active={props.marker.games?.length > 0 ? true : false}
-                            visible={currentViewMode() === VIEW_MODE.QRCODE ? true : false}
+                            active={
+                                props.marker.games?.length > 0 ? true : false
+                            }
+                            visible={
+                                currentViewMode() === VIEW_MODE.QRCODE
+                                    ? true
+                                    : false
+                            }
                             icon={faDownload}
                             onClick={handleDownloadQrCode}
                         >
@@ -479,22 +586,13 @@ const EditMarker = (props) => {
                     </FitHeightScrollable>
                 ) : (
                     <FitHeight>
-                        {/* <Message>
-                Dai un nome al tuo ambiente in AR che si riferisca al luogo in cui lo creerai, ad esempio 'salotto',
-                o alla scena in AR che implementarai, ad esempio 'ping pong da tavolo'.<br></br><br></br>
-                Il nome è totalmente arbitrario, ma ti auiterà a ricordare a cosa si riferisce.
-              </Message> */}
-                        {/* <InputField
-                            label="Testo di benvenuto"
-                            multiline={true}
-                            rows={4}
-                            resize="vertical"
-                            value={coverTitle()}
-                            onInput={(e) => setCoverTitle(e.target.value)}
-                        /> */}
                         <Button
                             animate={{ opacity: [0, 1] }}
-                            transition={{ duration: 0.5, easing: "ease-in-out", delay: 0 }}
+                            transition={{
+                                duration: 0.5,
+                                easing: "ease-in-out",
+                                delay: 0,
+                            }}
                             active={name() ? true : false}
                             icon={faSave}
                             onClick={handleSaveMarker}

@@ -166,77 +166,8 @@ const Welcome = (props) => {
             console.log("Tutte le immagini caricate:", isLoaded)
         })
 
-        // const handleARButtonClick = (e) => {
-        //     console.log("AR button clicked!")
-
-        //     // Store the custom colors
-        //     // before to set all them to transparent
-        //     storeColors()
-
-        //     // Trigger exit animations
-        //     const exitDuration = enterDuration * 1000
-        //     const logo = document.getElementById("logo")
-        //     if (logo) fadeOut(logo, exitDuration, enterDelay.logo * 1000)
-        //     const title = document.getElementById("title")
-        //     if (title) fadeOut(title, exitDuration, enterDelay.title * 1000)
-        //     const subtitle = document.getElementById("subtitle")
-        //     if (subtitle)
-        //         fadeOut(subtitle, exitDuration, enterDelay.subTitle * 1000)
-        //     const hero = document.getElementById("hero")
-        //     if (hero) fadeOut(hero, exitDuration, enterDelay.hero * 1000)
-        //     const arButton = document.getElementById("ArButtonContainer")
-        //     if (arButton)
-        //         fadeOut(arButton, exitDuration, enterDelay.ARButton * 1000)
-
-        //     setTimeout(
-        //         () => {
-        //             setColors(
-        //                 [
-        //                     {
-        //                         colorName: "--color-primary",
-        //                         colorValue: "transparent",
-        //                     },
-        //                     {
-        //                         colorName: "--color-secondary",
-        //                         colorValue: "transparent",
-        //                     },
-        //                     {
-        //                         colorName: "--color-accent",
-        //                         colorValue: "transparent",
-        //                     },
-        //                     {
-        //                         colorName: "--color-background",
-        //                         colorValue: "transparent",
-        //                     },
-        //                 ],
-        //                 1000,
-        //             ) // 300ms smooth transition
-
-        //             // let's wait for colors go to transparent
-        //             // and next finally send the event to proceed to enter in AR Session
-        //             setTimeout(() => {
-        //                 console.log("||||||||||EXIT ANIMATIONS FINISHED|||||||||||")
-        //                 document.dispatchEvent(
-        //                     new CustomEvent("exitAnimationsEnded"),
-        //                 )
-        //             }, 1000)
-        //         },
-        //         (enterDelay.logo +
-        //             enterDelay.title +
-        //             enterDelay.subTitle +
-        //             enterDelay.hero +
-        //             enterDelay.ARButton) *
-        //             1000,
-        //     )
-        // }
-
         // Listener for AR Button clicked
         document.addEventListener("arButtonClicked", handleARButtonClick)
-
-        // // Cleanup
-        // return () => {
-        //     document.removeEventListener("arButtonClicked", handleARButtonClick)
-        // }
     })
 
     onCleanup(() => {
