@@ -27,8 +27,6 @@ class ARButton {
     button.style.fontFamily = "SebinoSoftBold";
     button.style.minWidth = "80%";
 
-    let buttonClickTimeout = null;
-
 
     navigator.xr
       .isSessionSupported("immersive-ar")
@@ -55,6 +53,8 @@ class ARButton {
 
 
     function initializeButton() {
+      document.addEventListener("exitAnimationsEnded", startSession)
+
       let currentSession = null;
 
       function onSessionStarted(session) {
@@ -69,50 +69,59 @@ class ARButton {
         currentSession = null;
       }
 
+      function startSession() {
+        console.log("✅ ARButton: startSession called");
+        // Proceed with AR session initialization after animations
+        document.removeEventListener("exitAnimationsEnded", startSession)
+        if (config.debugOnDesktop) {
+          // Function called on click when debug on desktop is enabled
+          TestGameOnDesktopFallback();
+        }
+        else {
+          // Regular AR session initialization
+          if (currentSession === null) {
+            navigator.xr
+              .requestSession("immersive-ar", sessionInit)
+              .then(onSessionStarted);
+          } else {
+            currentSession.end();
+          }
+        }
+      }
+
 
       button.onclick = function () {
 
         // THIS BUTTON IS SPECIAL!!!
-        // SO WE NEED TO MODIFY IT SLIGHTLY TO ADD ANIMATION AND EVENT DISPATCHING
+        // SO WE NEED TO SEND EVENT DISPATCHING
+        // TO WAIT FOR EXIT ANIMATIONS TO END
 
-        // // Store original colors
-        // const originalBackground = button.style.background;
-        // const originalColor = button.style.color;
+        // Dispatch custom event
+        document.dispatchEvent(new CustomEvent('arButtonClicked'));
 
-        // // Change to active state colors
-        // button.style.background = "var(--color-accent)";
-        // button.style.color = "var(--color-background)";
 
-        // Revert colors after 150ms
-        setTimeout(() => {
-          // button.style.background = originalBackground;
-          // button.style.color = originalColor;
+        // setTimeout(() => {
+        //   // Proceed with AR session initialization after animations
+        //   if (config.debugOnDesktop) {
+        //     // Function called on click when debug on desktop is enabled
+        //     TestGameOnDesktopFallback();
+        //   }
+        //   else {
+        //     // Regular AR session initialization
+        //     if (currentSession === null) {
+        //       navigator.xr
+        //         .requestSession("immersive-ar", sessionInit)
+        //         .then(onSessionStarted);
+        //     } else {
+        //       currentSession.end();
+        //     }
+        //   }
+        // }, 1000); // Wait for exit animations to complete
 
-          // Dispatch custom event
-          document.dispatchEvent(new CustomEvent('arButtonClicked'));
-
-          return
-
-          setTimeout(() => {
-            // Proceed with AR session initialization after animations
-            if (config.debugOnDesktop) {
-              // Function called on click when debug on desktop is enabled
-              TestGameOnDesktopFallback();
-            }
-            else {
-              // Regular AR session initialization
-              if (currentSession === null) {
-                navigator.xr
-                  .requestSession("immersive-ar", sessionInit)
-                  .then(onSessionStarted);
-              } else {
-                currentSession.end();
-              }
-            }
-          }, 1000); // Wait for exit animations to complete
-        }, 150); // Duration of the button active state
       };
     }
+
+
 
     return button;
   }
