@@ -99,29 +99,9 @@ class ARButton {
         // Dispatch custom event
         document.dispatchEvent(new CustomEvent('arButtonClicked'));
 
-
-        // setTimeout(() => {
-        //   // Proceed with AR session initialization after animations
-        //   if (config.debugOnDesktop) {
-        //     // Function called on click when debug on desktop is enabled
-        //     TestGameOnDesktopFallback();
-        //   }
-        //   else {
-        //     // Regular AR session initialization
-        //     if (currentSession === null) {
-        //       navigator.xr
-        //         .requestSession("immersive-ar", sessionInit)
-        //         .then(onSessionStarted);
-        //     } else {
-        //       currentSession.end();
-        //     }
-        //   }
-        // }, 1000); // Wait for exit animations to complete
-
+        new Audio('/sounds/smallClick.mp3').play();
       };
     }
-
-
 
     return button;
   }
