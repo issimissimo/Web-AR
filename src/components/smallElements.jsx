@@ -49,8 +49,8 @@ export const BigTitle = styled(Motion.p)`
 export const Title = styled(Motion.p)`
     font-size: var(--font-size-xxxlarge);
     font-family: "SebinoSoftBold";
-    letter-spacing: 0.08rem;
-    line-height: 130%;
+    /* letter-spacing: 0.08rem; */
+    line-height: 120%;
     color: ${(props) => props.color ?? 'var(--color-primary)'};
     vertical-align: text-top;
     margin: 0;

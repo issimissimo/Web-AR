@@ -22,7 +22,7 @@ const StyledButton = styled(Motion.button)`
   border-color: var(--color-white);
   pointer-events: ${props => props.active ? 'auto' : 'none'};
   opacity: ${props => props.active ? 1 : 0.25};
-  color: var(--color-white);
+  color: #ffffff;
   box-shadow: none;
   outline: none;
   z-index: 1;

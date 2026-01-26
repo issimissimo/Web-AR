@@ -43,15 +43,10 @@ const Welcome = (props) => {
         },
     }
 
-    let ARButtonTheme
-
-    // console.log(enterDelay)
-
     // setup ARButton theme (here, NOT onMount!!!)
+    let ARButtonTheme
     const newTheme = props.cover?.ARButton?.theme ?? "default"
     ARButtonTheme = ArButtonThemes[newTheme]
-
-    console.log(ARButtonTheme)
 
     const handleARButtonClick = (e) => {
         // Store the custom colors
@@ -100,7 +95,6 @@ const Welcome = (props) => {
                 // let's wait for colors go to transparent
                 // and next finally send the event to proceed to enter in AR Session
                 setTimeout(() => {
-                    console.log("||||||||||EXIT ANIMATIONS FINISHED|||||||||||")
                     document.dispatchEvent(
                         new CustomEvent("exitAnimationsEnded"),
                     )
