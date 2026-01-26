@@ -20,13 +20,14 @@ const InfoContainer = styled("div")`
     box-sizing: border-box;
     display: flex;
     border: none;
-    background: #458dfa28;
+    /* background: #458dfa28; */
+    background: color-mix(in srgb, var(--color-secondary), transparent 80%);
     border-color: var(--color-secondary);
     color: var(--color-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0px 90px 90px 0px;
+    border-radius: 0px 90px 90px 90px;
     font-size: 0.7rem;
     font-weight: 500;
     padding: 0.5rem;
@@ -61,26 +62,10 @@ const Stats = (props) => {
         <>
             <InfoContainer class="glass">
                 <>
-                    <Fa icon={faPen} size="1x" translateX={0} class="icon" />
+                    {/* <Fa icon={faPen} size="1x" translateX={0} class="icon" /> */}
                     <StaticText>
                         {props.created.toDate().toLocaleDateString()}
                     </StaticText>
-                </>
-                <>
-                    <Fa icon={faClock} size="1x" translateX={0} class="icon" />
-                    <Show
-                        when={props.lastSee}
-                        fallback={<StaticText>n/a</StaticText>}
-                    >
-                        <StaticText>
-                            {`${props.lastSee.toDate().toLocaleDateString()} ${props.lastSee
-                                .toDate()
-                                .toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                })}`}
-                        </StaticText>
-                    </Show>
                 </>
                 <>
                     <StatisticsContainer class="glass">
@@ -91,6 +76,25 @@ const Stats = (props) => {
                             class="icon"
                         />
                         <StaticText>{props.views}</StaticText>
+                        <Fa
+                            icon={faClock}
+                            size="1x"
+                            translateX={0}
+                            class="icon"
+                        />
+                        <Show
+                            when={props.lastSee}
+                            fallback={<StaticText>n/a</StaticText>}
+                        >
+                            <StaticText>
+                                {`${props.lastSee.toDate().toLocaleDateString()} ${props.lastSee
+                                    .toDate()
+                                    .toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}`}
+                            </StaticText>
+                        </Show>
                     </StatisticsContainer>
                 </>
             </InfoContainer>
@@ -112,12 +116,17 @@ const NameContainer = styled("div")`
     box-sizing: border-box;
     color: var(--color-primary);
     width: fit-content;
+    background: color-mix(in srgb, var(--color-secondary), transparent 87%);
+    padding: 0.7rem;
+    padding-left: 1rem;
+    padding-right: 1.2rem;
+    border-radius: 0px 20px 0px 0px;
 `
 
 const Name = styled("p")`
     font-weight: 400;
     margin: 0;
-    margin-top: 0.3rem;
+    /* margin-top: 0.3rem; */
 `
 
 const BottomContainer = styled("div")`
@@ -199,7 +208,9 @@ const Empty = () => {
                 size={60}
             />
             <EmptyTitle>Non hai nessun ambiente</EmptyTitle>
-            <EmptySubtitle>Inizia creandone uno con il tasto + qui sotto</EmptySubtitle>
+            <EmptySubtitle>
+                Inizia creandone uno con il tasto + qui sotto
+            </EmptySubtitle>
         </EmptyContainer>
     )
 }
@@ -338,7 +349,15 @@ const MarkersList = (props) => {
                         "font-size": "var(--font-size-xxxlarge)",
                     }}
                 >
-                    BeeAr
+                    Bee
+                </span>
+                <span
+                    style={{
+                        color: "var(--color-secondary)",
+                        "font-size": "var(--font-size-xxxlarge)",
+                    }}
+                >
+                    Ar
                 </span>
             </Header>
 
@@ -347,7 +366,7 @@ const MarkersList = (props) => {
                 <Loader />
             ) : (
                 <>
-                    <p
+                    {/* <p
                         style={{
                             margin: 0,
                             color: "var(--color-secondary)",
@@ -355,7 +374,7 @@ const MarkersList = (props) => {
                         }}
                     >
                         I tuoi ambienti in AR
-                    </p>
+                    </p> */}
                     <AdaptableHeightScrollable
                         id="FitHeight"
                         style={{ "align-items": "center" }}

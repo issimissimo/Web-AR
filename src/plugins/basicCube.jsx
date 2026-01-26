@@ -4,7 +4,10 @@ import { MeshStandardMaterial, Mesh } from "three"
 import * as THREE from "three"
 import useOnce from "@hooks/SolidJS/useOnce"
 
+import Toast from "@components/Toast"
+
 export default function basicCube(props) {
+    let messageRef
     /*
      * Put here derived functions from Game
      */
@@ -56,6 +59,12 @@ export default function basicCube(props) {
          * Don't forget to call "game.setInitialized()" at finish
          */
         game.setInitialized()
+
+        setTimeout(() => {
+            messageRef.show("SUCAAAAAAAAAA", {
+                    infinite: true,
+                },)
+        }, 2000)
     }
 
     /*
@@ -76,9 +85,18 @@ export default function basicCube(props) {
         },
     )
 
+    // const renderView = () => {
+    //     return <>{props.selected && <>CIAO SONO IL CUBO!</>}</>
+    // }
+
     const renderView = () => {
-        return <>{props.selected && <>CIAO SONO IL CUBO!</>}</>
+        return (
+            <>
+                <Toast ref={messageRef} />
+            </>
+        )
     }
+
     // Delegate mounting to the shared game hook
     game.mountView(renderView)
 }

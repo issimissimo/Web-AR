@@ -42,7 +42,7 @@ const NavigationContainer = styled(Motion.div)`
     align-items: center;
     width: 100%;
     height: 35px;
-    color: var(--color-primary);
+    color: var(--color-accent);
 `
 
 const NavigationButtonContainer = styled("div")`
@@ -66,7 +66,7 @@ const BorderBottomBar = styled(Motion.div)`
     bottom: 0;
     width: 100%;
     height: 2px;
-    background: var(--color-primary);
+    background: var(--color-accent);
     transform-origin: left;
 `
 
@@ -502,10 +502,7 @@ const EditMarker = (props) => {
                         >
                             <QrCodeImg id="qr-code" />
                         </QrCodeContainer>
-                        <Centered
-                            id="CENTER"
-                            style={{ "justify-content": "center" }}
-                        >
+                        <Centered style={{ "justify-content": "center" }}>
                             <Message style={{ height: "auto" }}>
                                 Scarica e stampa il QR Code, o in alternativa
                                 condividi il link.
@@ -526,7 +523,7 @@ const EditMarker = (props) => {
     }
 
     return (
-        <Container>
+        <Container id="CONT">
             {/* HEADER */}
             <Header
                 onClickBack={props.onBack}
@@ -555,7 +552,7 @@ const EditMarker = (props) => {
                 />
 
                 {id() ? (
-                    <FitHeightScrollable>
+                    <FitHeightScrollable style={{ "align-items": "center" }}>
                         {/* NAVIGATION */}
                         <Navigation />
 
