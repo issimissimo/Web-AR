@@ -5,7 +5,7 @@
   <link rel="icon" href="/favicon.ico" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, , viewport-fit=cover" />
-<meta name="mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
   <meta name="msapplication-navbutton-color" content="#000000">
 
@@ -16,6 +16,7 @@
 
   <link rel="preload" href="/utils/loader/loader.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <link href="index.css" rel="stylesheet">
+  <script src="/utils/UI/circles.js"></script>
 
   <!-- Open Graph tags -->
   <meta property="og:type" content="website">
@@ -26,41 +27,22 @@
 </head>
 
 <body>
-
-  <div id="backgroundContainer">
-    <div class="circle circle-1"></div>
-    <div class="circle circle-2"></div>
-    <div class="circle circle-3"></div>
-    <div class="circle circle-4"></div>
-    <div class="circle circle-5"></div>
-    <div class="circle circle-6"></div>
-  </div>
-
+  <div id="backgroundContainer"></div>
   <div id="app"></div>
   <div id="ar-overlay"></div>
 
   <!-- spinner -->
   <script src="/utils/loader/loader.js"></script>
-
   <!-- launch -->
   <script>
     var iOS;
     window.addEventListener('vlaunch-initialized', (event) => {
-      console.log("vlaunch url:", event.detail.launchUrl)
-      if (event.detail.launchRequired) {
-        // //We need to use launch to get WebXR as we're on iOS
-        // window.location.href = event.detail.launchUrl
-        iOS = true;
-
-      }
-      else {
-        iOS = false;
-      }
+      console.log("aaaaa")
+      iOS = event.detail.launchRequired ? true : false
+      console.log(iOS)
     })
   </script>
-
   <script type="module" src="/index.jsx"></script>
-
 </body>
 
 </html>

@@ -99,7 +99,7 @@ class ARButton {
         // Dispatch custom event
         document.dispatchEvent(new CustomEvent('arButtonClicked'));
 
-        new Audio('/sounds/smallClick.mp3').play();
+        new Audio('./sounds/smallClick.mp3').play();
       };
     }
 
