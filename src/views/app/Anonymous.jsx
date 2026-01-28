@@ -36,7 +36,7 @@ const Welcome = (props) => {
         reverse: {
             background: "var(--color-accent)",
             color: "var(--color-background)",
-            orderColor: "var(--color-background)",
+            borderColor: "var(--color-background)",
             activeBackground: "var(--color-background)",
             activeColor: "var(--color-accent)",
             activeBorderColor: "var(--color-background)",
@@ -44,9 +44,36 @@ const Welcome = (props) => {
     }
 
     // setup ARButton theme (here, NOT onMount!!!)
-    let ARButtonTheme
-    const newTheme = props.cover?.ARButton?.theme ?? "default"
-    ARButtonTheme = ArButtonThemes[newTheme]
+    let ARButtonTheme = {}
+
+    if (props.cover?.ARButton?.customTheme) {
+        // console.log(props.cover.ARButton.customTheme)
+        ARButtonTheme.background =
+            props.cover.ARButton.customTheme.background,
+            ARButtonTheme.color = props.cover.ARButton.customTheme.color,
+            ARButtonTheme.activeBackground =
+                props.cover.ARButton.customTheme.activeBackground,
+            ARButtonTheme.activeColor =
+                props.cover.ARButton.customTheme.activeColor
+    }
+
+    // const newTheme = props.cover?.ARButton?.theme ?? "default"
+    // console.log(newTheme)
+    // if (newTheme === "custom") {
+    //     console.log("ADESSO:.....")
+    //     ;((ARButtonTheme.background = ""),
+    //         (ARButtonTheme.color = ""),
+    //         (ARButtonTheme.activeBackground = ""),
+    //         (ARButtonTheme.activeColor = ""))
+    // }
+    else {
+        ARButtonTheme =
+            ArButtonThemes[props.cover?.ARButton?.theme ?? "default"]
+    }
+
+    console.log("***************************")
+    console.log(ARButtonTheme)
+    console.log("***************************")
 
     const handleARButtonClick = (e) => {
         // Store the custom colors
@@ -187,13 +214,33 @@ const Welcome = (props) => {
     const Spacer = styled("div")`
         flex: 1;
     `
-    const TitleStyled = styled(Title)`
+    // const TitleStyled = styled(Title)`
+    //     width: 80%;
+    //     margin-top: 0.5rem;
+    // `
+
+    const TitleStyled = styled(Motion.p)`
+        font-size: 2.4rem;
+        font-family: "SebinoSoftMedium";
+        /* letter-spacing: 0.08rem; */
+        line-height: 120%;
+        color: ${(props) => props.color ?? "var(--color-primary)"};
+        margin: 0;
         width: 80%;
-        margin-top: 0.5rem;
     `
-    const SubTitleStyled = styled(SubTitle)`
+
+    // const SubTitleStyled = styled(SubTitle)`
+    //     width: 90%;
+    //     margin-top: 0.5rem;
+    // `
+
+    const SubTitleStyled = styled(Motion.p)`
+        font-size: 1.3rem;
+        font-family: "SebinoSoftMedium";
+        line-height: 130%;
+        color: ${(props) => props.color ?? "var(--color-secondary)"};
+        margin: 0;
         width: 90%;
-        margin-top: 0.5rem;
     `
 
     const ArButtonStyled = styled(Motion.div)`
@@ -260,9 +307,10 @@ const Welcome = (props) => {
                 {/* TITLE */}
                 <TitleStyled
                     id="title"
-                    color={
-                        props.cover?.color?.primary ?? "var(--color-primary)"
-                    }
+                    // color={
+                    //     props.cover?.color?.primary ?? "var(--color-primary)"
+                    // }
+                    color={props.cover?.color?.primary}
                     animate={{ opacity: [0, 1] }}
                     transition={{
                         duration: enterDuration,
@@ -276,10 +324,11 @@ const Welcome = (props) => {
                 {/* SUBTITLE */}
                 <SubTitleStyled
                     id="subtitle"
-                    color={
-                        props.cover?.color?.secondary ??
-                        "var(--color-secondary)"
-                    }
+                    // color={
+                    //     props.cover?.color?.secondary ??
+                    //     "var(--color-secondary)"
+                    // }
+                    color={props.cover?.color?.secondary}
                     animate={{ opacity: [0, 1] }}
                     transition={{
                         duration: enterDuration,
@@ -337,8 +386,10 @@ const Unavailable = () => {
             Spiacenti, l'esperienza AR che stai cercando non è più disponibile.
             <br></br>
             <br></br>
-            Verifica il link o contatta chi ti ha condiviso questa esperienza
-            per ottenere un nuovo collegamento.
+            <span style={{ color: "var(--color-secondary)" }}>
+                Verifica il link o contatta chi ti ha condiviso questa
+                esperienza per ottenere un nuovo collegamento.
+            </span>
         </Message>
     )
 }

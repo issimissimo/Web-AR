@@ -71,7 +71,7 @@ export default function placeCustomModel(props) {
         let remoteFileList = await firebase.storage.listFiles(path)
 
         remoteFileList = remoteFileList.filter(
-            (file) => file.name && file.name.endsWith(fileExtension)
+            (file) => file.name && file.name.endsWith(fileExtension),
         )
 
         // create list
@@ -184,7 +184,7 @@ export default function placeCustomModel(props) {
                     }
                 }
             })()
-        })
+        }),
     )
 
     const handleCloseInstructions = () => {
@@ -406,7 +406,7 @@ export default function placeCustomModel(props) {
                 blur: 2,
                 animate: false,
                 updateFrequency: 2,
-            }
+            },
         )
 
         clippingReveal = new ClippingReveal(model, SceneManager.renderer, {
@@ -467,8 +467,8 @@ export default function placeCustomModel(props) {
                     handleReticle()
                     handleBlurredCover()
                 }
-            }
-        )
+            },
+        ),
     )
 
     //region RENDER
@@ -580,7 +580,7 @@ export default function placeCustomModel(props) {
                     <ItemListContainer>
                         {fileList
                             ?.filter(
-                                (file) => file.fileName !== currentFileName()
+                                (file) => file.fileName !== currentFileName(),
                             )
                             .map((file) => (
                                 <FileItemContainer
@@ -606,36 +606,38 @@ export default function placeCustomModel(props) {
     const View = () => {
         return (
             <>
-                <Container>
-                    <SliderContainer data-interactive>
-                        <ButtonCircle
-                            onClick={setShowPresetList(!showPresetList())}
-                            border={false}
-                            theme={"dark"}
-                            active={variantsPresets()}
-                        >
-                            <Fa
-                                icon={faEllipsisVertical}
-                                size="1x"
-                                class="icon"
-                            />
-                        </ButtonCircle>
+                <Show when={!showInstructions()} id="Show">
+                    <Container id="Container">
+                        <SliderContainer data-interactive>
+                            <ButtonCircle
+                                onClick={setShowPresetList(!showPresetList())}
+                                border={false}
+                                theme={"dark"}
+                                active={variantsPresets()}
+                            >
+                                <Fa
+                                    icon={faEllipsisVertical}
+                                    size="1x"
+                                    class="icon"
+                                />
+                            </ButtonCircle>
 
-                        <FilePicker />
+                            <FilePicker />
 
-                        <ButtonCircle
-                            onClick={setShowFileList(!showFileList())}
-                            border={false}
-                            theme={"dark"}
-                            active={game.appMode === "save"}
-                        >
-                            <Fa icon={faListUl} size="1x" class="icon" />
-                        </ButtonCircle>
-                    </SliderContainer>
-                </Container>
+                            <ButtonCircle
+                                onClick={setShowFileList(!showFileList())}
+                                border={false}
+                                theme={"dark"}
+                                active={game.appMode === "save"}
+                            >
+                                <Fa icon={faListUl} size="1x" class="icon" />
+                            </ButtonCircle>
+                        </SliderContainer>
+                    </Container>
+                </Show>
 
                 <Show when={showInstructions()}>
-                    <InstructionsContainer>
+                    <InstructionsContainer id="InstructionsContainer">
                         <Instructions />
                     </InstructionsContainer>
                 </Show>

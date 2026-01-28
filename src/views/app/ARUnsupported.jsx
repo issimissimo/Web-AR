@@ -3,12 +3,8 @@ import { styled } from "solid-styled-components"
 import { Motion } from "solid-motionone"
 import { faSadCry, faExclamation } from "@fortawesome/free-solid-svg-icons"
 import { init } from "@hooks/useQRCode"
-
 import { Centered } from "@components/smallElements"
-import { SubTitle } from "@components/smallElements"
-import Message from "@components/Message"
 import Fa from "solid-fa"
-
 import isMobile from "@tools/mobileCheck"
 import whichBrowser from "@tools/browserDetect"
 

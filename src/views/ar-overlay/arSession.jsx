@@ -122,11 +122,16 @@ export default function ArSession(props) {
         handleBlurredCover({ visible: true })
 
         // ...and Starting the Reticle, to detect the space around us.
-        Reticle.setup(Reticle.MESH_TYPE.RINGS, {
+        // Reticle.setup(Reticle.MESH_TYPE.RINGS, {
+        //     size: 0.4,
+        //     ringNumber: 4,
+        //     ringThickness: 0.2,
+        //     color: 0xf472b6,
+        // })
+        Reticle.setup(Reticle.MESH_TYPE.PLANE, {
             size: 0.4,
-            ringNumber: 4,
-            ringThickness: 0.2,
-            color: 0xf472b6,
+            texturePath: "images/reticle_v2.png",
+            color: 0xffffff,
         })
 
         // When reopening the ARSession it seem to stay "true"...

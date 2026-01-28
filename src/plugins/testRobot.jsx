@@ -20,9 +20,9 @@ export default function testRobot(props) {
     let loadedModel, shadows, audioRobot, clippingReveal, robotGlb
 
     const handleCloseInstructions = () => {
-        setShowInstructions(false);
-        handleReticle();
-        handleBlurredCover();
+        setShowInstructions(false)
+        handleReticle()
+        handleBlurredCover()
     }
 
     const handleUndo = () => {
@@ -31,11 +31,11 @@ export default function testRobot(props) {
         if (shadows) shadows.dispose()
         if (audioRobot) audioRobot.stop()
         if (clippingReveal) clippingReveal.dispose()
-        robotGlb.resetAnimations();
+        robotGlb.resetAnimations()
 
-        game.removePreviousFromScene();
-        setSpawned(false);
-        handleReticle();
+        game.removePreviousFromScene()
+        setSpawned(false)
+        handleReticle()
     }
 
     /*
@@ -54,7 +54,7 @@ export default function testRobot(props) {
                 const hitMatrix = Reticle.getHitMatrix()
                 spawnModel(hitMatrix)
                 setSpawned(true)
-                handleReticle();
+                handleReticle()
             }
         },
 
@@ -77,12 +77,11 @@ export default function testRobot(props) {
      * On mount
      */
     onMount(async () => {
-
         const aoTexture = await new LoadTexture(
             "models/demo/Comau_RACER3/Comau_RACER3.jpg",
             {
                 flipY: false,
-            }
+            },
         )
 
         robotGlb = await new GLBFile(
@@ -90,7 +89,7 @@ export default function testRobot(props) {
             {
                 aoMap: aoTexture,
                 aoMapIntensity: 1.4,
-            }
+            },
         )
 
         loadedModel = robotGlb.model
@@ -101,7 +100,7 @@ export default function testRobot(props) {
             {
                 volume: 2,
                 loop: true,
-            }
+            },
         )
 
         /*
@@ -110,25 +109,27 @@ export default function testRobot(props) {
         game.setInitialized()
     })
 
-
-
     //region RETICLE AND BLURRED COVER
 
     const handleReticle = () => {
         if (showInstructions() || spawned()) {
-            Reticle.setEnabled(false);
-        }
-        else {
-            Reticle.setup(Reticle.MESH_TYPE.RINGS, {
+            Reticle.setEnabled(false)
+        } else {
+            // Reticle.setup(Reticle.MESH_TYPE.RINGS, {
+            //     size: 0.4,
+            //     ringNumber: 4,
+            //     ringThickness: 0.2,
+            //     color: 0xf472b6,
+            // });
+            Reticle.setup(Reticle.MESH_TYPE.PLANE, {
                 size: 0.4,
-                ringNumber: 4,
-                ringThickness: 0.2,
-                color: 0xf472b6,
-            });
+                texturePath: "images/reticle_v2.png",
+                color: 0xffffff,
+            })
             Reticle.setSurfType(Reticle.SURF_TYPE_MODE.FLOOR)
             Reticle.setVisible(true)
         }
-    };
+    }
 
     const handleBlurredCover = () => {
         if (showInstructions()) {
@@ -137,13 +138,12 @@ export default function testRobot(props) {
                 showHole: false,
                 priority: 999,
             })
-        }
-        else {
+        } else {
             game.handleBlurredCover({
                 visible: false,
             })
         }
-    };
+    }
 
     createEffect(
         on(
@@ -151,14 +151,15 @@ export default function testRobot(props) {
             ([enabled, selected]) => {
                 if (
                     (game.appMode === "load" &&
-                        enabled && game.gameDetails.interactable) ||
+                        enabled &&
+                        game.gameDetails.interactable) ||
                     (game.appMode === "save" && selected)
                 ) {
-                    handleReticle();
-                    handleBlurredCover();
+                    handleReticle()
+                    handleBlurredCover()
                 }
-            }
-        )
+            },
+        ),
     )
 
     //region RENDER
@@ -218,9 +219,6 @@ export default function testRobot(props) {
     // Delegate mounting to the shared game hook
     game.mountView(renderView)
 
-
-
-    
     //region FUNCTIONS
 
     function spawnModel(matrix) {
@@ -250,7 +248,7 @@ export default function testRobot(props) {
                 blur: 2,
                 animate: true,
                 updateFrequency: 2,
-            }
+            },
         )
 
         clippingReveal = new ClippingReveal(
@@ -266,7 +264,7 @@ export default function testRobot(props) {
                 startDelay: 200,
                 fadeOutDuration: 2,
                 onComplete: () => console.log("Reveal completed"),
-            }
+            },
         )
     }
 }

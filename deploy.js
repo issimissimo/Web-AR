@@ -27,12 +27,82 @@ const FTP_CONFIG = {
 const VERSION = packageJson.version;
 const DIST_FOLDER = './build';
 const REMOTE_BASE = '/issimissimo.com/public_html/prod/AR-Web'; // Percorso base sul server FTP
+const INDEX_HTML_PATH = path.join(__dirname, 'src', 'index.html'); // Percorso del file index.html
 
 // Verifica se è un deploy in staging
 const IS_STAGING = process.argv.includes('--staging');
 
 // ============================================
-// FUNZIONI HELPER
+// FUNZIONI HELPER PER GESTIONE LAUNCHAR SCRIPT
+// ============================================
+
+/**
+ * Pattern per trovare lo script launchar (sia commentato che non)
+ */
+const LAUNCHAR_PATTERN = /(\s*)(<!--\s*)?(<script src="https:\/\/launchar\.app\/sdk\/v1\?key=[^"]+"><\/script>)(\s*-->)?/;
+
+/**
+ * Uncommenta lo script launchar nel file index.html
+ * @returns {string|null} Il contenuto originale del file, o null se non trovato
+ */
+function uncommentLauncharScript() {
+  try {
+    if (!fs.existsSync(INDEX_HTML_PATH)) {
+      console.warn(`⚠️  File index.html non trovato in: ${INDEX_HTML_PATH}`);
+      return null;
+    }
+
+    const originalContent = fs.readFileSync(INDEX_HTML_PATH, 'utf8');
+    
+    // Verifica se lo script è presente
+    if (!LAUNCHAR_PATTERN.test(originalContent)) {
+      console.warn('⚠️  Script launchar non trovato in index.html');
+      return null;
+    }
+
+    // Uncommenta lo script
+    const uncommentedContent = originalContent.replace(
+      LAUNCHAR_PATTERN,
+      '$1$3' // Mantiene l'indentazione ($1) e lo script ($3), rimuove i commenti
+    );
+
+    // Verifica che sia cambiato qualcosa
+    if (originalContent === uncommentedContent) {
+      console.log('ℹ️  Script launchar era già uncommentato');
+      return originalContent; // Restituiamo comunque il contenuto per sicurezza
+    }
+
+    // Salva la versione uncommentata
+    fs.writeFileSync(INDEX_HTML_PATH, uncommentedContent, 'utf8');
+    console.log('✓ Script launchar uncommentato per il deploy');
+    
+    return originalContent;
+  } catch (err) {
+    console.error('❌ Errore durante uncomment dello script:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Ripristina il contenuto originale del file index.html
+ * @param {string} originalContent - Il contenuto originale da ripristinare
+ */
+function restoreIndexHtml(originalContent) {
+  try {
+    if (!originalContent) {
+      console.warn('⚠️  Nessun contenuto da ripristinare');
+      return;
+    }
+
+    fs.writeFileSync(INDEX_HTML_PATH, originalContent, 'utf8');
+    console.log('✓ File index.html ripristinato allo stato originale');
+  } catch (err) {
+    console.error('❌ Errore durante il ripristino di index.html:', err.message);
+  }
+}
+
+// ============================================
+// FUNZIONI HELPER FTP
 // ============================================
 
 /**
@@ -107,15 +177,27 @@ async function deploy() {
   const deployType = IS_STAGING ? 'STAGING' : 'PRODUZIONE';
   const deployTypeEmoji = IS_STAGING ? '🧪' : '🚀';
   
+  let originalIndexContent = null;
+
   console.log('╔═══════════════════════════════════════════╗');
   console.log(`║  ${deployTypeEmoji} Deploy ${deployType} v${VERSION.padEnd(18)} ║`);
   console.log('╚═══════════════════════════════════════════╝\n');
 
   try {
+    // STEP 0: Uncommenta lo script launchar
+    console.log('🔧 Step 0/3: Preparazione index.html...');
+    originalIndexContent = uncommentLauncharScript();
+    console.log('');
+
     // STEP 1: Build
     console.log('📦 Step 1/3: Building...');
     execSync('npm run build', { stdio: 'inherit' });
     console.log('✓ Build completata\n');
+
+    // STEP 1.5: Ripristina immediatamente index.html
+    console.log('🔄 Ripristino index.html...');
+    restoreIndexHtml(originalIndexContent);
+    console.log('');
 
     // Verifica che la cartella dist esista
     if (!fs.existsSync(DIST_FOLDER)) {
@@ -174,6 +256,13 @@ async function deploy() {
 
   } catch (err) {
     console.error('\n❌ Errore durante il deploy:', err.message);
+    
+    // In caso di errore, assicurati di ripristinare index.html
+    if (originalIndexContent) {
+      console.log('\n🔄 Ripristino index.html dopo errore...');
+      restoreIndexHtml(originalIndexContent);
+    }
+    
     process.exit(1);
   }
 }
