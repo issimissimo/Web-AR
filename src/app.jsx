@@ -181,8 +181,8 @@ export default function App() {
                     // update last user login timestamp
                     const userId = firebase.auth.user().uid
                     await firebase.auth.updateLoginTimestamp(userId)
+                    goToMarkerList()
                 }
-                goToMarkerList()
             }
         } else {
             goToLogin()

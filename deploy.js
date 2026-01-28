@@ -108,9 +108,10 @@ function restoreIndexHtml(originalContent) {
 
 /**
  * Modifica appConfig.json impostando i parametri debug a false
+ * @param {boolean} isProduction - Se true, imposta anche production: true
  * @returns {string|null} Il contenuto originale del file, o null se non trovato
  */
-function setProductionConfig() {
+function setProductionConfig(isProduction = false) {
   try {
     if (!fs.existsSync(APP_CONFIG_PATH)) {
       console.warn(`⚠️  File appConfig.json non trovato in: ${APP_CONFIG_PATH}`);
@@ -129,10 +130,11 @@ function setProductionConfig() {
     }
 
     // Verifica se ci sono modifiche da fare
-    const needsChange = config.debugOnDesktop !== false || config.debugLoadMode !== false;
+    const needsDebugChange = config.debugOnDesktop !== false || config.debugLoadMode !== false;
+    const needsProductionChange = isProduction && config.production !== true;
     
-    if (!needsChange) {
-      console.log('ℹ️  appConfig.json ha già i valori corretti per produzione');
+    if (!needsDebugChange && !needsProductionChange) {
+      console.log('ℹ️  appConfig.json ha già i valori corretti');
       return originalContent; // Restituiamo comunque il contenuto per sicurezza
     }
 
@@ -141,8 +143,10 @@ function setProductionConfig() {
     productionConfig.debugOnDesktop = false;
     productionConfig.debugLoadMode = false;
     
-    // Opzionalmente, puoi anche forzare production: true
-    // productionConfig.production = true;
+    // Se è un deploy di produzione (non staging), imposta anche production: true
+    if (isProduction) {
+      productionConfig.production = true;
+    }
 
     // Converti in JSON con formattazione leggibile (2 spazi di indentazione)
     const productionContent = JSON.stringify(productionConfig, null, 2);
@@ -150,9 +154,12 @@ function setProductionConfig() {
     // Salva la versione di produzione
     fs.writeFileSync(APP_CONFIG_PATH, productionContent, 'utf8');
     
-    console.log('✓ appConfig.json configurato per produzione:');
+    console.log('✓ appConfig.json configurato:');
     console.log('  • debugOnDesktop: false');
     console.log('  • debugLoadMode: false');
+    if (isProduction) {
+      console.log('  • production: true');
+    }
     
     return originalContent;
   } catch (err) {
@@ -263,14 +270,14 @@ async function deploy() {
   console.log('╚═══════════════════════════════════════════╝\n');
 
   try {
-    // STEP 0: Preparazione file per produzione
-    console.log('🔧 Step 0/3: Preparazione file per produzione...');
+    // STEP 0: Preparazione file per deploy
+    console.log(`🔧 Step 0/3: Preparazione file per ${deployType.toLowerCase()}...`);
     
     // Uncommenta script launchar
     originalIndexContent = uncommentLauncharScript();
     
-    // Imposta configurazione di produzione
-    originalAppConfigContent = setProductionConfig();
+    // Imposta configurazione (con production:true solo per PRODUZIONE, non per staging)
+    originalAppConfigContent = setProductionConfig(!IS_STAGING);
     
     console.log('');
 

@@ -10,7 +10,8 @@ let appConfig = {
   debugLoadMode: false,
   debugUserId: null,
   debugMarkerId: null,
-  minimumFPS: 10
+  minimumFPS: 10,
+  ui: null
 };
 
 
