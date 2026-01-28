@@ -1,6 +1,6 @@
 // **************************************
 // * DON'T MODIFY THIS FILE!!!
-// * USE "appConfig.json" INSTEAD
+// * please use "appConfig.json" in "public" folder instead
 // **************************************
 
 // default values (don't modify!)

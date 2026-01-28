@@ -28,6 +28,7 @@ const VERSION = packageJson.version;
 const DIST_FOLDER = './build';
 const REMOTE_BASE = '/issimissimo.com/public_html/prod/AR-Web'; // Percorso base sul server FTP
 const INDEX_HTML_PATH = path.join(__dirname, 'src', 'index.html'); // Percorso del file index.html
+const APP_CONFIG_PATH = path.join(__dirname, 'public', 'appConfig.json'); // Percorso del file appConfig.json
 
 // Verifica se è un deploy in staging
 const IS_STAGING = process.argv.includes('--staging');
@@ -90,7 +91,7 @@ function uncommentLauncharScript() {
 function restoreIndexHtml(originalContent) {
   try {
     if (!originalContent) {
-      console.warn('⚠️  Nessun contenuto da ripristinare');
+      console.warn('⚠️  Nessun contenuto index.html da ripristinare');
       return;
     }
 
@@ -98,6 +99,83 @@ function restoreIndexHtml(originalContent) {
     console.log('✓ File index.html ripristinato allo stato originale');
   } catch (err) {
     console.error('❌ Errore durante il ripristino di index.html:', err.message);
+  }
+}
+
+// ============================================
+// FUNZIONI HELPER PER GESTIONE APPCONFIG.JSON
+// ============================================
+
+/**
+ * Modifica appConfig.json impostando i parametri debug a false
+ * @returns {string|null} Il contenuto originale del file, o null se non trovato
+ */
+function setProductionConfig() {
+  try {
+    if (!fs.existsSync(APP_CONFIG_PATH)) {
+      console.warn(`⚠️  File appConfig.json non trovato in: ${APP_CONFIG_PATH}`);
+      return null;
+    }
+
+    const originalContent = fs.readFileSync(APP_CONFIG_PATH, 'utf8');
+    
+    // Parse del JSON
+    let config;
+    try {
+      config = JSON.parse(originalContent);
+    } catch (parseErr) {
+      console.error('❌ Errore nel parsing di appConfig.json:', parseErr.message);
+      return null;
+    }
+
+    // Verifica se ci sono modifiche da fare
+    const needsChange = config.debugOnDesktop !== false || config.debugLoadMode !== false;
+    
+    if (!needsChange) {
+      console.log('ℹ️  appConfig.json ha già i valori corretti per produzione');
+      return originalContent; // Restituiamo comunque il contenuto per sicurezza
+    }
+
+    // Crea una copia della config e modifica solo i campi necessari
+    const productionConfig = { ...config };
+    productionConfig.debugOnDesktop = false;
+    productionConfig.debugLoadMode = false;
+    
+    // Opzionalmente, puoi anche forzare production: true
+    // productionConfig.production = true;
+
+    // Converti in JSON con formattazione leggibile (2 spazi di indentazione)
+    const productionContent = JSON.stringify(productionConfig, null, 2);
+
+    // Salva la versione di produzione
+    fs.writeFileSync(APP_CONFIG_PATH, productionContent, 'utf8');
+    
+    console.log('✓ appConfig.json configurato per produzione:');
+    console.log('  • debugOnDesktop: false');
+    console.log('  • debugLoadMode: false');
+    
+    return originalContent;
+  } catch (err) {
+    console.error('❌ Errore durante modifica di appConfig.json:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Ripristina il contenuto originale del file appConfig.json
+ * @param {string} originalContent - Il contenuto originale da ripristinare
+ */
+function restoreAppConfig(originalContent) {
+  try {
+    if (!originalContent) {
+      console.warn('⚠️  Nessun contenuto appConfig.json da ripristinare');
+      return;
+    }
+
+    fs.writeFileSync(APP_CONFIG_PATH, originalContent, 'utf8');
+    console.log('✓ File appConfig.json ripristinato allo stato originale');
+  } catch (err) {
+    console.error('❌ Errore durante il ripristino di appConfig.json:', err.message);
   }
 }
 
@@ -178,15 +256,22 @@ async function deploy() {
   const deployTypeEmoji = IS_STAGING ? '🧪' : '🚀';
   
   let originalIndexContent = null;
+  let originalAppConfigContent = null;
 
   console.log('╔═══════════════════════════════════════════╗');
   console.log(`║  ${deployTypeEmoji} Deploy ${deployType} v${VERSION.padEnd(18)} ║`);
   console.log('╚═══════════════════════════════════════════╝\n');
 
   try {
-    // STEP 0: Uncommenta lo script launchar
-    console.log('🔧 Step 0/3: Preparazione index.html...');
+    // STEP 0: Preparazione file per produzione
+    console.log('🔧 Step 0/3: Preparazione file per produzione...');
+    
+    // Uncommenta script launchar
     originalIndexContent = uncommentLauncharScript();
+    
+    // Imposta configurazione di produzione
+    originalAppConfigContent = setProductionConfig();
+    
     console.log('');
 
     // STEP 1: Build
@@ -194,9 +279,10 @@ async function deploy() {
     execSync('npm run build', { stdio: 'inherit' });
     console.log('✓ Build completata\n');
 
-    // STEP 1.5: Ripristina immediatamente index.html
-    console.log('🔄 Ripristino index.html...');
+    // STEP 1.5: Ripristina immediatamente i file originali
+    console.log('🔄 Ripristino file di sviluppo...');
     restoreIndexHtml(originalIndexContent);
+    restoreAppConfig(originalAppConfigContent);
     console.log('');
 
     // Verifica che la cartella dist esista
@@ -257,10 +343,15 @@ async function deploy() {
   } catch (err) {
     console.error('\n❌ Errore durante il deploy:', err.message);
     
-    // In caso di errore, assicurati di ripristinare index.html
-    if (originalIndexContent) {
-      console.log('\n🔄 Ripristino index.html dopo errore...');
-      restoreIndexHtml(originalIndexContent);
+    // In caso di errore, assicurati di ripristinare i file originali
+    if (originalIndexContent || originalAppConfigContent) {
+      console.log('\n🔄 Ripristino file dopo errore...');
+      if (originalIndexContent) {
+        restoreIndexHtml(originalIndexContent);
+      }
+      if (originalAppConfigContent) {
+        restoreAppConfig(originalAppConfigContent);
+      }
     }
     
     process.exit(1);
